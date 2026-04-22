@@ -6,6 +6,9 @@
 	const pool = $derived(m.cartesia_pool ?? []);
 	const models = $derived(m.llm_models ?? []);
 
+	// Tab state
+	let activeTab = $state<'system' | 'llm' | 'tts' | 'tiktok'>('system');
+
 	// LLM tier editable state — synced from metrics on first load
 	type TierEdit = { model: string; api_base: string; api_key: string };
 	let tierEdits = $state<Record<string, TierEdit>>({});
@@ -143,6 +146,56 @@
 		<TestButton command="reload_env" label="Reload .env" variant="secondary" size="sm" />
 	</div>
 
+	<!-- Tab Navigation -->
+	<div class="border-b border-border">
+		<nav class="flex gap-1">
+			<button
+				onclick={() => activeTab = 'system'}
+				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
+					{activeTab === 'system' 
+						? 'border-accent text-accent' 
+						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
+			>
+				⚙️ System & Runtime
+			</button>
+			<button
+				onclick={() => activeTab = 'llm'}
+				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
+					{activeTab === 'llm' 
+						? 'border-accent text-accent' 
+						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
+			>
+				🤖 LLM & AI
+			</button>
+			<button
+				onclick={() => activeTab = 'tts'}
+				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
+					{activeTab === 'tts' 
+						? 'border-accent text-accent' 
+						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
+			>
+				🔊 TTS & Audio
+			</button>
+			<button
+				onclick={() => activeTab = 'tiktok'}
+				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
+					{activeTab === 'tiktok' 
+						? 'border-accent text-accent' 
+						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
+			>
+				📱 TikTok
+			</button>
+		</nav>
+	</div>
+
+	<!-- Tab Content -->
+	<div class="space-y-6">
+
+	{#if activeTab === 'system'}
+	<!-- ============================================ -->
+	<!-- TAB 1: SYSTEM & RUNTIME -->
+	<!-- ============================================ -->
+
 	<!-- Runtime toggles -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
 		<h3 class="text-lg font-semibold mb-4">
@@ -184,6 +237,27 @@
 			<TestButton command="test_ffplay" label="Probe" />
 		</div>
 	</section>
+
+	<!-- === P3 · Budget === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Daily Budget (IDR)</h3>
+		<div class="flex gap-2">
+			<input
+				type="number"
+				bind:value={budgetIdr}
+				min="0"
+				max="10000000"
+				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+			/>
+			<TestButton command="set_budget_idr" params={{ value: budgetIdr }} label="Save" />
+		</div>
+		<p class="text-xs text-text-secondary mt-2">Current usage: Rp {m.cost_idr ?? 0} / Rp {m.budget_idr ?? budgetIdr}</p>
+	</section>
+
+	{:else if activeTab === 'llm'}
+	<!-- ============================================ -->
+	<!-- TAB 2: LLM & AI -->
+	<!-- ============================================ -->
 
 	<!-- 9router -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
@@ -359,87 +433,7 @@
 		{/if}
 	</section>
 
-	<!-- Cartesia pool -->
-	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<div class="flex items-center justify-between mb-4">
-			<h3 class="text-lg font-semibold">Cartesia TTS Pool ({pool.length} key)</h3>
-			<TestButton command="test_cartesia_all" label="Test semua key" />
-		</div>
-		{#if pool.length === 0}
-			<p class="text-text-secondary text-sm">No keys configured. Set CARTESIA_API_KEYS=key1,key2,... di .env.</p>
-		{:else}
-			<div class="space-y-2">
-				{#each pool as slot, i}
-					<div class="flex items-center justify-between p-3 bg-bg-elevated rounded">
-						<div>
-							<div class="font-mono text-sm">{slot.key}</div>
-							<div class="text-xs text-text-secondary">
-								{slot.calls} calls · {slot.errors} errors
-								{#if slot.exhausted} · <span class="text-error">⏳ {Math.floor(slot.cooldown_s / 3600)}h cooldown</span>{/if}
-							</div>
-						</div>
-						<TestButton command="test_cartesia_key" params={{ key_index: i }} label="Test" size="sm" />
-					</div>
-				{/each}
-			</div>
-		{/if}
-	</section>
-
-	<!-- Edge-TTS + Voice out -->
-	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">TTS Output</h3>
-		<div class="space-y-3">
-			<div class="flex items-center justify-between p-3 bg-bg-elevated rounded">
-				<div>
-					<div class="font-medium">Edge-TTS fallback (id-ID-ArdiNeural)</div>
-					<div class="text-xs text-text-secondary">Synth tanpa play — validasi Azure reachability</div>
-				</div>
-				<TestButton command="test_edge_tts" label="Test synth" />
-			</div>
-			<div class="p-3 bg-bg-elevated rounded">
-				<div class="font-medium mb-2">Voice Output (end-to-end, keluar suara)</div>
-				<div class="flex gap-2 mb-2">
-					<input
-						bind:value={ttsTestText}
-						class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
-						placeholder="Text untuk disintesis & diputar"
-					/>
-					<select
-						bind:value={ttsTestEmotion}
-						class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
-						title="Emotion (Cartesia Sonic-3 only)"
-					>
-						<option value="neutral">😐 neutral</option>
-						<option value="happy">😊 happy</option>
-						<option value="sad">😢 sad</option>
-						<option value="angry">😠 angry</option>
-						<option value="dramatic">🎭 dramatic</option>
-						<option value="comedic">😄 comedic</option>
-					</select>
-					<TestButton command="test_tts_voice_out" params={{ text: ttsTestText, emotion: ttsTestEmotion }} label="Speak" />
-				</div>
-				<div class="text-xs text-text-secondary">Suara keluar di default audio device (atau VB-CABLE kalau sudah di-route). Emotion hanya berlaku untuk Cartesia Sonic-3.</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- TikTok -->
-	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">TikTok Connection</h3>
-		<div class="p-3 bg-bg-elevated rounded">
-			<div class="flex gap-2">
-				<input
-					bind:value={tiktokTestUsername}
-					class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm font-mono"
-					placeholder="username (tanpa @) — kosong = pakai TIKTOK_USERNAME dari .env"
-				/>
-				<TestButton command="test_tiktok_conn" params={{ username: tiktokTestUsername }} label="Check live" />
-			</div>
-			<div class="text-xs text-text-secondary mt-1">Verify akun live atau offline (read-only, no ban risk)</div>
-		</div>
-	</section>
-
-	<!-- Guardrail -->
+	<!-- Guardrail Test -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
 		<h3 class="text-lg font-semibold mb-4">Guardrail Test</h3>
 		<div class="p-3 bg-bg-elevated rounded space-y-2">
@@ -457,90 +451,6 @@
 				<TestButton command="test_guardrail" params={{ user: guardrailTestUser, text: guardrailTestText }} label="Check" />
 			</div>
 			<div class="text-xs text-text-secondary">Verify filter regex + rate limit + dedup sebelum go-live</div>
-		</div>
-	</section>
-
-	<!-- === P3 · Cartesia Voice Config === -->
-	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">Cartesia Voice Config</h3>
-		<div class="space-y-3">
-			<div class="grid grid-cols-2 gap-3">
-				<div>
-					<label class="text-xs text-text-secondary">Voice ID (UUID)</label>
-					<input
-						bind:value={cartesiaVoiceId}
-						class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
-						placeholder="280171e4-eeb5-4d26-862e-bb6a072beef7"
-					/>
-				</div>
-				<div>
-					<label class="text-xs text-text-secondary">Model</label>
-					<select bind:value={cartesiaModel} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
-						<option value="sonic-3">sonic-3 (latest)</option>
-						<option value="sonic-2">sonic-2</option>
-						<option value="sonic-english">sonic-english</option>
-					</select>
-				</div>
-			</div>
-			<div>
-				<label class="text-xs text-text-secondary">Default Emotion (dipakai saat reply live)</label>
-				<select bind:value={cartesiaDefaultEmotion} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
-					<option value="neutral">😐 neutral</option>
-					<option value="happy">😊 happy</option>
-					<option value="comedic">😄 comedic</option>
-					<option value="dramatic">🎭 dramatic</option>
-					<option value="sad">😢 sad</option>
-					<option value="angry">😠 angry</option>
-				</select>
-			</div>
-			<button
-				onclick={saveCartesiaConfig}
-				disabled={!wsStore.connected}
-				class="px-4 py-2 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
-			>
-				💾 Save &amp; Apply
-			</button>
-			{#if cartesiaConfigResult}
-				{#if cartesiaConfigResult.ok}
-					<div class="text-xs text-success">✓ Saved + hot-reloaded · backup: {cartesiaConfigResult.result?.persisted ? '.env.bak created' : 'no changes'}</div>
-				{:else}
-					<div class="text-xs text-error">✗ {cartesiaConfigResult.error}</div>
-				{/if}
-			{/if}
-		</div>
-	</section>
-
-	<!-- === P3 · Cartesia Keys CRUD === -->
-	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">Cartesia Key Pool Management</h3>
-		<div class="space-y-2">
-			{#each pool as slot}
-				<div class="flex items-center justify-between p-2 bg-bg-elevated rounded">
-					<span class="font-mono text-sm">{slot.key}</span>
-					<button
-						onclick={() => removeCartesiaKey(slot.key)}
-						disabled={!wsStore.connected}
-						class="px-2 py-0.5 text-xs text-error border border-error/30 rounded hover:bg-error/10 disabled:opacity-40"
-					>
-						Remove
-					</button>
-				</div>
-			{/each}
-			<div class="flex gap-2 pt-2">
-				<input
-					bind:value={newCartesiaKey}
-					placeholder="sk_car_..."
-					class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
-				/>
-				<button
-					onclick={addCartesiaKey}
-					disabled={!wsStore.connected || !newCartesiaKey.startsWith('sk_car_')}
-					class="px-4 py-1.5 bg-accent text-bg-primary rounded text-sm disabled:opacity-40"
-				>
-					+ Add Key
-				</button>
-			</div>
-			<p class="text-xs text-text-secondary">Each key has 24h cooldown after quota exhausted. Pool rotates least-used.</p>
 		</div>
 	</section>
 
@@ -596,38 +506,157 @@
 		</div>
 	</section>
 
-	<!-- === P3 · Budget === -->
+	{:else if activeTab === 'tts'}
+	<!-- ============================================ -->
+	<!-- TAB 3: TTS & AUDIO -->
+	<!-- ============================================ -->
+
+	<!-- === P3 · Cartesia Voice Config === -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">Daily Budget (IDR)</h3>
-		<div class="flex gap-2">
-			<input
-				type="number"
-				bind:value={budgetIdr}
-				min="0"
-				max="10000000"
-				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
-			/>
-			<TestButton command="set_budget_idr" params={{ value: budgetIdr }} label="Save" />
+		<h3 class="text-lg font-semibold mb-4">Cartesia Voice Config</h3>
+		<div class="space-y-3">
+			<div class="grid grid-cols-2 gap-3">
+				<div>
+					<label class="text-xs text-text-secondary">Voice ID (UUID)</label>
+					<input
+						bind:value={cartesiaVoiceId}
+						class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+						placeholder="280171e4-eeb5-4d26-862e-bb6a072beef7"
+					/>
+				</div>
+				<div>
+					<label class="text-xs text-text-secondary">Model</label>
+					<select bind:value={cartesiaModel} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+						<option value="sonic-3">sonic-3 (latest)</option>
+						<option value="sonic-2">sonic-2</option>
+						<option value="sonic-english">sonic-english</option>
+					</select>
+				</div>
+			</div>
+			<div>
+				<label class="text-xs text-text-secondary">Default Emotion (dipakai saat reply live)</label>
+				<select bind:value={cartesiaDefaultEmotion} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+					<option value="neutral">😐 neutral</option>
+					<option value="happy">😊 happy</option>
+					<option value="comedic">😄 comedic</option>
+					<option value="dramatic">🎭 dramatic</option>
+					<option value="sad">😢 sad</option>
+					<option value="angry">😠 angry</option>
+				</select>
+			</div>
+			<button
+				onclick={saveCartesiaConfig}
+				disabled={!wsStore.connected}
+				class="px-4 py-2 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
+			>
+				💾 Save &amp; Apply
+			</button>
+			{#if cartesiaConfigResult}
+				{#if cartesiaConfigResult.ok}
+					<div class="text-xs text-success">✓ Saved + hot-reloaded · backup: {cartesiaConfigResult.result?.persisted ? '.env.bak created' : 'no changes'}</div>
+				{:else}
+					<div class="text-xs text-error">✗ {cartesiaConfigResult.error}</div>
+				{/if}
+			{/if}
 		</div>
-		<p class="text-xs text-text-secondary mt-2">Current usage: Rp {m.cost_idr ?? 0} / Rp {m.budget_idr ?? budgetIdr}</p>
 	</section>
 
-	<!-- === P3 · TikTok Hot-Swap === -->
+	<!-- Cartesia pool -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">TikTok Account (hot-swap)</h3>
-		<div class="flex gap-2">
-			<input
-				bind:value={tiktokHotswapUsername}
-				placeholder="username (tanpa @)"
-				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
-			/>
-			<TestButton command="connect_tiktok" params={{ username: tiktokHotswapUsername }} label="Connect" />
-			<TestButton command="disconnect_tiktok" params={{}} label="Disconnect" variant="secondary" />
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">Cartesia TTS Pool ({pool.length} key)</h3>
+			<TestButton command="test_cartesia_all" label="Test semua key" />
 		</div>
-		<p class="text-xs text-text-secondary mt-2">
-			Status: <b>{m.status ?? 'idle'}</b> · Current: <b>@{m.tiktok_username || '-'}</b>
-			{#if m.tiktok_running} · <span class="text-success">● running</span>{/if}
-		</p>
+		{#if pool.length === 0}
+			<p class="text-text-secondary text-sm">No keys configured. Set CARTESIA_API_KEYS=key1,key2,... di .env.</p>
+		{:else}
+			<div class="space-y-2">
+				{#each pool as slot, i}
+					<div class="flex items-center justify-between p-3 bg-bg-elevated rounded">
+						<div>
+							<div class="font-mono text-sm">{slot.key}</div>
+							<div class="text-xs text-text-secondary">
+								{slot.calls} calls · {slot.errors} errors
+								{#if slot.exhausted} · <span class="text-error">⏳ {Math.floor(slot.cooldown_s / 3600)}h cooldown</span>{/if}
+							</div>
+						</div>
+						<TestButton command="test_cartesia_key" params={{ key_index: i }} label="Test" size="sm" />
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</section>
+
+	<!-- === P3 · Cartesia Keys CRUD === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Cartesia Key Pool Management</h3>
+		<div class="space-y-2">
+			{#each pool as slot}
+				<div class="flex items-center justify-between p-2 bg-bg-elevated rounded">
+					<span class="font-mono text-sm">{slot.key}</span>
+					<button
+						onclick={() => removeCartesiaKey(slot.key)}
+						disabled={!wsStore.connected}
+						class="px-2 py-0.5 text-xs text-error border border-error/30 rounded hover:bg-error/10 disabled:opacity-40"
+					>
+						Remove
+					</button>
+				</div>
+			{/each}
+			<div class="flex gap-2 pt-2">
+				<input
+					bind:value={newCartesiaKey}
+					placeholder="sk_car_..."
+					class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+				/>
+				<button
+					onclick={addCartesiaKey}
+					disabled={!wsStore.connected || !newCartesiaKey.startsWith('sk_car_')}
+					class="px-4 py-1.5 bg-accent text-bg-primary rounded text-sm disabled:opacity-40"
+				>
+					+ Add Key
+				</button>
+			</div>
+			<p class="text-xs text-text-secondary">Each key has 24h cooldown after quota exhausted. Pool rotates least-used.</p>
+		</div>
+	</section>
+
+	<!-- Edge-TTS + Voice out -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">TTS Output</h3>
+		<div class="space-y-3">
+			<div class="flex items-center justify-between p-3 bg-bg-elevated rounded">
+				<div>
+					<div class="font-medium">Edge-TTS fallback (id-ID-ArdiNeural)</div>
+					<div class="text-xs text-text-secondary">Synth tanpa play — validasi Azure reachability</div>
+				</div>
+				<TestButton command="test_edge_tts" label="Test synth" />
+			</div>
+			<div class="p-3 bg-bg-elevated rounded">
+				<div class="font-medium mb-2">Voice Output (end-to-end, keluar suara)</div>
+				<div class="flex gap-2 mb-2">
+					<input
+						bind:value={ttsTestText}
+						class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+						placeholder="Text untuk disintesis & diputar"
+					/>
+					<select
+						bind:value={ttsTestEmotion}
+						class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+						title="Emotion (Cartesia Sonic-3 only)"
+					>
+						<option value="neutral">😐 neutral</option>
+						<option value="happy">😊 happy</option>
+						<option value="sad">😢 sad</option>
+						<option value="angry">😠 angry</option>
+						<option value="dramatic">🎭 dramatic</option>
+						<option value="comedic">😄 comedic</option>
+					</select>
+					<TestButton command="test_tts_voice_out" params={{ text: ttsTestText, emotion: ttsTestEmotion }} label="Speak" />
+				</div>
+				<div class="text-xs text-text-secondary">Suara keluar di default audio device (atau VB-CABLE kalau sudah di-route). Emotion hanya berlaku untuk Cartesia Sonic-3.</div>
+			</div>
+		</div>
 	</section>
 
 	<!-- === P3 · Audio Device === -->
@@ -658,4 +687,47 @@
 			💡 Untuk VB-CABLE routing: pilih <b>CABLE Input (VB-Audio)</b> sebagai Windows default (Sound settings), lalu set OBS capture dari <b>CABLE Output</b>.
 		</p>
 	</section>
+
+	{:else if activeTab === 'tiktok'}
+	<!-- ============================================ -->
+	<!-- TAB 4: TIKTOK -->
+	<!-- ============================================ -->
+
+	<!-- TikTok Connection Test -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">TikTok Connection Test</h3>
+		<div class="p-3 bg-bg-elevated rounded">
+			<div class="flex gap-2">
+				<input
+					bind:value={tiktokTestUsername}
+					class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm font-mono"
+					placeholder="username (tanpa @) — kosong = pakai TIKTOK_USERNAME dari .env"
+				/>
+				<TestButton command="test_tiktok_conn" params={{ username: tiktokTestUsername }} label="Check live" />
+			</div>
+			<div class="text-xs text-text-secondary mt-1">Verify akun live atau offline (read-only, no ban risk)</div>
+		</div>
+	</section>
+
+	<!-- === P3 · TikTok Hot-Swap === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">TikTok Account (hot-swap)</h3>
+		<div class="flex gap-2">
+			<input
+				bind:value={tiktokHotswapUsername}
+				placeholder="username (tanpa @)"
+				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+			/>
+			<TestButton command="connect_tiktok" params={{ username: tiktokHotswapUsername }} label="Connect" />
+			<TestButton command="disconnect_tiktok" params={{}} label="Disconnect" variant="secondary" />
+		</div>
+		<p class="text-xs text-text-secondary mt-2">
+			Status: <b>{m.status ?? 'idle'}</b> · Current: <b>@{m.tiktok_username || '-'}</b>
+			{#if m.tiktok_running} · <span class="text-success">● running</span>{/if}
+		</p>
+	</section>
+
+	{/if}
+
+	</div>
 </div>

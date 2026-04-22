@@ -8,7 +8,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Tidak ada perubahan pending saat ini. Semua sprint P1–P3 sudah merged ke `main`.
+### Changed
+
+**Frontend — UI Improvement:**
+- `/config` page: Reorganized dengan tab navigation untuk mengurangi scroll panjang
+  - **Tab 1: ⚙️ System & Runtime** — Runtime toggles, System checks, Daily budget
+  - **Tab 2: 🤖 LLM & AI** — 9router, LLM tiers, Guardrail test & rules
+  - **Tab 3: 🔊 TTS & Audio** — Cartesia config, key pool, Edge-TTS, Audio devices
+  - **Tab 4: 📱 TikTok** — Connection test, Hot-swap account
+  - Lebih user-friendly dengan navigasi yang jelas dan konten terorganisir per kategori
 
 ---
 
