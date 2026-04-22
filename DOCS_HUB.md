@@ -1,6 +1,6 @@
-# 📚 tiklivenotion · Docs Hub (PRD + Arch + Design + Agent Brief)
+# 📚 livetik · Docs Hub (PRD + Arch + Design + Agent Brief)
 
-> 🎯 **Tujuan hub ini**: sumber tunggal kebenaran (single source of truth) untuk repo `bamsbung/tiklivenotion`.  
+> 🎯 **Tujuan hub ini**: sumber tunggal kebenaran (single source of truth) untuk repo `dedy45/livetik`.  
 > Semua PRD, arsitektur, design, dan plan ada di sini — siap di-hand off ke **agent coding VSCode** (Claude Code / Cursor / Windsurf / Copilot Chat + GitHub MCP).
 
 ---
@@ -27,7 +27,7 @@
 ## 🏗️ Monorepo Folder Structure (final, locked)
 
 ```
-tiklivenotion/
+livetik/
 ├── apps/
 │   ├── worker/                        # Python 3.11+ (UV managed)
 │   │   ├── pyproject.toml
@@ -43,7 +43,7 @@ tiklivenotion/
 │           ├── routes/                # dashboard, live, errors, persona, config, cost
 │           └── lib/                   # components, stores, api
 ├── docs/                              # ← semua dokumen ini
-├── scripts/                           # dev.sh, dev.ps1, smoke.sh
+├── scripts/                           # dev.bat, install.bat
 ├── .github/workflows/ci.yml
 ├── .vscode/
 ├── .env.example

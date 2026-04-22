@@ -1,4 +1,4 @@
-"""Main entry point for Bang Hack worker (dev-wired)."""
+"""Main entry point for Bang Hack worker (P0-final, idle-aware)."""
 
 import asyncio
 import logging
@@ -9,46 +9,44 @@ from .ipc.ws_server import WSServer
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s %(message)s"
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 log = logging.getLogger("banghack")
 
+# Broadcast setiap 5 detik = cukup untuk heartbeat UI, tidak spam log
+HEARTBEAT_INTERVAL_S = 5
+
 
 async def main() -> NoReturn:
-    """Main orchestrator with WebSocket server and dummy metrics broadcast."""
+    """Main orchestrator with idle-aware heartbeat."""
     log.info("🎙️ Bang Hack Worker v0.1.0-dev starting")
-    
-    # Initialize WebSocket server
+    log.info("Mode: IDLE (TikTok adapter belum aktif, no LLM calls, no cost)")
+
     ws = WSServer(host="127.0.0.1", port=8765)
     await ws.start()
 
     start_ts = time.time()
-    tick = 0
-    
     try:
         while True:
-            tick += 1
             uptime = int(time.time() - start_ts)
-            
-            # Broadcast dummy metrics every 2 seconds
+            # Semua counter tetap 0 sampai adapter real dibuat di fase P2.
+            # Status "idle" = worker hidup tapi belum connect ke TikTok.
             await ws.broadcast({
                 "type": "metrics",
                 "ts": time.time(),
-                "status": "connected" if tick > 2 else "connecting",
+                "status": "idle",
                 "uptime_s": uptime,
                 "viewers": 0,
-                "comments": tick * 3,
-                "replies": tick,
-                "queue_size": max(0, tick % 5),
-                "latency_p95_ms": 120,
-                "cost_idr": tick * 50,
+                "comments": 0,
+                "replies": 0,
+                "queue_size": 0,
+                "latency_p95_ms": 0,
+                "cost_idr": 0,
+                "mode": "dev-idle",
             })
-            
-            log.debug("Broadcasted metrics (tick=%d, clients=%d)", tick, len(ws.clients))
-            await asyncio.sleep(2)
-            
-    except KeyboardInterrupt:
-        log.info("Shutting down gracefully...")
+            await asyncio.sleep(HEARTBEAT_INTERVAL_S)
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        log.info("shutting down")
         await ws.stop()
         raise
 

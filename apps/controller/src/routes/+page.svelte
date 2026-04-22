@@ -3,11 +3,16 @@
 
 	const m = $derived(wsStore.metrics);
 	const statusColor = $derived(
-		wsStore.connected && m.status === 'connected'
+		m.status === 'live'
 			? 'bg-ok'
-			: wsStore.connected
+			: m.status === 'connecting'
 				? 'bg-warn'
-				: 'bg-error'
+				: m.status === 'idle'
+					? 'bg-warn'
+					: 'bg-error'
+	);
+	const statusText = $derived(
+		m.status === 'idle' ? 'Idle (worker ready, TikTok belum connect)' : m.status
 	);
 </script>
 
@@ -17,7 +22,7 @@
 		<div class="flex items-center gap-3">
 			<span class="flex items-center gap-2">
 				<span class="w-3 h-3 rounded-full {statusColor}"></span>
-				<span class="text-sm text-text-secondary">{m.status}</span>
+				<span class="text-sm text-text-secondary">{statusText}</span>
 			</span>
 			<span class="text-sm text-text-secondary">Uptime: {wsStore.uptime}</span>
 			<span class="px-3 py-1 bg-bg-elevated rounded-md text-sm">Queue: {m.queue_size}</span>

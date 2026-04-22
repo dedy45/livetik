@@ -1,4 +1,4 @@
-# 🎙️ tiklivenotion — Bang Hack Live AI Co-Pilot
+# 🎙️ livetik — Bang Hack Live AI Co-Pilot
 
 > AI co-pilot untuk TikTok Live @interiorhack.id. Python worker + Svelte controller, stack Rp 0, siap jalan lokal.
 
@@ -79,11 +79,11 @@ echo Setup OK!
 ## 🧭 Struktur Repo
 
 ```
-tiklivenotion/
+livetik/
 ├── apps/worker/        # Python bot (UV)
 ├── apps/controller/    # Svelte 5 dashboard
 ├── docs/               # PRD, Arch, Design, Plan (source of truth)
-├── scripts/            # dev.sh, smoke.sh
+├── scripts/            # dev.bat, install.bat
 └── .vscode/            # Debug configs
 ```
 
@@ -108,15 +108,14 @@ Navigasi detail & file pertama saat error: [`docs/ARCHITECTURE.md`](docs/ARCHITE
 
 **Quick backup:**
 ```cmd
-cd scripts
-backup-github.bat
+scripts\backup-github.bat
 ```
 
 **Manual:**
 ```cmd
 git add .
 git commit -m "Backup: update"
-git push origin main
+git push origin master
 ```
 
 Troubleshooting: [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
