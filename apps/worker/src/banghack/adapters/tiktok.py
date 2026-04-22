@@ -48,6 +48,24 @@ class TikTokAdapter:
         self._register_handlers()
 
     def _register_handlers(self) -> None:
+        def _get_nickname(ev: object) -> str:
+            """Safely extract nickname from event, bypassing broken ExtendedUser.from_user().
+
+            TikTokLive 6.6.5 has a bug where ev.user triggers ExtendedUser.from_user()
+            which calls user.to_pydict() returning camelCase 'nickName', but ExtendedUser
+            expects snake_case 'nickname'. We bypass this by reading user_info directly.
+            """
+            try:
+                user_info = getattr(ev, "user_info", None)
+                if user_info is not None:
+                    # user_info is the raw proto User object — access fields directly
+                    nick = getattr(user_info, "nickname", "") or getattr(user_info, "nick_name", "")
+                    uid = getattr(user_info, "unique_id", "")
+                    return nick or uid or "anon"
+            except Exception:  # noqa: BLE001
+                pass
+            return "anon"
+
         @self.client.on(ConnectEvent)  # type: ignore[untyped-decorator]
         async def _on_connect(_: ConnectEvent) -> None:
             log.info("TikTok CONNECTED to @%s", self.unique_id)
@@ -60,7 +78,7 @@ class TikTokAdapter:
 
         @self.client.on(CommentEvent)  # type: ignore[untyped-decorator]
         async def _on_comment(ev: CommentEvent) -> None:
-            nickname = ev.user.nickname or ev.user.unique_id or "anon"
+            nickname = _get_nickname(ev)
             log.info("[comment] %s: %s", nickname, ev.comment)
             await self.callback(
                 TTEvent(type="comment", user=nickname, text=ev.comment or "")
@@ -71,7 +89,7 @@ class TikTokAdapter:
             # Skip intermediate streak events, only count the finalized one.
             if ev.gift.streakable and not ev.streaking:
                 return
-            nickname = ev.user.nickname or ev.user.unique_id or "anon"
+            nickname = _get_nickname(ev)
             count = ev.repeat_count or 1
             log.info("[gift] %s sent %s x%d", nickname, ev.gift.name, count)
             await self.callback(
@@ -80,12 +98,12 @@ class TikTokAdapter:
 
         @self.client.on(JoinEvent)  # type: ignore[untyped-decorator]
         async def _on_join(ev: JoinEvent) -> None:
-            nickname = ev.user.nickname or ev.user.unique_id or "anon"
+            nickname = _get_nickname(ev)
             await self.callback(TTEvent(type="join", user=nickname))
 
         @self.client.on(LikeEvent)  # type: ignore[untyped-decorator]
         async def _on_like(ev: LikeEvent) -> None:
-            nickname = ev.user.nickname or ev.user.unique_id or "anon"
+            nickname = _get_nickname(ev)
             await self.callback(
                 TTEvent(type="like", user=nickname, count=ev.count or 1)
             )
