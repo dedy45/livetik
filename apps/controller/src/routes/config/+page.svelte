@@ -49,6 +49,83 @@
 	let guardrailTestText = $state('');
 	let guardrailTestUser = $state('TestUser');
 
+	// ── P3 state ──────────────────────────────────────────────────────────
+	let cartesiaVoiceId = $state('');
+	let cartesiaModel = $state('sonic-3');
+	let cartesiaDefaultEmotion = $state('neutral');
+	let cartesiaConfigReqId = $state<string | null>(null);
+	const cartesiaConfigResult = $derived(cartesiaConfigReqId ? wsStore.testResults.get(cartesiaConfigReqId) : undefined);
+
+	let newCartesiaKey = $state('');
+
+	let guardrailForbiddenText = $state('');
+	let guardrailMinWords = $state(2);
+	let guardrailRateMax = $state(3);
+	let guardrailWindow = $state(60);
+	let guardrailMaxChars = $state(300);
+	let guardrailSaveReqId = $state<string | null>(null);
+	const guardrailSaveResult = $derived(guardrailSaveReqId ? wsStore.testResults.get(guardrailSaveReqId) : undefined);
+
+	let budgetIdr = $state(5000);
+	let tiktokHotswapUsername = $state('');
+	let audioDevices = $state<Array<{index: number; name: string; max_output_channels: number; is_default: boolean}>>([]);
+	let audioDeviceIndex = $state(0);
+
+	// Populate guardrail from metrics
+	$effect(() => {
+		const g = m.guardrail;
+		if (g && guardrailForbiddenText === '') {
+			guardrailForbiddenText = (g.forbidden_patterns || []).join('\n');
+			guardrailMinWords = g.min_words ?? 2;
+			guardrailRateMax = g.rate_max ?? 3;
+			guardrailWindow = g.rate_window_s ?? 60;
+			guardrailMaxChars = g.max_chars ?? 300;
+		}
+	});
+
+	// Populate budget from metrics
+	$effect(() => {
+		if (m.budget_idr && m.budget_idr > 0) budgetIdr = m.budget_idr;
+	});
+
+	function saveCartesiaConfig() {
+		cartesiaConfigReqId = wsStore.sendCommand('set_cartesia_config', {
+			voice_id: cartesiaVoiceId,
+			model: cartesiaModel,
+			default_emotion: cartesiaDefaultEmotion,
+		});
+	}
+	function addCartesiaKey() {
+		wsStore.sendCommand('add_cartesia_key', { key: newCartesiaKey });
+		newCartesiaKey = '';
+	}
+	function removeCartesiaKey(keyPreview: string) {
+		wsStore.sendCommand('remove_cartesia_key', { key_preview: keyPreview });
+	}
+	function saveGuardrail() {
+		const patterns = guardrailForbiddenText.split('\n').map((s: string) => s.trim()).filter((s: string) => s);
+		guardrailSaveReqId = wsStore.sendCommand('update_guardrail', {
+			forbidden_patterns: patterns,
+			min_words: guardrailMinWords,
+			rate_max: guardrailRateMax,
+			rate_window_s: guardrailWindow,
+			max_chars: guardrailMaxChars,
+		});
+	}
+
+	let audioDevicesReqId = $state<string | null>(null);
+	const audioDevicesResult = $derived(audioDevicesReqId ? wsStore.testResults.get(audioDevicesReqId) : undefined);
+	$effect(() => {
+		if (audioDevicesResult?.ok && audioDevicesResult.result?.devices) {
+			audioDevices = audioDevicesResult.result.devices as typeof audioDevices;
+		}
+	});
+	function loadAudioDevices() {
+		audioDevicesReqId = wsStore.sendCommand('list_audio_devices');
+	}
+	// Auto-load on connect
+	$effect(() => { if (wsStore.connected && audioDevices.length === 0) loadAudioDevices(); });
+
 	function applyTierModel(tierId: string) {
 		const edit = tierEdits[tierId];
 		if (!edit) return;
@@ -381,5 +458,204 @@
 			</div>
 			<div class="text-xs text-text-secondary">Verify filter regex + rate limit + dedup sebelum go-live</div>
 		</div>
+	</section>
+
+	<!-- === P3 · Cartesia Voice Config === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Cartesia Voice Config</h3>
+		<div class="space-y-3">
+			<div class="grid grid-cols-2 gap-3">
+				<div>
+					<label class="text-xs text-text-secondary">Voice ID (UUID)</label>
+					<input
+						bind:value={cartesiaVoiceId}
+						class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+						placeholder="280171e4-eeb5-4d26-862e-bb6a072beef7"
+					/>
+				</div>
+				<div>
+					<label class="text-xs text-text-secondary">Model</label>
+					<select bind:value={cartesiaModel} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+						<option value="sonic-3">sonic-3 (latest)</option>
+						<option value="sonic-2">sonic-2</option>
+						<option value="sonic-english">sonic-english</option>
+					</select>
+				</div>
+			</div>
+			<div>
+				<label class="text-xs text-text-secondary">Default Emotion (dipakai saat reply live)</label>
+				<select bind:value={cartesiaDefaultEmotion} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+					<option value="neutral">😐 neutral</option>
+					<option value="happy">😊 happy</option>
+					<option value="comedic">😄 comedic</option>
+					<option value="dramatic">🎭 dramatic</option>
+					<option value="sad">😢 sad</option>
+					<option value="angry">😠 angry</option>
+				</select>
+			</div>
+			<button
+				onclick={saveCartesiaConfig}
+				disabled={!wsStore.connected}
+				class="px-4 py-2 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
+			>
+				💾 Save &amp; Apply
+			</button>
+			{#if cartesiaConfigResult}
+				{#if cartesiaConfigResult.ok}
+					<div class="text-xs text-success">✓ Saved + hot-reloaded · backup: {cartesiaConfigResult.result?.persisted ? '.env.bak created' : 'no changes'}</div>
+				{:else}
+					<div class="text-xs text-error">✗ {cartesiaConfigResult.error}</div>
+				{/if}
+			{/if}
+		</div>
+	</section>
+
+	<!-- === P3 · Cartesia Keys CRUD === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Cartesia Key Pool Management</h3>
+		<div class="space-y-2">
+			{#each pool as slot}
+				<div class="flex items-center justify-between p-2 bg-bg-elevated rounded">
+					<span class="font-mono text-sm">{slot.key}</span>
+					<button
+						onclick={() => removeCartesiaKey(slot.key)}
+						disabled={!wsStore.connected}
+						class="px-2 py-0.5 text-xs text-error border border-error/30 rounded hover:bg-error/10 disabled:opacity-40"
+					>
+						Remove
+					</button>
+				</div>
+			{/each}
+			<div class="flex gap-2 pt-2">
+				<input
+					bind:value={newCartesiaKey}
+					placeholder="sk_car_..."
+					class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+				/>
+				<button
+					onclick={addCartesiaKey}
+					disabled={!wsStore.connected || !newCartesiaKey.startsWith('sk_car_')}
+					class="px-4 py-1.5 bg-accent text-bg-primary rounded text-sm disabled:opacity-40"
+				>
+					+ Add Key
+				</button>
+			</div>
+			<p class="text-xs text-text-secondary">Each key has 24h cooldown after quota exhausted. Pool rotates least-used.</p>
+		</div>
+	</section>
+
+	<!-- === P3 · Guardrail Rules === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Guardrail Rules</h3>
+		<div class="space-y-3">
+			<div>
+				<label class="text-xs text-text-secondary">Forbidden Patterns (regex, 1 per baris)</label>
+				<textarea
+					bind:value={guardrailForbiddenText}
+					rows={6}
+					spellcheck={false}
+					class="w-full mt-1 px-3 py-2 bg-bg-elevated border border-border rounded text-sm font-mono resize-y"
+				></textarea>
+			</div>
+			<div class="grid grid-cols-4 gap-3">
+				<div>
+					<label class="text-xs text-text-secondary">Min Words</label>
+					<input type="number" bind:value={guardrailMinWords} min="1" max="10"
+						class="w-full mt-1 px-2 py-1 bg-bg-elevated border border-border rounded text-sm" />
+				</div>
+				<div>
+					<label class="text-xs text-text-secondary">Rate Max / user</label>
+					<input type="number" bind:value={guardrailRateMax} min="1" max="20"
+						class="w-full mt-1 px-2 py-1 bg-bg-elevated border border-border rounded text-sm" />
+				</div>
+				<div>
+					<label class="text-xs text-text-secondary">Window (s)</label>
+					<input type="number" bind:value={guardrailWindow} min="10" max="600"
+						class="w-full mt-1 px-2 py-1 bg-bg-elevated border border-border rounded text-sm" />
+				</div>
+				<div>
+					<label class="text-xs text-text-secondary">Max Chars</label>
+					<input type="number" bind:value={guardrailMaxChars} min="20" max="1000"
+						class="w-full mt-1 px-2 py-1 bg-bg-elevated border border-border rounded text-sm" />
+				</div>
+			</div>
+			<button
+				onclick={saveGuardrail}
+				disabled={!wsStore.connected}
+				class="px-4 py-2 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
+			>
+				💾 Save &amp; Apply
+			</button>
+			{#if guardrailSaveResult}
+				{#if guardrailSaveResult.ok}
+					<div class="text-xs text-success">✓ Saved: {guardrailSaveResult.result?.forbidden_patterns?.length} patterns · rate {guardrailSaveResult.result?.rate_max}/{guardrailSaveResult.result?.rate_window_s}s</div>
+				{:else}
+					<div class="text-xs text-error">✗ {guardrailSaveResult.error}</div>
+				{/if}
+			{/if}
+		</div>
+	</section>
+
+	<!-- === P3 · Budget === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Daily Budget (IDR)</h3>
+		<div class="flex gap-2">
+			<input
+				type="number"
+				bind:value={budgetIdr}
+				min="0"
+				max="10000000"
+				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+			/>
+			<TestButton command="set_budget_idr" params={{ value: budgetIdr }} label="Save" />
+		</div>
+		<p class="text-xs text-text-secondary mt-2">Current usage: Rp {m.cost_idr ?? 0} / Rp {m.budget_idr ?? budgetIdr}</p>
+	</section>
+
+	<!-- === P3 · TikTok Hot-Swap === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">TikTok Account (hot-swap)</h3>
+		<div class="flex gap-2">
+			<input
+				bind:value={tiktokHotswapUsername}
+				placeholder="username (tanpa @)"
+				class="flex-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm font-mono"
+			/>
+			<TestButton command="connect_tiktok" params={{ username: tiktokHotswapUsername }} label="Connect" />
+			<TestButton command="disconnect_tiktok" params={{}} label="Disconnect" variant="secondary" />
+		</div>
+		<p class="text-xs text-text-secondary mt-2">
+			Status: <b>{m.status ?? 'idle'}</b> · Current: <b>@{m.tiktok_username || '-'}</b>
+			{#if m.tiktok_running} · <span class="text-success">● running</span>{/if}
+		</p>
+	</section>
+
+	<!-- === P3 · Audio Device === -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Audio Output Device</h3>
+		<div class="flex gap-2 items-end">
+			<div class="flex-1">
+				<label class="text-xs text-text-secondary">Device</label>
+				{#if audioDevices.length === 0}
+					<p class="mt-1 text-sm text-text-secondary">Loading devices...</p>
+				{:else}
+					<select bind:value={audioDeviceIndex} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+						{#each audioDevices as d}
+							<option value={d.index}>{d.name} {d.is_default ? '(default)' : ''} · {d.max_output_channels}ch</option>
+						{/each}
+					</select>
+				{/if}
+			</div>
+			<button
+				onclick={loadAudioDevices}
+				disabled={!wsStore.connected}
+				class="px-3 py-1.5 border border-border rounded text-sm hover:bg-bg-elevated disabled:opacity-40"
+			>
+				🔄 Refresh
+			</button>
+		</div>
+		<p class="text-xs text-text-secondary mt-2">
+			💡 Untuk VB-CABLE routing: pilih <b>CABLE Input (VB-Audio)</b> sebagai Windows default (Sound settings), lalu set OBS capture dari <b>CABLE Output</b>.
+		</p>
 	</section>
 </div>

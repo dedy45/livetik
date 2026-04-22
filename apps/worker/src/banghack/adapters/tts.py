@@ -32,26 +32,30 @@ class TTSAdapter:
         self.pool = pool
         self.voice_id = os.getenv("CARTESIA_VOICE_ID", "")
         self.model_id = os.getenv("CARTESIA_MODEL", "sonic-3")
+        self.default_emotion = os.getenv("CARTESIA_DEFAULT_EMOTION", "neutral")
         self.edge_voice = os.getenv("EDGE_TTS_VOICE", "id-ID-ArdiNeural")
         self._play_lock = asyncio.Lock()
         if not self.voice_id:
             log.warning("CARTESIA_VOICE_ID not set — Cartesia will fail, will fall back to edge-tts")
 
-    async def speak(self, text: str, emotion: str = "neutral") -> TTSResult:
+    async def speak(self, text: str, emotion: str | None = None) -> TTSResult:
         """Synthesize then play (sequential, lock-protected).
 
         Args:
             text: Text to synthesize.
             emotion: Cartesia emotion — neutral | happy | sad | angry | dramatic | comedic.
+                     If None, uses self.default_emotion (runtime mutable).
                      Ignored by edge-tts fallback.
         """
         text = text.strip()
         if not text:
             return TTSResult(engine="error", duration_s=0, char_count=0)
+        # Kalau emotion None → pakai default_emotion (runtime mutable)
+        use_emotion = emotion if emotion else self.default_emotion
         async with self._play_lock:
             # Try Cartesia first
             try:
-                return await self._cartesia_speak(text, emotion=emotion)
+                return await self._cartesia_speak(text, emotion=use_emotion)
             except Exception as e:
                 log.warning("Cartesia failed (%s) → falling back to edge-tts", e)
             # Fallback: edge-tts

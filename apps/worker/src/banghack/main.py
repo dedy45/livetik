@@ -1,9 +1,11 @@
-"""Main entry — P2-C: TikTok read + LLM + TTS reply loop + bidirectional WS commands."""
+"""Main entry — P3: TikTok read + LLM + TTS reply loop + bidirectional WS commands."""
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -18,10 +20,13 @@ from .adapters.cartesia_pool import CartesiaPool
 from .adapters.llm import LLMAdapter
 from .adapters.tiktok import TikTokAdapter, TTEvent
 from .adapters.tts import TTSAdapter
+from .core.config_store import load_state, save_state, read_env, write_env
 from .core.cost import CostDay, CostTracker
 from .core.guardrail import Guardrail
 from .core.persona import load_persona
 from .core.queue import ReplyJob, ReplyQueue
+from .core.tiktok_supervisor import TikTokSupervisor
+from .ipc.audio import list_devices
 from .ipc.http_server import create_app
 from .ipc.ws_server import WSServer
 
@@ -43,6 +48,11 @@ _flags: dict[str, bool] = {
     "REPLY_ENABLED": os.getenv("REPLY_ENABLED", "false").lower() == "true",
     "DRY_RUN": os.getenv("DRY_RUN", "false").lower() == "true",
 }
+
+# Restore runtime flags dari .state.json
+_saved_state = load_state()
+_flags["REPLY_ENABLED"] = bool(_saved_state.get("reply_enabled", _flags["REPLY_ENABLED"]))
+_flags["DRY_RUN"] = bool(_saved_state.get("dry_run", _flags["DRY_RUN"]))
 
 
 async def _run_http(llm: LLMAdapter) -> None:
@@ -88,6 +98,23 @@ async def main() -> NoReturn:
 
     ws = WSServer(host="127.0.0.1", port=8765)
     await ws.start()
+
+    def _wrap_cmd(name: str, category: str, handler):  # type: ignore[no-untyped-def]
+        """Wrap command: broadcast error_event on exception, then re-raise for cmd_result."""
+        async def wrapped(p: dict[str, object]) -> dict[str, object]:
+            try:
+                return await handler(p)
+            except Exception as e:
+                await ws.broadcast({
+                    "type": "error_event", "ts": time.time(),
+                    "category": category, "user": "system",
+                    "detail": f"{name}: {type(e).__name__}: {str(e)[:200]}",
+                })
+                raise
+        return wrapped
+
+    def _persist_flags() -> None:
+        save_state({"reply_enabled": _flags["REPLY_ENABLED"], "dry_run": _flags["DRY_RUN"]})
 
     state = State()
     guardrail = Guardrail()
@@ -333,11 +360,13 @@ async def main() -> NoReturn:
 
     async def cmd_set_reply_enabled(p: dict[str, object]) -> dict[str, object]:
         _flags["REPLY_ENABLED"] = bool(p.get("value", False))
-        return {"reply_enabled": _flags["REPLY_ENABLED"], "note": "runtime only, not persisted"}
+        _persist_flags()
+        return {"reply_enabled": _flags["REPLY_ENABLED"], "note": "persisted to .state.json"}
 
     async def cmd_set_dry_run(p: dict[str, object]) -> dict[str, object]:
         _flags["DRY_RUN"] = bool(p.get("value", False))
-        return {"dry_run": _flags["DRY_RUN"], "note": "runtime only, not persisted"}
+        _persist_flags()
+        return {"dry_run": _flags["DRY_RUN"], "note": "persisted to .state.json"}
 
     async def cmd_update_llm_tier(p: dict[str, object]) -> dict[str, object]:
         tier_id = str(p.get("tier_id", ""))
@@ -380,28 +409,160 @@ async def main() -> NoReturn:
         ]
         return {"base": base, "count": len(models), "models": models}
 
-    for cmd_name, cmd_handler in [
-        ("test_ffplay", cmd_test_ffplay),
-        ("test_ninerouter", cmd_test_ninerouter),
-        ("test_llm", cmd_test_llm),
-        ("test_cartesia_key", cmd_test_cartesia_key),
-        ("test_cartesia_all", cmd_test_cartesia_all),
-        ("test_edge_tts", cmd_test_edge_tts),
-        ("test_tts_voice_out", cmd_test_tts_voice_out),
-        ("test_tiktok_conn", cmd_test_tiktok_conn),
-        ("reload_persona", cmd_reload_persona),
-        ("save_persona", cmd_save_persona),
-        ("test_reply", cmd_test_reply),
-        ("test_guardrail", cmd_test_guardrail),
-        ("reset_cost_today", cmd_reset_cost_today),
-        ("reload_env", cmd_reload_env),
-        ("set_reply_enabled", cmd_set_reply_enabled),
-        ("set_dry_run", cmd_set_dry_run),
-        ("update_llm_tier", cmd_update_llm_tier),
-        ("test_llm_custom", cmd_test_llm_custom),
-        ("list_ninerouter_models", cmd_list_ninerouter_models),
+    # ── P3 new command handlers ─────────────────────────────────────────────
+
+    async def cmd_read_env(_p: dict[str, object]) -> dict[str, object]:
+        return {"env": read_env(mask_secrets=True)}
+
+    async def cmd_save_env(p: dict[str, object]) -> dict[str, object]:
+        updates = p.get("updates")
+        if not isinstance(updates, dict) or not updates:
+            raise RuntimeError("updates dict required — e.g. {TIKTOK_USERNAME: 'foo'}")
+        str_updates = {str(k): str(v) for k, v in updates.items()}
+        backup = write_env(str_updates)
+        return {"saved": True, "backup": backup.name, "keys": list(str_updates.keys())}
+
+    async def cmd_set_cartesia_config(p: dict[str, object]) -> dict[str, object]:
+        if tts is None:
+            raise RuntimeError("TTS not initialized — set CARTESIA_API_KEYS dulu")
+        voice_id = str(p.get("voice_id", "")).strip()
+        model = str(p.get("model", "")).strip()
+        default_emotion = str(p.get("default_emotion", "")).strip()
+        updates: dict[str, str] = {}
+        if voice_id:
+            if not re.match(r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$", voice_id):
+                raise RuntimeError("voice_id must be UUID format (8-4-4-4-12 hex)")
+            tts.voice_id = voice_id
+            updates["CARTESIA_VOICE_ID"] = voice_id
+        if model:
+            if model not in ("sonic-3", "sonic-2", "sonic-english", "sonic-preview"):
+                raise RuntimeError(f"unknown model {model!r}")
+            tts.model_id = model
+            updates["CARTESIA_MODEL"] = model
+        if default_emotion:
+            if default_emotion not in tts.VALID_EMOTIONS:
+                raise RuntimeError(f"invalid emotion {default_emotion!r} — must be one of {sorted(tts.VALID_EMOTIONS)}")
+            tts.default_emotion = default_emotion
+            updates["CARTESIA_DEFAULT_EMOTION"] = default_emotion
+        if updates:
+            write_env(updates)
+        return {
+            "voice_id": tts.voice_id, "model": tts.model_id,
+            "default_emotion": tts.default_emotion,
+            "persisted": bool(updates),
+        }
+
+    async def cmd_add_cartesia_key(p: dict[str, object]) -> dict[str, object]:
+        if tts is None:
+            raise RuntimeError("TTS not initialized")
+        key = str(p.get("key", "")).strip()
+        tts.pool.add_key(key)  # raises kalau invalid
+        all_keys = [s.key for s in tts.pool.slots]
+        write_env({"CARTESIA_API_KEYS": ",".join(all_keys)})
+        return {"added": True, "pool_size": len(tts.pool.slots)}
+
+    async def cmd_remove_cartesia_key(p: dict[str, object]) -> dict[str, object]:
+        if tts is None:
+            raise RuntimeError("TTS not initialized")
+        key_preview = str(p.get("key_preview", "")).strip()
+        if not tts.pool.remove_key_by_preview(key_preview):
+            raise RuntimeError(f"key not found: {key_preview!r}")
+        all_keys = [s.key for s in tts.pool.slots]
+        write_env({"CARTESIA_API_KEYS": ",".join(all_keys) if all_keys else ""})
+        return {"removed": True, "pool_size": len(tts.pool.slots)}
+
+    async def cmd_update_guardrail(p: dict[str, object]) -> dict[str, object]:
+        forbidden = p.get("forbidden_patterns")
+        try:
+            guardrail.update_config(
+                forbidden=forbidden if isinstance(forbidden, list) else None,
+                min_words=int(p["min_words"]) if "min_words" in p else None,
+                rate_max=int(p["rate_max"]) if "rate_max" in p else None,
+                rate_window_s=int(p["rate_window_s"]) if "rate_window_s" in p else None,
+                max_chars=int(p["max_chars"]) if "max_chars" in p else None,
+            )
+        except re.error as e:
+            raise RuntimeError(f"invalid regex: {e}") from e
+        snap = guardrail.config_snapshot()
+        write_env({
+            "GUARDRAIL_MIN_WORDS": str(snap["min_words"]),
+            "GUARDRAIL_RATE_MAX": str(snap["rate_max"]),
+            "GUARDRAIL_RATE_WINDOW_S": str(snap["rate_window_s"]),
+            "GUARDRAIL_MAX_CHARS": str(snap["max_chars"]),
+        })
+        return {"updated": True, **snap}
+
+    async def cmd_set_budget_idr(p: dict[str, object]) -> dict[str, object]:
+        value = float(p.get("value", 5000))
+        cost.set_budget(value)  # raises ValueError kalau out of range
+        write_env({"BUDGET_IDR_DAILY": str(int(value))})
+        return {"budget_idr": value}
+
+    async def cmd_connect_tiktok(p: dict[str, object]) -> dict[str, object]:
+        username = str(p.get("username", "")).strip().lstrip("@")
+        if not username:
+            raise RuntimeError("username empty")
+        await tt_supervisor.connect(username)
+        write_env({"TIKTOK_USERNAME": username})
+        return {"connected": True, "username": username}
+
+    async def cmd_disconnect_tiktok(_p: dict[str, object]) -> dict[str, object]:
+        await tt_supervisor.disconnect()
+        return {"connected": False}
+
+    async def cmd_list_audio_devices(_p: dict[str, object]) -> dict[str, object]:
+        return {"devices": list_devices()}
+
+    async def cmd_read_cost_history(p: dict[str, object]) -> dict[str, object]:
+        days = int(p.get("days", 7))
+        cutoff = time.time() - days * 86400
+        rows: list[dict[str, object]] = []
+        cost_path = Path("costs.jsonl")
+        if cost_path.exists():
+            for line in cost_path.read_text(encoding="utf-8").splitlines():
+                try:
+                    rec = json.loads(line)
+                    if rec.get("ts", 0) >= cutoff:
+                        rows.append(rec)
+                except Exception:
+                    continue
+        return {"rows": rows, "count": len(rows)}
+
+    for cmd_name, cmd_handler, category in [
+        # existing 19
+        ("test_ffplay", cmd_test_ffplay, "system"),
+        ("test_ninerouter", cmd_test_ninerouter, "llm"),
+        ("test_llm", cmd_test_llm, "llm"),
+        ("test_cartesia_key", cmd_test_cartesia_key, "tts"),
+        ("test_cartesia_all", cmd_test_cartesia_all, "tts"),
+        ("test_edge_tts", cmd_test_edge_tts, "tts"),
+        ("test_tts_voice_out", cmd_test_tts_voice_out, "tts"),
+        ("test_tiktok_conn", cmd_test_tiktok_conn, "tiktok"),
+        ("reload_persona", cmd_reload_persona, "config"),
+        ("save_persona", cmd_save_persona, "config"),
+        ("test_reply", cmd_test_reply, "llm"),
+        ("test_guardrail", cmd_test_guardrail, "guardrail"),
+        ("reset_cost_today", cmd_reset_cost_today, "cost"),
+        ("reload_env", cmd_reload_env, "config"),
+        ("set_reply_enabled", cmd_set_reply_enabled, "config"),
+        ("set_dry_run", cmd_set_dry_run, "config"),
+        ("update_llm_tier", cmd_update_llm_tier, "llm"),
+        ("test_llm_custom", cmd_test_llm_custom, "llm"),
+        ("list_ninerouter_models", cmd_list_ninerouter_models, "llm"),
+        # P3 new 11
+        ("read_env", cmd_read_env, "config"),
+        ("save_env", cmd_save_env, "config"),
+        ("set_cartesia_config", cmd_set_cartesia_config, "tts"),
+        ("add_cartesia_key", cmd_add_cartesia_key, "tts"),
+        ("remove_cartesia_key", cmd_remove_cartesia_key, "tts"),
+        ("update_guardrail", cmd_update_guardrail, "guardrail"),
+        ("set_budget_idr", cmd_set_budget_idr, "cost"),
+        ("connect_tiktok", cmd_connect_tiktok, "tiktok"),
+        ("disconnect_tiktok", cmd_disconnect_tiktok, "tiktok"),
+        ("list_audio_devices", cmd_list_audio_devices, "system"),
+        ("read_cost_history", cmd_read_cost_history, "cost"),
     ]:
-        ws.register_command(cmd_name, cmd_handler)
+        ws.register_command(cmd_name, _wrap_cmd(cmd_name, category, cmd_handler))
 
     # ── TikTok event handler ────────────────────────────────────────────────
 
@@ -430,22 +591,22 @@ async def main() -> NoReturn:
             "text": ev.text, "count": ev.count,
         })
 
-    tiktok_task: asyncio.Task[None] | None = None
+    tt_supervisor = TikTokSupervisor(on_tt_event)
     if TIKTOK_USERNAME:
         log.info("Starting TikTok adapter for @%s", TIKTOK_USERNAME)
-        tt = TikTokAdapter(TIKTOK_USERNAME, on_tt_event)
-        tiktok_task = asyncio.create_task(tt.run_with_retry(), name="tiktok")
+        await tt_supervisor.connect(TIKTOK_USERNAME)
     else:
-        log.warning("TIKTOK_USERNAME not set — heartbeat only")
+        log.warning("TIKTOK_USERNAME not set — standby, connect via UI")
 
     http_task = asyncio.create_task(_run_http(llm), name="http")
     log.info("HTTP API listening on http://%s:%d", HTTP_HOST, HTTP_PORT)
 
+    _last_cost_log_hour = -1
     try:
         while True:
             uptime = int(time.time() - state.start_ts)
             cost_snap = cost.snapshot()
-            mode = "p2c-reply-loop" if _flags["REPLY_ENABLED"] else "p2c-readonly"
+            mode = "p3-reply-loop" if _flags["REPLY_ENABLED"] else "p3-readonly"
             await ws.broadcast({
                 "type": "metrics", "ts": time.time(),
                 "status": state.status, "uptime_s": uptime,
@@ -465,24 +626,21 @@ async def main() -> NoReturn:
                 "dry_run": _flags["DRY_RUN"],
                 "cartesia_pool": tts.pool.stats() if tts else [],
                 "llm_models": llm.get_model_list(),
+                "tiktok_username": tt_supervisor.current_username,
+                "tiktok_running": tt_supervisor.is_running(),
+                "guardrail": guardrail.config_snapshot(),
             })
-            if tiktok_task and tiktok_task.done():
-                exc = tiktok_task.exception()
-                if exc:
-                    log.error("TikTok task crashed: %s", exc)
-                    state.status = "error"
-                    tiktok_task = None
+            _current_hour = int(time.time() // 3600)
+            if _current_hour != _last_cost_log_hour:
+                _last_cost_log_hour = _current_hour
+                with Path("costs.jsonl").open("a", encoding="utf-8") as _f:
+                    _f.write(json.dumps({"ts": time.time(), "total_idr": cost_snap["total_idr"], "by_tier": cost_snap["by_tier"]}) + "\n")
             await asyncio.sleep(HEARTBEAT_INTERVAL_S)
     except (KeyboardInterrupt, asyncio.CancelledError):
         log.info("shutting down")
         await queue.stop()
         http_task.cancel()
-        if tiktok_task and not tiktok_task.done():
-            tiktok_task.cancel()
-            try:
-                await tiktok_task
-            except (asyncio.CancelledError, Exception):
-                pass
+        await tt_supervisor.disconnect()
         await ws.stop()
         raise
 

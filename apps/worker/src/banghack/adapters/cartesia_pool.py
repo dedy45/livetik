@@ -79,3 +79,23 @@ class CartesiaPool:
             }
             for s in self.slots
         ]
+
+    def add_key(self, key: str) -> None:
+        """Add new key ke pool. Raises RuntimeError kalau key sudah ada atau invalid format."""
+        key = key.strip()
+        if not key.startswith("sk_car_"):
+            raise RuntimeError("invalid format — Cartesia key must start with sk_car_")
+        if any(s.key == key for s in self.slots):
+            raise RuntimeError("key already in pool")
+        self.slots.append(KeySlot(key=key))
+        log.info("added key to pool (total: %d)", len(self.slots))
+
+    def remove_key_by_preview(self, preview_or_full: str) -> bool:
+        """Remove key by preview string atau full key. Returns True kalau found."""
+        target = preview_or_full.strip()
+        for i, s in enumerate(self.slots):
+            if s.preview() == target or s.key == target:
+                del self.slots[i]
+                log.info("removed key (total: %d)", len(self.slots))
+                return True
+        return False

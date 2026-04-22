@@ -210,7 +210,7 @@
 				{/each}
 			</div>
 			<div class="mt-3 text-xs text-text-secondary">
-				<p>💡 Edit models in <code class="px-1 py-0.5 bg-bg-elevated rounded">.env</code> file</p>
+				<p>💡 Edit &amp; apply di <a href="/config" class="text-accent underline">Config page</a> — perubahan real-time tanpa restart</p>
 			</div>
 		{/if}
 	</div>
