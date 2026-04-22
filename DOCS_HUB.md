@@ -55,6 +55,8 @@ tiklivenotion/
 
 | Error type | File pertama dibuka |
 |------------|---------------------|
+| Git push failed | `docs/TROUBLESHOOTING.md` |
+| SvelteKit tsconfig warning | `docs/TROUBLESHOOTING.md` |
 | TikTok disconnect | `adapters/tiktok.py` |
 | LLM rate limit / timeout | `adapters/llm.py` |
 | TTS tidak bunyi | `adapters/tts.py` |
@@ -140,13 +142,15 @@ REM Controller: http://localhost:5173
 - [AGENT_BRIEF.md](docs/AGENT_BRIEF.md)
 - [GITHUB.md](docs/GITHUB.md)
 - [STRUCTURE.md](docs/STRUCTURE.md)
+- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ---
 
 ## 🎯 Definition of Done Docs Hub
 
-- [x] 10 dokumen tersedia sebagai file `.md` di folder `docs/`
+- [x] 11 dokumen tersedia sebagai file `.md` di folder `docs/`
 - [x] Agent VSCode bisa mulai coding hanya dengan baca **Agent Brief** + **PRD** + **Architecture**
 - [x] Setiap bug yang muncul punya **1 file pertama yang dibuka** (tabel navigasi error di atas)
 - [x] Tidak ada duplikasi konten — setiap konsep ada di **1 dokumen canonical**
 - [x] Format semua doc: Markdown (kompatibel GitHub render)
+- [x] Troubleshooting guide untuk Git & SvelteKit errors
