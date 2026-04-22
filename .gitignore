@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# UV
+.uv/
+uv.lock
+
+# Logs
+logs/
+*.log
+*.jsonl
+session-*.json
+
+# Environment
+.env
+.env.local
+
+# OBS
+obs/
+_out.mp3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+.pnpm-store/
+dist/
+.svelte-kit/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Notion sync cache
+.notion_sync_cache.json

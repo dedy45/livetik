@@ -1,0 +1,226 @@
+# 🗓️ 07 · Plan — Roadmap & Tiket Coding
+
+> **Canonical**: roadmap fase + daftar tiket `CC-LIVE-xxx` siap diambil agent VSCode. Mirror dari Notion.
+
+---
+
+## 1. Fase & Target
+
+| Fase | Nama | Target | Goals |
+|------|------|--------|-------|
+| M0 | Scaffold | Day 1 | Monorepo structure, CI, VSCode config |
+| M1 | Core Worker | Week 1 | TikTok + LLM + TTS + OBS + Guardrail + Queue |
+| M2 | Controller UI | Week 1 | Dashboard + Live + Errors + Persona + Config + Cost |
+| M3 | Polish | Week 2 | Telemetry, fallback, hot-reload, dry-run |
+| M4 | v0.2 Features | Week 2 | Gift/Follow reply, Claude fallback, session export |
+| M5 | v0.3 Features | Week 3 | TikFinity, OBS scene switch |
+
+---
+
+## 2. Tiket CC-LIVE-xxx (Siap Diambil Agent)
+
+Format tiap tiket: **ID • Title • Fase • Estimasi • Definition of Done • File yang disentuh • Reference**
+
+---
+
+### CC-LIVE-REPO-001 | Scaffold monorepo
+
+- **Fase**: M0 • **Est**: 1h
+- **DoD**: Semua folder dari ARCHITECTURE.md ada, `uv sync` jalan, `pnpm install` jalan, CI hijau
+- **Files**: struktur awal saja
+- **Ref**: folder tree di docs hub
+
+---
+
+### CC-LIVE-REPO-002 | Tailwind v4 theme + layout shell
+
+- **Fase**: M0 • **Est**: 1h
+- **DoD**: `app.css` dengan `@theme` (lihat Design doc §6), `+layout.svelte` sidebar + top bar, route stub `/`
+- **Files**: `apps/controller/src/app.css`, `src/routes/+layout.svelte`, `src/lib/components/Sidebar.svelte`
+- **Ref**: Design doc §3 IA, §6 Theme
+
+---
+
+### CC-LIVE-REPO-003 | CI GitHub Actions
+
+- **Fase**: M0 • **Est**: 30m
+- **DoD**: `.github/workflows/ci.yml` — job `worker` (uv sync, ruff, mypy, pytest) + job `controller` (pnpm i, svelte-check, build)
+- **Files**: `.github/workflows/ci.yml`
+
+---
+
+### CC-LIVE-REPO-004 | VSCode workspace config
+
+- **Fase**: M0 • **Est**: 30m
+- **DoD**: `.vscode/settings.json` (python.defaultInterpreter = `.venv`), `launch.json` (debug worker + attach controller), `tasks.json` (dev task)
+- **Files**: `.vscode/*.json`
+
+---
+
+### CC-LIVE-CORE-001 | Persona loader
+
+- **Fase**: M1 • **Est**: 1h
+- **DoD**: `core/persona.py` load markdown, return string; unit test
+- **Files**: `core/persona.py`, `config/persona.md` (paste dari master blueprint §6), `tests/test_persona.py`
+
+---
+
+### CC-LIVE-CORE-002 | Guardrail engine
+
+- **Fase**: M1 • **Est**: 2h
+- **DoD**: `core/guardrail.py` dengan `check_input` + `check_output`, return `(ok: bool, reason: str)`, unit test minimal 20 case (link, brand, 08xx, politik, SARA, normal)
+- **Files**: `core/guardrail.py`, `tests/test_guardrail.py`
+- **Ref**: FORBIDDEN_PATTERNS di memory
+
+---
+
+### CC-LIVE-CORE-003 | Queue + rate limit
+
+- **Fase**: M1 • **Est**: 2h
+- **DoD**: `core/queue.py` dengan `asyncio.Queue`, dedup by comment_id (TTL 60s), `asyncio_throttle` max 8/min + min 4s gap; test dengan burst 50 events
+- **Files**: `core/queue.py`, `tests/test_queue.py`
+
+---
+
+### CC-LIVE-ADAPTER-001 | TikTok adapter
+
+- **Fase**: M1 • **Est**: 2h
+- **DoD**: `adapters/tiktok.py` wrap `TikTokLiveClient`, translate `CommentEvent`/`GiftEvent`/`FollowEvent`/`ConnectEvent` → domain events di `core/events.py`, emit via callback
+- **Files**: `adapters/tiktok.py`, `core/events.py`
+- **Ref**: isaackogan quickstart
+
+---
+
+### CC-LIVE-ADAPTER-002 | LLM adapter DeepSeek
+
+- **Fase**: M1 • **Est**: 2h
+- **DoD**: `adapters/llm.py` class `LLMProvider` + `DeepSeekProvider` using `openai` SDK base_url override; retry 3× exponential backoff; token count return
+- **Files**: `adapters/llm.py`, `tests/test_llm_smoke.py`
+
+---
+
+### CC-LIVE-ADAPTER-003 | TTS adapter Edge
+
+- **Fase**: M1 • **Est**: 1.5h
+- **DoD**: `adapters/tts.py` synthesize MP3 via `edge-tts`, play via ffplay subprocess serial, queue-driven
+- **Files**: `adapters/tts.py`
+
+---
+
+### CC-LIVE-ADAPTER-004 | OBS file bridge
+
+- **Fase**: M1 • **Est**: 30m
+- **DoD**: `adapters/obs.py` atomic write (tmp + rename), test concurrent write 100×
+- **Files**: `adapters/obs.py`
+
+---
+
+### CC-LIVE-MAIN-001 | Orchestrator wiring
+
+- **Fase**: M1 • **Est**: 2h
+- **DoD**: `main.py` asyncio.TaskGroup dengan 4 tasks (tiktok, ws, http, tts); graceful shutdown Ctrl+C; healthcheck log tiap 30s
+- **Files**: `main.py`
+
+---
+
+### CC-LIVE-IPC-001 | WebSocket server
+
+- **Fase**: M2 • **Est**: 1.5h
+- **DoD**: `ipc/ws_server.py` broadcast ke semua client; heartbeat 30s; reconnect-safe
+- **Files**: `ipc/ws_server.py`
+
+---
+
+### CC-LIVE-IPC-002 | FastAPI REST
+
+- **Fase**: M2 • **Est**: 2h
+- **DoD**: `ipc/http_api.py` endpoints per Arch doc §5b; Pydantic models; CORS localhost
+- **Files**: `ipc/http_api.py`
+
+---
+
+### CC-LIVE-UI-001 | WS store + reconnect
+
+- **Fase**: M2 • **Est**: 1.5h
+- **DoD**: `lib/stores/ws.svelte.ts` runes-based, auto-reconnect 3s, cap 500 events
+- **Files**: `apps/controller/src/lib/stores/ws.svelte.ts`, `state.svelte.ts`
+
+---
+
+### CC-LIVE-UI-002 | Dashboard 6 KPI cards
+
+- **Fase**: M2 • **Est**: 2h
+- **DoD**: route `/` dengan 6 KPICard + 1 chart + 5 event mini-feed (Design §3.1)
+- **Files**: `src/routes/+page.svelte`, `src/lib/components/KPICard.svelte`, `StatusPill.svelte`, `SparkLine.svelte`
+
+---
+
+### CC-LIVE-UI-003 | Live monitor split view
+
+- **Fase**: M2 • **Est**: 2h
+- **DoD**: `/live` split 50/50 comment+reply feed, sticky filter, klik pair highlight
+- **Files**: `src/routes/live/+page.svelte`, `EventRow.svelte`
+
+---
+
+### CC-LIVE-UI-004 | Errors page
+
+- **Fase**: M2 • **Est**: 1.5h
+- **DoD**: `/errors` tab per domain, table sortable, copy reproduce
+- **Files**: `src/routes/errors/+page.svelte`
+
+---
+
+### CC-LIVE-UI-005 | Persona editor
+
+- **Fase**: M2 • **Est**: 2h
+- **DoD**: `/persona` Monaco editor + preview, save REST, test prompt box
+- **Files**: `src/routes/persona/+page.svelte`
+
+---
+
+### CC-LIVE-UI-006 | Config page
+
+- **Fase**: M2 • **Est**: 1.5h
+- **DoD**: `/config` auto-form dari schema Pydantic (endpoint `/api/config/schema`)
+- **Files**: `src/routes/config/+page.svelte`
+
+---
+
+### CC-LIVE-UI-007 | Cost tracker
+
+- **Fase**: M2 • **Est**: 1h
+- **DoD**: `/cost` today/week/month + chart + export CSV
+- **Files**: `src/routes/cost/+page.svelte`
+
+---
+
+### CC-LIVE-TEL-001 | Structured logger
+
+- **Fase**: M3 • **Est**: 1h
+- **DoD**: `telemetry/logger.py` JSON log ke file + stdout; include trace_id
+- **Files**: `telemetry/logger.py`
+
+---
+
+### CC-LIVE-TEL-002 | Cost tracker backend
+
+- **Fase**: M3 • **Est**: 1h
+- **DoD**: `telemetry/cost.py` accumulate token counts, expose via REST `/api/cost`
+- **Files**: `telemetry/cost.py`
+
+---
+
+## 3. Dependency Graph
+
+```
+M0: REPO-001 → REPO-002 → REPO-003 → REPO-004
+M1: CORE-001 → CORE-002 → CORE-003
+    ADAPTER-001 → ADAPTER-002 → ADAPTER-003 → ADAPTER-004
+    MAIN-001 (depends on all M1)
+M2: IPC-001 → IPC-002
+    UI-001 → UI-002 → UI-003 → UI-004 → UI-005 → UI-006 → UI-007
+M3: TEL-001 → TEL-002
+```
+
+Agent harus ambil tiket urut dependency graph. Jangan skip ke M2 sebelum M1 selesai.
