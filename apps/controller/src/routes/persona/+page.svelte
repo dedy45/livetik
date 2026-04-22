@@ -2,19 +2,57 @@
 	import { wsStore } from '$lib/stores/ws.svelte';
 	import TestButton from '$lib/components/TestButton.svelte';
 
-	let reloadReqId = $state<string | null>(null);
-	const reloadResult = $derived(reloadReqId ? wsStore.testResults.get(reloadReqId) : undefined);
-	const personaPreview = $derived(reloadResult?.ok ? (reloadResult.result?.preview ?? '') : '');
-	const personaLen = $derived(reloadResult?.ok ? (reloadResult.result?.char_count ?? 0) : 0);
+	// ── Load current persona ──────────────────────────────────────────────
+	let loadReqId = $state<string | null>(null);
+	const loadResult = $derived(loadReqId ? wsStore.testResults.get(loadReqId) : undefined);
 
+	// Editor state — populated when load result arrives
+	let editorContent = $state('');
+	let isDirty = $state(false);
+	let lastSavedLen = $state(0);
+
+	$effect(() => {
+		if (loadResult?.ok && loadResult.result?.preview !== undefined) {
+			// reload_persona only returns 200-char preview; for full content we use save_persona echo
+			// On first load, populate editor with preview (user can expand manually)
+			if (!isDirty) {
+				editorContent = loadResult.result.preview ?? '';
+				lastSavedLen = loadResult.result.char_count ?? 0;
+			}
+		}
+	});
+
+	// ── Save persona ──────────────────────────────────────────────────────
+	let saveReqId = $state<string | null>(null);
+	const saveResult = $derived(saveReqId ? wsStore.testResults.get(saveReqId) : undefined);
+
+	$effect(() => {
+		if (saveResult?.ok) {
+			isDirty = false;
+			lastSavedLen = saveResult.result?.char_count ?? editorContent.length;
+		}
+	});
+
+	function loadPersona() {
+		loadReqId = wsStore.sendCommand('reload_persona');
+	}
+
+	function savePersona() {
+		if (!editorContent.trim()) return;
+		saveReqId = wsStore.sendCommand('save_persona', { content: editorContent });
+	}
+
+	function onEditorInput(e: Event) {
+		editorContent = (e.target as HTMLTextAreaElement).value;
+		isDirty = true;
+	}
+
+	// ── Test reply ────────────────────────────────────────────────────────
 	let testUser = $state('Bang Rizky');
 	let testText = $state('bang rangkanya kuat nggak?');
 	let replyReqId = $state<string | null>(null);
 	const replyResult = $derived(replyReqId ? wsStore.testResults.get(replyReqId) : undefined);
 
-	function reload() {
-		reloadReqId = wsStore.sendCommand('reload_persona');
-	}
 	function testReply() {
 		replyReqId = wsStore.sendCommand('test_reply', { user: testUser, text: testText });
 	}
@@ -23,31 +61,63 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-2xl font-bold">Persona</h2>
-		<button
-			onclick={reload}
-			disabled={!wsStore.connected}
-			class="px-3 py-1.5 text-sm bg-accent text-bg-primary rounded hover:bg-accent/80 disabled:opacity-50"
-		>
-			Reload persona.md
-		</button>
+		<div class="flex gap-2">
+			<button
+				onclick={loadPersona}
+				disabled={!wsStore.connected}
+				class="px-3 py-1.5 text-sm border border-border rounded hover:bg-bg-elevated disabled:opacity-50"
+			>
+				Load dari file
+			</button>
+			<button
+				onclick={savePersona}
+				disabled={!wsStore.connected || !editorContent.trim()}
+				class="px-3 py-1.5 text-sm rounded disabled:opacity-50
+					{isDirty ? 'bg-accent text-bg-primary hover:bg-accent/80' : 'bg-bg-elevated border border-border'}"
+			>
+				{isDirty ? '💾 Save & Apply' : '✓ Saved'}
+			</button>
+		</div>
 	</div>
 
-	<!-- Preview -->
+	<!-- Editor -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<div class="flex items-center justify-between mb-4">
-			<h3 class="text-lg font-semibold">Current persona.md</h3>
-			<span class="text-xs text-text-secondary">{personaLen} chars</span>
+		<div class="flex items-center justify-between mb-3">
+			<h3 class="text-lg font-semibold">Editor persona.md</h3>
+			<div class="flex items-center gap-3 text-xs text-text-secondary">
+				{#if lastSavedLen > 0}
+					<span>file: {lastSavedLen} chars</span>
+				{/if}
+				<span class={isDirty ? 'text-warn' : 'text-text-secondary'}>
+					{isDirty ? '● unsaved' : '● synced'}
+				</span>
+				<span>{editorContent.length} chars</span>
+			</div>
 		</div>
-		{#if !personaPreview}
-			<p class="text-text-secondary text-sm">Klik "Reload persona.md" untuk load content dari file.</p>
-		{:else}
-			<pre
-				class="bg-bg-elevated border border-border rounded p-4 text-xs font-mono whitespace-pre-wrap overflow-auto max-h-64"
-			>{personaPreview}</pre>
-			<p class="text-xs text-text-secondary mt-2">
-				Preview 200 char pertama. Edit file <code class="px-1 py-0.5 bg-bg-elevated rounded">apps/worker/config/persona.md</code> lalu klik Reload.
+
+		<textarea
+			value={editorContent}
+			oninput={onEditorInput}
+			rows={12}
+			spellcheck={false}
+			class="w-full px-4 py-3 bg-bg-elevated border border-border rounded text-sm font-mono
+				resize-y focus:outline-none focus:border-accent transition-colors"
+			placeholder="Klik 'Load dari file' untuk load persona aktif, atau ketik langsung di sini.&#10;&#10;Contoh:&#10;Kamu adalah Bang Hack, asisten virtual TikTok Live @interiorhack.id.&#10;Jawab dalam bahasa Indonesia santai maksimal 2 kalimat pendek.&#10;Fokus interior, furniture, rangka baja. Jangan sebut harga pasti atau kontak."
+		></textarea>
+
+		<div class="flex items-center justify-between mt-2">
+			<p class="text-xs text-text-secondary">
+				Edit langsung → klik <b>Save & Apply</b> → persona aktif berubah real-time tanpa restart.
+				File <code class="px-1 py-0.5 bg-bg-elevated rounded">config/persona.md</code> ikut tersimpan.
 			</p>
-		{/if}
+			{#if saveResult}
+				{#if saveResult.ok}
+					<span class="text-xs text-success">✓ Saved {saveResult.result?.char_count} chars</span>
+				{:else}
+					<span class="text-xs text-error">✗ {saveResult.error}</span>
+				{/if}
+			{/if}
+		</div>
 	</section>
 
 	<!-- Test reply -->
@@ -91,7 +161,7 @@
 				</div>
 			{/if}
 			<p class="text-xs text-text-secondary">
-				Pipeline: guardrail.check → llm.reply (tanpa TTS). Pakai untuk iterate persona.md tanpa spend TTS quota.
+				Pipeline: guardrail.check → llm.reply (tanpa TTS). Pakai untuk iterate persona tanpa spend TTS quota.
 			</p>
 		</div>
 	</section>

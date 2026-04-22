@@ -9,8 +9,14 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 import websockets
+from websockets.exceptions import InvalidMessage
 
 log = logging.getLogger(__name__)
+
+# Suppress noisy "did not receive a valid HTTP request" errors that occur when
+# plain TCP health-check probes (e.g. socket.connect_ex) touch the WS port.
+# These are harmless — the connection is immediately closed by the prober.
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
 
 CommandHandler = Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]
 

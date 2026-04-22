@@ -258,12 +258,14 @@ async def main() -> NoReturn:
         if not tts:
             raise RuntimeError("TTS not initialized — check CARTESIA_API_KEYS")
         text = str(p.get("text", "Halo bos, Bang Hack di sini makasih udah mampir"))
-        result = await tts.speak(text)
+        emotion = str(p.get("emotion", "neutral"))
+        result = await tts.speak(text, emotion=emotion)
         if result.engine == "error":
             raise RuntimeError("TTS engine error — check logs")
         return {
             "engine": result.engine, "char_count": result.char_count,
             "duration_s": round(result.duration_s, 2), "key": result.key_preview,
+            "emotion": emotion,
         }
 
     async def cmd_test_tiktok_conn(p: dict[str, object]) -> dict[str, object]:
@@ -284,6 +286,19 @@ async def main() -> NoReturn:
         new_text = load_persona("config/persona.md")
         persona_text = new_text
         return {"char_count": len(new_text), "preview": new_text[:200]}
+
+    async def cmd_save_persona(p: dict[str, object]) -> dict[str, object]:
+        """Save persona text to config/persona.md and hot-reload into memory."""
+        nonlocal persona_text
+        content = str(p.get("content", "")).strip()
+        if not content:
+            raise RuntimeError("content required — cannot save empty persona")
+        persona_path = Path("config/persona.md")
+        persona_path.parent.mkdir(parents=True, exist_ok=True)
+        persona_path.write_text(content, encoding="utf-8")
+        persona_text = content
+        log.info("persona saved (%d chars) and hot-reloaded", len(content))
+        return {"saved": True, "char_count": len(content), "preview": content[:200]}
 
     async def cmd_test_reply(p: dict[str, object]) -> dict[str, object]:
         user = str(p.get("user", "TestUser"))
@@ -375,6 +390,7 @@ async def main() -> NoReturn:
         ("test_tts_voice_out", cmd_test_tts_voice_out),
         ("test_tiktok_conn", cmd_test_tiktok_conn),
         ("reload_persona", cmd_reload_persona),
+        ("save_persona", cmd_save_persona),
         ("test_reply", cmd_test_reply),
         ("test_guardrail", cmd_test_guardrail),
         ("reset_cost_today", cmd_reset_cost_today),

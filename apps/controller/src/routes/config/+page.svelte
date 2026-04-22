@@ -44,6 +44,7 @@
 	let nineRouterKey = $state('');
 
 	let ttsTestText = $state('Halo bos, Bang Hack di sini');
+	let ttsTestEmotion = $state('neutral');
 	let tiktokTestUsername = $state('');
 	let guardrailTestText = $state('');
 	let guardrailTestUser = $state('TestUser');
@@ -296,7 +297,7 @@
 						<div>
 							<div class="font-mono text-sm">{slot.key}</div>
 							<div class="text-xs text-text-secondary">
-								{slot.calls} calls · {slot.total_errors} errors
+								{slot.calls} calls · {slot.errors} errors
 								{#if slot.exhausted} · <span class="text-error">⏳ {Math.floor(slot.cooldown_s / 3600)}h cooldown</span>{/if}
 							</div>
 						</div>
@@ -320,15 +321,27 @@
 			</div>
 			<div class="p-3 bg-bg-elevated rounded">
 				<div class="font-medium mb-2">Voice Output (end-to-end, keluar suara)</div>
-				<div class="flex gap-2">
+				<div class="flex gap-2 mb-2">
 					<input
 						bind:value={ttsTestText}
 						class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
 						placeholder="Text untuk disintesis & diputar"
 					/>
-					<TestButton command="test_tts_voice_out" params={{ text: ttsTestText }} label="Speak" />
+					<select
+						bind:value={ttsTestEmotion}
+						class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+						title="Emotion (Cartesia Sonic-3 only)"
+					>
+						<option value="neutral">😐 neutral</option>
+						<option value="happy">😊 happy</option>
+						<option value="sad">😢 sad</option>
+						<option value="angry">😠 angry</option>
+						<option value="dramatic">🎭 dramatic</option>
+						<option value="comedic">😄 comedic</option>
+					</select>
+					<TestButton command="test_tts_voice_out" params={{ text: ttsTestText, emotion: ttsTestEmotion }} label="Speak" />
 				</div>
-				<div class="text-xs text-text-secondary mt-1">Suara keluar di default audio device (atau VB-CABLE kalau sudah di-route)</div>
+				<div class="text-xs text-text-secondary">Suara keluar di default audio device (atau VB-CABLE kalau sudah di-route). Emotion hanya berlaku untuk Cartesia Sonic-3.</div>
 			</div>
 		</div>
 	</section>

@@ -32,7 +32,7 @@ def _build_router() -> Router:
         {
             "model_name": "chat",
             "litellm_params": {
-                "model": "openai/kc/kilo-auto/free",
+                "model": os.getenv("NINEROUTER_MODEL", "openai/kc/kilo-auto/free"),
                 "api_base": ninerouter_base,
                 "api_key": ninerouter_key,
                 "timeout": 15,

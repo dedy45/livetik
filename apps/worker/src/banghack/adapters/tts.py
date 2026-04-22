@@ -37,15 +37,21 @@ class TTSAdapter:
         if not self.voice_id:
             log.warning("CARTESIA_VOICE_ID not set — Cartesia will fail, will fall back to edge-tts")
 
-    async def speak(self, text: str) -> TTSResult:
-        """Synthesize then play (sequential, lock-protected)."""
+    async def speak(self, text: str, emotion: str = "neutral") -> TTSResult:
+        """Synthesize then play (sequential, lock-protected).
+
+        Args:
+            text: Text to synthesize.
+            emotion: Cartesia emotion — neutral | happy | sad | angry | dramatic | comedic.
+                     Ignored by edge-tts fallback.
+        """
         text = text.strip()
         if not text:
             return TTSResult(engine="error", duration_s=0, char_count=0)
         async with self._play_lock:
             # Try Cartesia first
             try:
-                return await self._cartesia_speak(text)
+                return await self._cartesia_speak(text, emotion=emotion)
             except Exception as e:
                 log.warning("Cartesia failed (%s) → falling back to edge-tts", e)
             # Fallback: edge-tts
@@ -55,24 +61,33 @@ class TTSAdapter:
                 log.error("edge-tts also failed: %s", e)
                 return TTSResult(engine="error", duration_s=0, char_count=len(text))
 
-    async def _cartesia_speak(self, text: str) -> TTSResult:
+    # Valid Cartesia Sonic-3 emotions
+    VALID_EMOTIONS = frozenset({"neutral", "happy", "sad", "angry", "dramatic", "comedic"})
+
+    async def _cartesia_speak(self, text: str, emotion: str = "neutral") -> TTSResult:
         import time
         if not self.voice_id:
             raise RuntimeError("CARTESIA_VOICE_ID not set")
         slot: KeySlot = await self.pool.acquire()
         t0 = time.monotonic()
+        # Normalise emotion — fall back to neutral if unknown
+        safe_emotion = emotion if emotion in self.VALID_EMOTIONS else "neutral"
         try:
             async with AsyncCartesia(api_key=slot.key) as client:
                 audio_bytes = b""
                 async for chunk in client.tts.bytes(
                     model_id=self.model_id,
                     transcript=text,
-                    voice={"mode": "id", "id": self.voice_id},
+                    voice={
+                        "mode": "id",
+                        "id": self.voice_id,
+                        "experimental_controls": {"emotions": [safe_emotion]},
+                    },
                     language="id",
                     output_format={
                         "container": "wav",
-                        "encoding": "pcm_s16le",
-                        "sample_rate": 22050,
+                        "encoding": "pcm_f32le",   # matches tested working script
+                        "sample_rate": 44100,       # matches tested working script
                     },
                 ):
                     audio_bytes += chunk
