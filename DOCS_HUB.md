@@ -19,6 +19,7 @@
 | 08 | Agent Brief | [AGENT_BRIEF.md](docs/AGENT_BRIEF.md) | Agent | Paste di session awal |
 | 09 | GitHub | [GITHUB.md](docs/GITHUB.md) | Dev | Setup & sync GitHub |
 | 10 | Structure | [STRUCTURE.md](docs/STRUCTURE.md) | Dev | Cari file/folder |
+| 11 | Troubleshooting | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Dev | Fix errors |
 
 ---
 

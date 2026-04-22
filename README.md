@@ -102,6 +102,24 @@ Navigasi detail & file pertama saat error: [`docs/ARCHITECTURE.md`](docs/ARCHITE
 - [CHANGELOG](docs/CHANGELOG.md) — Keep a Changelog format
 - [GitHub](docs/GITHUB.md) — GitHub setup & sync
 - [Structure](docs/STRUCTURE.md) — Project structure
+- [Troubleshooting](docs/TROUBLESHOOTING.md) — Fix common errors
+
+## 💾 Backup ke GitHub
+
+**Quick backup:**
+```cmd
+cd scripts
+backup-github.bat
+```
+
+**Manual:**
+```cmd
+git add .
+git commit -m "Backup: update"
+git push origin main
+```
+
+Troubleshooting: [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
 
 ## 🛠️ Kontribusi
 
