@@ -20,6 +20,7 @@
 | 09 | GitHub | [GITHUB.md](docs/GITHUB.md) | Dev | Setup & sync GitHub |
 | 10 | Structure | [STRUCTURE.md](docs/STRUCTURE.md) | Dev | Cari file/folder |
 | 11 | Troubleshooting | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Dev | Fix errors |
+| 12 | Kiro Guide | [KIRO_GUIDE.md](docs/KIRO_GUIDE.md) | Kiro IDE users | Development workflow |
 
 ---
 
@@ -143,6 +144,7 @@ REM Controller: http://localhost:5173
 - [GITHUB.md](docs/GITHUB.md)
 - [STRUCTURE.md](docs/STRUCTURE.md)
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- [KIRO_GUIDE.md](docs/KIRO_GUIDE.md)
 
 ---
 
