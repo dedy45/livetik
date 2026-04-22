@@ -1,37 +1,61 @@
-"""Main entry point for Bang Hack worker."""
+"""Main entry point for Bang Hack worker (dev-wired)."""
 
 import asyncio
-import signal
-import sys
+import logging
+import time
 from typing import NoReturn
+
+from .ipc.ws_server import WSServer
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s"
+)
+log = logging.getLogger("banghack")
 
 
 async def main() -> NoReturn:
-    """Main orchestrator with graceful shutdown."""
-    print("🎙️ Bang Hack Worker v0.1.0-dev")
-    print("Starting TikTok Live AI Co-Pilot...")
+    """Main orchestrator with WebSocket server and dummy metrics broadcast."""
+    log.info("🎙️ Bang Hack Worker v0.1.0-dev starting")
     
-    # TODO: Initialize components
-    # - TikTok adapter
-    # - LLM adapter
-    # - TTS adapter
-    # - OBS adapter
-    # - WebSocket server
-    # - HTTP API server
+    # Initialize WebSocket server
+    ws = WSServer(host="127.0.0.1", port=8765)
+    await ws.start()
+
+    start_ts = time.time()
+    tick = 0
     
     try:
-        # Keep running
         while True:
-            await asyncio.sleep(30)
-            print("❤️ Heartbeat - Worker running...")
+            tick += 1
+            uptime = int(time.time() - start_ts)
+            
+            # Broadcast dummy metrics every 2 seconds
+            await ws.broadcast({
+                "type": "metrics",
+                "ts": time.time(),
+                "status": "connected" if tick > 2 else "connecting",
+                "uptime_s": uptime,
+                "viewers": 0,
+                "comments": tick * 3,
+                "replies": tick,
+                "queue_size": max(0, tick % 5),
+                "latency_p95_ms": 120,
+                "cost_idr": tick * 50,
+            })
+            
+            log.debug("Broadcasted metrics (tick=%d, clients=%d)", tick, len(ws.clients))
+            await asyncio.sleep(2)
+            
     except KeyboardInterrupt:
-        print("\n🛑 Shutting down gracefully...")
-        sys.exit(0)
+        log.info("Shutting down gracefully...")
+        await ws.stop()
+        raise
 
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\n👋 Goodbye!")
-        sys.exit(0)
+        log.info("Goodbye!")
+
