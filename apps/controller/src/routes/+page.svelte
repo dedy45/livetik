@@ -78,4 +78,28 @@
 			</ul>
 		{/if}
 	</div>
+
+	<div class="bg-bg-panel border border-border rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">Live Comments</h3>
+			<a href="/live" class="text-sm text-accent hover:underline">Full monitor →</a>
+		</div>
+		{#if wsStore.comments.length === 0}
+			<p class="text-text-secondary text-sm">
+				{m.status === 'live' ? 'Menunggu comment masuk…' : `Status: ${m.status} — set TIKTOK_USERNAME di .env lalu restart worker.`}
+			</p>
+		{:else}
+			<ul class="space-y-2 text-sm max-h-64 overflow-auto">
+				{#each wsStore.comments.slice(0, 15) as c (c.ts + c.user)}
+					<li class="flex items-baseline gap-2">
+						<span class="text-accent font-mono text-xs shrink-0">
+							{new Date(c.ts).toLocaleTimeString('id-ID')}
+						</span>
+						<span class="font-semibold shrink-0">{c.user}:</span>
+						<span class="text-text-primary">{c.text}</span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
 </div>

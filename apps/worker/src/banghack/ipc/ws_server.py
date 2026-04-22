@@ -5,29 +5,28 @@ import logging
 from typing import Any
 
 import websockets
-from websockets.server import WebSocketServerProtocol
 
 log = logging.getLogger(__name__)
 
 
 class WSServer:
     """WebSocket server untuk real-time communication dengan controller."""
-    
+
     def __init__(self, host: str = "127.0.0.1", port: int = 8765) -> None:
         """Initialize WebSocket server.
-        
+
         Args:
             host: Host address to bind to
             port: Port number to listen on
         """
         self.host = host
         self.port = port
-        self.clients: set[WebSocketServerProtocol] = set()
+        self.clients: set[Any] = set()
         self._server: Any = None
 
-    async def _handler(self, ws: WebSocketServerProtocol) -> None:
+    async def _handler(self, ws: Any) -> None:
         """Handle individual WebSocket connection.
-        
+
         Args:
             ws: WebSocket connection protocol
         """
@@ -54,7 +53,7 @@ class WSServer:
 
     async def broadcast(self, event: dict[str, Any]) -> None:
         """Broadcast event to all connected clients.
-        
+
         Args:
             event: Event dictionary to broadcast
         """

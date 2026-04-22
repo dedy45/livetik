@@ -1,1 +1,1 @@
-"""External service adapters."""
+"""Adapters package — external service connectors."""
