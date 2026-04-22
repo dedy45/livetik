@@ -7,6 +7,7 @@ import os
 import time
 from typing import NoReturn
 
+import uvicorn
 from dotenv import load_dotenv
 
 from .adapters.cartesia_pool import CartesiaPool
@@ -17,6 +18,7 @@ from .core.cost import CostTracker
 from .core.guardrail import Guardrail
 from .core.persona import load_persona
 from .core.queue import ReplyJob, ReplyQueue
+from .ipc.http_server import create_app
 from .ipc.ws_server import WSServer
 
 load_dotenv()
@@ -30,7 +32,23 @@ log = logging.getLogger("banghack")
 TIKTOK_USERNAME = os.getenv("TIKTOK_USERNAME", "").strip().lstrip("@")
 REPLY_ENABLED = os.getenv("REPLY_ENABLED", "false").lower() == "true"
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"
+HTTP_HOST = os.getenv("HTTP_HOST", "127.0.0.1")
+HTTP_PORT = int(os.getenv("HTTP_PORT", "8766"))
 HEARTBEAT_INTERVAL_S = 5
+
+
+async def _run_http(llm: LLMAdapter) -> None:
+    """Run FastAPI HTTP server for config/model API."""
+    app = create_app(llm)
+    config = uvicorn.Config(
+        app,
+        host=HTTP_HOST,
+        port=HTTP_PORT,
+        log_level="warning",
+        access_log=False,
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
 
 
 class State:
@@ -166,6 +184,10 @@ async def main() -> NoReturn:
     else:
         log.warning("TIKTOK_USERNAME not set — heartbeat only")
 
+    # Start HTTP API server (config + model discovery)
+    http_task = asyncio.create_task(_run_http(llm), name="http")
+    log.info("HTTP API listening on http://%s:%d", HTTP_HOST, HTTP_PORT)
+
     mode = "p2b-reply-loop" if REPLY_ENABLED else "p2b-readonly"
     try:
         while True:
@@ -203,6 +225,7 @@ async def main() -> NoReturn:
     except (KeyboardInterrupt, asyncio.CancelledError):
         log.info("shutting down")
         await queue.stop()
+        http_task.cancel()
         if tiktok_task and not tiktok_task.done():
             tiktok_task.cancel()
             try:
