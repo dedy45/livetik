@@ -1,4 +1,6 @@
 @echo off
+setlocal enabledelayedexpansion
+
 REM Clean script untuk reset instalasi
 echo.
 echo ========================================
@@ -17,10 +19,16 @@ if /i not "%confirm%"=="y" (
     exit /b 0
 )
 
+REM Get absolute paths
+set "SCRIPT_DIR=%~dp0"
+set "PROJECT_ROOT=%SCRIPT_DIR%.."
+set "WORKER_DIR=%PROJECT_ROOT%\apps\worker"
+set "CONTROLLER_DIR=%PROJECT_ROOT%\apps\controller"
+
 echo.
 echo [1/4] Cleaning Python worker...
-if exist "%~dp0..\apps\worker\.venv" (
-    rmdir /s /q "%~dp0..\apps\worker\.venv"
+if exist "%WORKER_DIR%\.venv" (
+    rmdir /s /q "%WORKER_DIR%\.venv"
     echo [OK] Removed .venv
 ) else (
     echo [SKIP] .venv not found
@@ -28,15 +36,15 @@ if exist "%~dp0..\apps\worker\.venv" (
 echo.
 
 echo [2/4] Cleaning controller...
-if exist "%~dp0..\apps\controller\node_modules" (
-    rmdir /s /q "%~dp0..\apps\controller\node_modules"
+if exist "%CONTROLLER_DIR%\node_modules" (
+    rmdir /s /q "%CONTROLLER_DIR%\node_modules"
     echo [OK] Removed node_modules
 ) else (
     echo [SKIP] node_modules not found
 )
 
-if exist "%~dp0..\apps\controller\.svelte-kit" (
-    rmdir /s /q "%~dp0..\apps\controller\.svelte-kit"
+if exist "%CONTROLLER_DIR%\.svelte-kit" (
+    rmdir /s /q "%CONTROLLER_DIR%\.svelte-kit"
     echo [OK] Removed .svelte-kit
 ) else (
     echo [SKIP] .svelte-kit not found
@@ -44,22 +52,22 @@ if exist "%~dp0..\apps\controller\.svelte-kit" (
 echo.
 
 echo [3/4] Cleaning logs and temp files...
-if exist "%~dp0..\logs" (
-    rmdir /s /q "%~dp0..\logs"
+if exist "%PROJECT_ROOT%\logs" (
+    rmdir /s /q "%PROJECT_ROOT%\logs"
     echo [OK] Removed logs
 ) else (
     echo [SKIP] logs not found
 )
 
-if exist "%~dp0..\obs" (
-    rmdir /s /q "%~dp0..\obs"
+if exist "%PROJECT_ROOT%\obs" (
+    rmdir /s /q "%PROJECT_ROOT%\obs"
     echo [OK] Removed obs
 ) else (
     echo [SKIP] obs not found
 )
 
-if exist "%~dp0..\_out.mp3" (
-    del /q "%~dp0..\_out.mp3"
+if exist "%PROJECT_ROOT%\_out.mp3" (
+    del /q "%PROJECT_ROOT%\_out.mp3"
     echo [OK] Removed _out.mp3
 ) else (
     echo [SKIP] _out.mp3 not found
@@ -74,3 +82,4 @@ echo ========================================
 echo  Run: scripts\install.bat
 echo.
 pause
+endlocal

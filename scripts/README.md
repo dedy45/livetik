@@ -166,26 +166,24 @@ Jangan pindahkan scripts ke folder lain.
 
 ### Path Resolution
 
-All scripts use `%~dp0` untuk resolve paths:
-- `%~dp0` = Directory where script is located
-- `%~dp0..` = Parent directory (project root)
-- `%~dp0..\apps\worker` = Worker directory
+All scripts use `%~dp0` and absolute paths untuk resolve paths:
+- `%~dp0` = Directory where script is located (with trailing backslash)
+- `%SCRIPT_DIR%` = `%~dp0` (script directory)
+- `%PROJECT_ROOT%` = `%SCRIPT_DIR%..` (parent directory)
+- `%WORKER_DIR%` = `%PROJECT_ROOT%\apps\worker`
+- `%CONTROLLER_DIR%` = `%PROJECT_ROOT%\apps\controller`
+
+Scripts use `cd /d` untuk change directory dengan drive letter support.
 
 ### Error Handling
 
 All scripts:
-- ✅ Check prerequisites
-- ✅ Validate paths exist
+- ✅ Check prerequisites (UV, pnpm, git)
+- ✅ Validate paths exist before operations
 - ✅ Return proper exit codes
 - ✅ Show clear error messages
 - ✅ Pause before exit (untuk baca error)
-
-### Directory Changes
-
-Scripts use `pushd/popd` instead of `cd`:
-- `pushd` = Change directory dan save previous
-- `popd` = Return to previous directory
-- Lebih reliable untuk nested operations
+- ✅ Use `setlocal enabledelayedexpansion` untuk variable handling
 
 ---
 

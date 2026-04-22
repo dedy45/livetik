@@ -14,12 +14,6 @@ set "PROJECT_ROOT=%SCRIPT_DIR%.."
 set "WORKER_DIR=%PROJECT_ROOT%\apps\worker"
 set "CONTROLLER_DIR=%PROJECT_ROOT%\apps\controller"
 
-echo [DEBUG] Script directory: %SCRIPT_DIR%
-echo [DEBUG] Project root: %PROJECT_ROOT%
-echo [DEBUG] Worker directory: %WORKER_DIR%
-echo [DEBUG] Controller directory: %CONTROLLER_DIR%
-echo.
-
 REM Check if UV is installed
 where uv >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
@@ -29,8 +23,6 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
-echo [OK] UV found
-echo.
 
 REM Check if pnpm is installed
 where pnpm >nul 2>nul
@@ -41,8 +33,6 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
-echo [OK] pnpm found
-echo.
 
 REM Check if worker directory exists
 if not exist "%WORKER_DIR%" (
@@ -57,8 +47,6 @@ if not exist "%WORKER_DIR%\pyproject.toml" (
     pause
     exit /b 1
 )
-echo [OK] Worker directory found
-echo.
 
 REM Check if controller directory exists
 if not exist "%CONTROLLER_DIR%" (
@@ -73,8 +61,6 @@ if not exist "%CONTROLLER_DIR%\package.json" (
     pause
     exit /b 1
 )
-echo [OK] Controller directory found
-echo.
 
 echo [1/4] Installing Python worker dependencies...
 cd /d "%WORKER_DIR%"
@@ -83,7 +69,6 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
-echo [DEBUG] Current directory: %CD%
 call uv sync
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to install worker dependencies
@@ -102,7 +87,6 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
-echo [DEBUG] Current directory: %CD%
 call pnpm install
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to install controller dependencies
