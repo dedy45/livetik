@@ -81,6 +81,119 @@
 
 	<div class="bg-bg-panel border border-border rounded-lg p-6">
 		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">Reply Feed</h3>
+			<span class="text-xs px-2 py-1 rounded {m.reply_enabled ? 'bg-ok text-bg' : 'bg-warn text-bg'}">
+				{m.reply_enabled ? (m.dry_run ? 'DRY RUN' : 'LIVE') : 'DISABLED'}
+			</span>
+		</div>
+		{#if wsStore.replies.length === 0}
+			<p class="text-text-secondary text-sm">
+				{m.reply_enabled ? 'Menunggu reply…' : 'REPLY_ENABLED=false di .env'}
+			</p>
+		{:else}
+			<ul class="space-y-3 text-sm max-h-64 overflow-auto">
+				{#each wsStore.replies.slice(0, 10) as r (r.ts + r.user)}
+					<li class="border-l-2 border-accent pl-3">
+						<div class="flex items-baseline gap-2 mb-1">
+							<span class="text-accent font-mono text-xs shrink-0">
+								{new Date(r.ts).toLocaleTimeString('id-ID')}
+							</span>
+							<span class="font-semibold shrink-0">{r.user}:</span>
+							<span class="text-text-secondary text-xs">{r.comment}</span>
+						</div>
+						<div class="flex items-baseline gap-2">
+							<span class="text-ok">→</span>
+							<span class="text-text-primary">{r.reply}</span>
+						</div>
+						<div class="flex gap-2 mt-1 text-xs text-text-secondary">
+							<span>tier={r.tier}</span>
+							<span>tts={r.tts}</span>
+							<span>{r.latency_ms}ms</span>
+						</div>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
+
+	<div class="bg-bg-panel border border-border rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">Cost & Budget</h3>
+			<span class="text-xs px-2 py-1 rounded {m.over_budget ? 'bg-error text-bg' : 'bg-ok text-bg'}">
+				{m.over_budget ? 'OVER BUDGET' : 'OK'}
+			</span>
+		</div>
+		<div class="space-y-2">
+			<div class="flex justify-between items-baseline">
+				<span class="text-sm text-text-secondary">Cost Today</span>
+				<span class="text-2xl font-bold">Rp {m.cost_idr.toLocaleString('id-ID')}</span>
+			</div>
+			<div class="flex justify-between items-baseline">
+				<span class="text-sm text-text-secondary">Budget</span>
+				<span class="text-lg">Rp {m.budget_idr.toLocaleString('id-ID')}</span>
+			</div>
+			<div class="w-full bg-bg-elevated rounded-full h-2 overflow-hidden">
+				<div
+					class="h-full transition-all {m.over_budget ? 'bg-error' : 'bg-ok'}"
+					style="width: {Math.min(m.budget_pct, 100)}%"
+				></div>
+			</div>
+			<p class="text-xs text-text-secondary text-right">{m.budget_pct.toFixed(1)}% used</p>
+			
+			{#if m.cartesia_pool && m.cartesia_pool.length > 0}
+				<div class="mt-3 text-xs text-text-secondary border-t border-border pt-3">
+					<div class="mb-1">Cartesia pool ({m.cartesia_pool.length} key):</div>
+					{#each m.cartesia_pool as slot}
+						<div class="flex justify-between font-mono">
+							<span>{slot.key}</span>
+							<span class={slot.exhausted ? 'text-error' : 'text-ok'}>
+								{slot.exhausted ? `⏳ ${Math.floor(slot.cooldown_s/3600)}h` : `✓ ${slot.calls} calls`}
+							</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	</div>
+
+	<div class="bg-bg-panel border border-border rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">LLM Models</h3>
+			<span class="text-xs px-2 py-1 rounded bg-bg-elevated">
+				{m.llm_models.length} tier{m.llm_models.length !== 1 ? 's' : ''}
+			</span>
+		</div>
+		{#if m.llm_models.length === 0}
+			<p class="text-text-secondary text-sm">No models configured</p>
+		{:else}
+			<div class="space-y-2 text-sm">
+				{#each m.llm_models as model, i}
+					<div class="border border-border rounded p-3">
+						<div class="flex items-center justify-between mb-1">
+							<span class="font-semibold text-accent">Tier {i + 1}: {model.id}</span>
+							<span class="text-xs px-2 py-0.5 rounded bg-bg-elevated font-mono">
+								{model.timeout}s
+							</span>
+						</div>
+						<div class="text-xs text-text-secondary font-mono">
+							{model.model}
+						</div>
+						{#if model.api_base}
+							<div class="text-xs text-text-secondary mt-1">
+								{model.api_base}
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+			<div class="mt-3 text-xs text-text-secondary">
+				<p>💡 Edit models in <code class="px-1 py-0.5 bg-bg-elevated rounded">.env</code> file</p>
+			</div>
+		{/if}
+	</div>
+
+	<div class="bg-bg-panel border border-border rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-semibold">Live Comments</h3>
 			<a href="/live" class="text-sm text-accent hover:underline">Full monitor →</a>
 		</div>
