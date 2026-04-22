@@ -31,7 +31,7 @@ class TTSAdapter:
     def __init__(self, pool: CartesiaPool) -> None:
         self.pool = pool
         self.voice_id = os.getenv("CARTESIA_VOICE_ID", "")
-        self.model_id = os.getenv("CARTESIA_MODEL", "sonic-2")
+        self.model_id = os.getenv("CARTESIA_MODEL", "sonic-3")
         self.edge_voice = os.getenv("EDGE_TTS_VOICE", "id-ID-ArdiNeural")
         self._play_lock = asyncio.Lock()
         if not self.voice_id:

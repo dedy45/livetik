@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { wsStore } from '$lib/stores/ws.svelte';
+	import TestButton from '$lib/components/TestButton.svelte';
 
 	const m = $derived(wsStore.metrics);
 	const statusColor = $derived(
@@ -26,6 +27,28 @@
 			</span>
 			<span class="text-sm text-text-secondary">Uptime: {wsStore.uptime}</span>
 			<span class="px-3 py-1 bg-bg-elevated rounded-md text-sm">Queue: {m.queue_size}</span>
+		</div>
+	</div>
+
+	<!-- System Health card (P2-C) -->
+	<div class="bg-bg-panel border border-border rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold">System Health</h3>
+			<a href="/config" class="text-sm text-accent hover:underline">Full validation →</a>
+		</div>
+		<div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+			{#each [
+				{ label: 'ffplay', cmd: 'test_ffplay' },
+				{ label: '9router', cmd: 'test_ninerouter' },
+				{ label: 'LLM', cmd: 'test_llm' },
+				{ label: 'Cartesia', cmd: 'test_cartesia_all' },
+				{ label: 'Edge-TTS', cmd: 'test_edge_tts' }
+			] as probe}
+				<div class="flex flex-col items-center gap-1 p-3 bg-bg-elevated rounded">
+					<span class="text-xs text-text-secondary">{probe.label}</span>
+					<TestButton command={probe.cmd} label="Probe" size="sm" variant="secondary" />
+				</div>
+			{/each}
 		</div>
 	</div>
 
