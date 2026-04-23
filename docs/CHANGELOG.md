@@ -8,6 +8,27 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+**Frontend — TTS Output Test:**
+- 2 section terpisah untuk test TTS dengan download & play:
+  - **Edge-TTS (Lokal Fallback)** — Voice selector (ArdiNeural/GadisNeural)
+  - **Cartesia TTS (Premium)** — Emotion selector (neutral/happy/sad/angry/dramatic/comedic)
+- HTML5 audio player untuk preview hasil generate
+- Download button untuk save audio file
+- Metadata display (duration, file size)
+- Real-time generation dengan loading state
+
+**Backend — TTS Generate Commands:**
+- `generate_edge_tts`: Generate Edge-TTS audio → save to static folder
+  - Input: text, voice (default: id-ID-ArdiNeural)
+  - Output: file_path, duration_s, file_size_kb, voice
+- `generate_cartesia_tts`: Generate Cartesia TTS audio → save to static folder
+  - Input: text, emotion (default: neutral)
+  - Output: file_path, duration_s, file_size_kb, emotion, key_preview
+- Static folder: `apps/controller/static/tts-samples/`
+- File naming: `edge-{timestamp}.mp3` dan `cartesia-{timestamp}.wav`
+
 ### Fixed
 
 **Frontend — Persona Page:**
@@ -26,7 +47,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `/config` page: Reorganized dengan tab navigation untuk mengurangi scroll panjang
   - **Tab 1: ⚙️ System & Runtime** — Runtime toggles, System checks, Daily budget
   - **Tab 2: 🤖 LLM & AI** — 9router, LLM tiers, Guardrail test & rules
-  - **Tab 3: 🔊 TTS & Audio** — Cartesia config, key pool, Edge-TTS, Audio devices
+  - **Tab 3: 🔊 TTS & Audio** — Cartesia config, key pool, Edge-TTS test, Cartesia test, Audio devices
   - **Tab 4: 📱 TikTok** — Connection test, Hot-swap account
   - Lebih user-friendly dengan navigasi yang jelas dan konten terorganisir per kategori
 
