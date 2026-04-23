@@ -281,6 +281,112 @@ async def main() -> NoReturn:
         finally:
             Path(tmp).unlink(missing_ok=True)
 
+    async def cmd_generate_edge_tts(p: dict[str, object]) -> dict[str, object]:
+        """Generate Edge-TTS audio and save to static folder for download/play."""
+        import edge_tts as _edge_tts  # type: ignore[import-not-found]
+        import time
+        
+        text = str(p.get("text", "")).strip()
+        if not text:
+            raise RuntimeError("text required")
+        voice = str(p.get("voice", os.getenv("EDGE_TTS_VOICE", "id-ID-ArdiNeural")))
+        
+        # Save to controller static folder
+        static_dir = Path("../controller/static/tts-samples")
+        static_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = int(time.time())
+        filename = f"edge-{timestamp}.mp3"
+        output_path = static_dir / filename
+        
+        communicate = _edge_tts.Communicate(text, voice)
+        await communicate.save(str(output_path))
+        
+        # Get file metadata
+        file_size_kb = output_path.stat().st_size / 1024
+        
+        # Estimate duration (rough: 150 words per minute, average 5 chars per word)
+        word_count = len(text.split())
+        duration_s = (word_count / 150) * 60
+        
+        return {
+            "file_path": f"/tts-samples/{filename}",
+            "duration_s": round(duration_s, 2),
+            "file_size_kb": round(file_size_kb, 1),
+            "voice": voice
+        }
+
+    async def cmd_generate_cartesia_tts(p: dict[str, object]) -> dict[str, object]:
+        """Generate Cartesia TTS audio and save to static folder for download/play."""
+        import time
+        
+        if not tts:
+            raise RuntimeError("TTS not initialized — check CARTESIA_API_KEYS")
+        
+        text = str(p.get("text", "")).strip()
+        if not text:
+            raise RuntimeError("text required")
+        emotion = str(p.get("emotion", "neutral"))
+        
+        # Save to controller static folder
+        static_dir = Path("../controller/static/tts-samples")
+        static_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = int(time.time())
+        filename = f"cartesia-{timestamp}.wav"
+        output_path = static_dir / filename
+        
+        # Use Cartesia API directly to generate and save
+        if not tts.voice_id:
+            raise RuntimeError("CARTESIA_VOICE_ID not set")
+        
+        slot = await tts.pool.acquire()
+        safe_emotion = emotion if emotion in tts.VALID_EMOTIONS else "neutral"
+        
+        try:
+            from cartesia import AsyncCartesia
+            async with AsyncCartesia(api_key=slot.key) as client:
+                output_format = {
+                    "container": "wav",
+                    "encoding": "pcm_f32le",
+                    "sample_rate": 44100,
+                }
+                
+                # Add emotion control for Sonic-3
+                experimental_controls = {}
+                if tts.model_id == "sonic-3":
+                    experimental_controls = {"emotions": [safe_emotion]}
+                
+                response = await client.tts.bytes(
+                    model_id=tts.model_id,
+                    transcript=text,
+                    voice={"mode": "id", "id": tts.voice_id},
+                    language="id",
+                    output_format=output_format,
+                    **({"experimental_controls": experimental_controls} if experimental_controls else {}),
+                )
+                
+                # Save audio bytes to file
+                audio_bytes = response["audio"]
+                output_path.write_bytes(audio_bytes)
+                
+                # Calculate metadata
+                file_size_kb = len(audio_bytes) / 1024
+                # Estimate duration: 44100 Hz, 32-bit float (4 bytes), mono
+                duration_s = len(audio_bytes) / (44100 * 4)
+                
+                return {
+                    "file_path": f"/tts-samples/{filename}",
+                    "duration_s": round(duration_s, 2),
+                    "file_size_kb": round(file_size_kb, 1),
+                    "emotion": safe_emotion,
+                    "key_preview": slot.key[:12] + "..."
+                }
+        except Exception as e:
+            log.error("Cartesia TTS generation failed: %s", e)
+            raise RuntimeError(f"Cartesia TTS failed: {e}")
+
+
     async def cmd_test_tts_voice_out(p: dict[str, object]) -> dict[str, object]:
         if not tts:
             raise RuntimeError("TTS not initialized — check CARTESIA_API_KEYS")
@@ -561,6 +667,9 @@ async def main() -> NoReturn:
         ("disconnect_tiktok", cmd_disconnect_tiktok, "tiktok"),
         ("list_audio_devices", cmd_list_audio_devices, "system"),
         ("read_cost_history", cmd_read_cost_history, "cost"),
+        # TTS generate with download/play
+        ("generate_edge_tts", cmd_generate_edge_tts, "tts"),
+        ("generate_cartesia_tts", cmd_generate_cartesia_tts, "tts"),
     ]:
         ws.register_command(cmd_name, _wrap_cmd(cmd_name, category, cmd_handler))
 

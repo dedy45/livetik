@@ -52,6 +52,18 @@
 	let guardrailTestText = $state('');
 	let guardrailTestUser = $state('TestUser');
 
+	// Edge-TTS generate state
+	let edgeTtsText = $state('Halo bos, Bang Hack di sini');
+	let edgeTtsVoice = $state('id-ID-ArdiNeural');
+	let edgeTtsReqId = $state<string | null>(null);
+	const edgeTtsResult = $derived(edgeTtsReqId ? wsStore.testResults.get(edgeTtsReqId) : undefined);
+
+	// Cartesia TTS generate state
+	let cartesiaTtsText = $state('Halo bos, Bang Hack di sini');
+	let cartesiaTtsEmotion = $state('neutral');
+	let cartesiaTtsReqId = $state<string | null>(null);
+	const cartesiaTtsResult = $derived(cartesiaTtsReqId ? wsStore.testResults.get(cartesiaTtsReqId) : undefined);
+
 	// ── P3 state ──────────────────────────────────────────────────────────
 	let cartesiaVoiceId = $state('');
 	let cartesiaModel = $state('sonic-3');
@@ -137,6 +149,20 @@
 
 	function selectModel(model: string) {
 		nineRouterTestModel = model;
+	}
+
+	function generateEdgeTts() {
+		edgeTtsReqId = wsStore.sendCommand('generate_edge_tts', {
+			text: edgeTtsText,
+			voice: edgeTtsVoice
+		});
+	}
+
+	function generateCartesiaTts() {
+		cartesiaTtsReqId = wsStore.sendCommand('generate_cartesia_tts', {
+			text: cartesiaTtsText,
+			emotion: cartesiaTtsEmotion
+		});
 	}
 </script>
 
@@ -621,41 +647,117 @@
 		</div>
 	</section>
 
-	<!-- Edge-TTS + Voice out -->
+	<!-- Edge-TTS Test -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">TTS Output</h3>
+		<h3 class="text-lg font-semibold mb-4">Edge-TTS (Lokal Fallback)</h3>
 		<div class="space-y-3">
-			<div class="flex items-center justify-between p-3 bg-bg-elevated rounded">
-				<div>
-					<div class="font-medium">Edge-TTS fallback (id-ID-ArdiNeural)</div>
-					<div class="text-xs text-text-secondary">Synth tanpa play — validasi Azure reachability</div>
-				</div>
-				<TestButton command="test_edge_tts" label="Test synth" />
+			<div class="flex gap-2">
+				<input
+					bind:value={edgeTtsText}
+					class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+					placeholder="Text untuk disintesis"
+				/>
+				<select
+					bind:value={edgeTtsVoice}
+					class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+				>
+					<option value="id-ID-ArdiNeural">👨 ArdiNeural (Male)</option>
+					<option value="id-ID-GadisNeural">👩 GadisNeural (Female)</option>
+				</select>
+				<button
+					onclick={generateEdgeTts}
+					disabled={!wsStore.connected || !edgeTtsText.trim()}
+					class="px-4 py-1.5 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
+				>
+					Generate
+				</button>
 			</div>
-			<div class="p-3 bg-bg-elevated rounded">
-				<div class="font-medium mb-2">Voice Output (end-to-end, keluar suara)</div>
-				<div class="flex gap-2 mb-2">
-					<input
-						bind:value={ttsTestText}
-						class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
-						placeholder="Text untuk disintesis & diputar"
-					/>
-					<select
-						bind:value={ttsTestEmotion}
-						class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
-						title="Emotion (Cartesia Sonic-3 only)"
-					>
-						<option value="neutral">😐 neutral</option>
-						<option value="happy">😊 happy</option>
-						<option value="sad">😢 sad</option>
-						<option value="angry">😠 angry</option>
-						<option value="dramatic">🎭 dramatic</option>
-						<option value="comedic">😄 comedic</option>
-					</select>
-					<TestButton command="test_tts_voice_out" params={{ text: ttsTestText, emotion: ttsTestEmotion }} label="Speak" />
-				</div>
-				<div class="text-xs text-text-secondary">Suara keluar di default audio device (atau VB-CABLE kalau sudah di-route). Emotion hanya berlaku untuk Cartesia Sonic-3.</div>
+
+			{#if edgeTtsResult}
+				{#if edgeTtsResult.ok && edgeTtsResult.result?.file_path}
+					<div class="p-4 bg-bg-elevated rounded space-y-3">
+						<audio controls class="w-full" src={edgeTtsResult.result.file_path}>
+							Your browser does not support audio playback.
+						</audio>
+						<div class="flex items-center justify-between text-xs text-text-secondary">
+							<span>Duration: {edgeTtsResult.result.duration_s}s | Size: {edgeTtsResult.result.file_size_kb} KB</span>
+							<div class="flex gap-2">
+								<a
+									href={edgeTtsResult.result.file_path}
+									download
+									class="px-3 py-1 bg-bg-primary border border-border rounded hover:bg-bg-elevated"
+								>
+									⬇ Download
+								</a>
+							</div>
+						</div>
+					</div>
+				{:else}
+					<div class="text-xs text-error">✗ {edgeTtsResult.error || 'Generation failed'}</div>
+				{/if}
+			{/if}
+			<p class="text-xs text-text-secondary">
+				Edge-TTS gratis dari Azure, tidak perlu API key. Kualitas bagus untuk fallback.
+			</p>
+		</div>
+	</section>
+
+	<!-- Cartesia TTS Test -->
+	<section class="bg-bg-panel border border-border rounded-lg p-6">
+		<h3 class="text-lg font-semibold mb-4">Cartesia TTS (Premium)</h3>
+		<div class="space-y-3">
+			<div class="flex gap-2">
+				<input
+					bind:value={cartesiaTtsText}
+					class="flex-1 px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+					placeholder="Text untuk disintesis"
+				/>
+				<select
+					bind:value={cartesiaTtsEmotion}
+					class="px-3 py-1.5 bg-bg-primary border border-border rounded text-sm"
+				>
+					<option value="neutral">😐 neutral</option>
+					<option value="happy">😊 happy</option>
+					<option value="sad">😢 sad</option>
+					<option value="angry">😠 angry</option>
+					<option value="dramatic">🎭 dramatic</option>
+					<option value="comedic">😄 comedic</option>
+				</select>
+				<button
+					onclick={generateCartesiaTts}
+					disabled={!wsStore.connected || !cartesiaTtsText.trim()}
+					class="px-4 py-1.5 bg-accent text-bg-primary rounded text-sm hover:bg-accent/80 disabled:opacity-40"
+				>
+					Generate
+				</button>
 			</div>
+
+			{#if cartesiaTtsResult}
+				{#if cartesiaTtsResult.ok && cartesiaTtsResult.result?.file_path}
+					<div class="p-4 bg-bg-elevated rounded space-y-3">
+						<audio controls class="w-full" src={cartesiaTtsResult.result.file_path}>
+							Your browser does not support audio playback.
+						</audio>
+						<div class="flex items-center justify-between text-xs text-text-secondary">
+							<span>Duration: {cartesiaTtsResult.result.duration_s}s | Size: {cartesiaTtsResult.result.file_size_kb} KB</span>
+							<div class="flex gap-2">
+								<a
+									href={cartesiaTtsResult.result.file_path}
+									download
+									class="px-3 py-1 bg-bg-primary border border-border rounded hover:bg-bg-elevated"
+								>
+									⬇ Download
+								</a>
+							</div>
+						</div>
+					</div>
+				{:else}
+					<div class="text-xs text-error">✗ {cartesiaTtsResult.error || 'Generation failed'}</div>
+				{/if}
+			{/if}
+			<p class="text-xs text-text-secondary">
+				Cartesia Sonic-3 dengan emotion control. Kualitas premium, pakai API key dari pool.
+			</p>
 		</div>
 	</section>
 
