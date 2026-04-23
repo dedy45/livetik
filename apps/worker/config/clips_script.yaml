@@ -1,0 +1,1617 @@
+clips:
+- id: A_opening_001
+  category: A_opening
+  text: Halo semuanya, selamat datang di live interiorhack! Senang banget kalian hadir
+    di sini malam ini.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_002
+  category: A_opening
+  text: Hai hai hai, welcome back di live kita! Hari ini ada banyak produk keren yang
+    mau kita bahas bareng.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_003
+  category: A_opening
+  text: Selamat datang di live interiorhack! Buat yang baru pertama kali mampir, kalian
+    datang di waktu yang tepat.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_004
+  category: A_opening
+  text: Halo teman-teman semua! Makasih udah mampir ke live kita, ada banyak promo
+    spesial hari ini lho.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_005
+  category: A_opening
+  text: Assalamualaikum dan selamat malam semuanya! Live kita mulai ya, siap-siap
+    ada kejutan menarik.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_006
+  category: A_opening
+  text: Halo gaes! Selamat datang di live interiorhack, tempat solusi rumah impian
+    kalian semua.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_007
+  category: A_opening
+  text: Hai semua yang udah join! Kita mulai live-nya ya, banyak produk bagus yang
+    bakal kita showcase hari ini.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_008
+  category: A_opening
+  text: Selamat sore dan selamat datang! Makasih udah luangin waktu buat nonton live
+    kita hari ini.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_009
+  category: A_opening
+  text: Halo halo! Wah udah banyak yang join nih, makasih ya teman-teman setia interiorhack.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_010
+  category: A_opening
+  text: Welcome to live interiorhack! Hari ini kita punya banyak produk premium dengan
+    harga yang super terjangkau.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_011
+  category: A_opening
+  text: Hai semuanya, good evening! Kita mulai live malam ini dengan semangat dan
+    produk-produk pilihan terbaik.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_012
+  category: A_opening
+  text: Halo teman-teman! Kalian udah siap belanja produk rumah berkualitas? Kita
+    mulai yuk!
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_013
+  category: A_opening
+  text: Selamat datang di live interiorhack, toko solusi hunian terpercaya kalian!
+    Banyak yang mau kita share hari ini.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_014
+  category: A_opening
+  text: Hai hai! Makasih udah nemenin kita live hari ini, ada banyak info produk menarik
+    yang sayang dilewatin.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_015
+  category: A_opening
+  text: Halo semua! Live kita resmi dimulai, yuk kita explore bareng produk-produk
+    unggulan interiorhack.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_016
+  category: A_opening
+  text: Selamat bergabung di live interiorhack! Hari ini spesial banget, ada diskon
+    dan promo eksklusif buat kalian.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_017
+  category: A_opening
+  text: Hai teman-teman! Seneng banget bisa ketemu lagi di live, kita bahas produk
+    keren bareng-bareng yuk.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: A_opening_018
+  category: A_opening
+  text: Halo semuanya! Live interiorhack dimulai, siap-siap dapet info produk terbaik
+    dan penawaran spesial hari ini.
+  tags:
+  - opening
+  - greeting
+  emotion: happy
+- id: B_paloma_demo_001
+  category: B_paloma_demo
+  text: Oke sekarang kita bahas PALOMA Smart Lock, kunci pintu pintar yang bakal bikin
+    rumah kalian makin aman dan modern.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_002
+  category: B_paloma_demo
+  text: PALOMA Smart Lock ini bisa dibuka pakai sidik jari, kartu, PIN, atau remote
+    dari HP lho, canggih banget kan?
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_003
+  category: B_paloma_demo
+  text: Coba lihat nih, PALOMA Smart Lock dipasang di pintu dan langsung bisa dioperasikan
+    tanpa kunci konvensional sama sekali.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_004
+  category: B_paloma_demo
+  text: Keunggulan PALOMA Smart Lock adalah materialnya yang premium, anti-karat,
+    dan tahan cuaca ekstrem sekalipun.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_005
+  category: B_paloma_demo
+  text: Dengan PALOMA Smart Lock, kalian bisa kasih akses ke anggota keluarga tanpa
+    perlu duplikat kunci fisik lagi.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_006
+  category: B_paloma_demo
+  text: PALOMA Smart Lock punya fitur alarm otomatis kalau ada yang coba paksa buka
+    pintu, keamanan ekstra buat rumah kalian.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_007
+  category: B_paloma_demo
+  text: Instalasinya gampang banget, PALOMA Smart Lock bisa dipasang sendiri di rumah
+    tanpa perlu tukang khusus.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_008
+  category: B_paloma_demo
+  text: Baterai PALOMA Smart Lock tahan sampai satu tahun pemakaian normal, jadi nggak
+    perlu sering-sering ganti.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_009
+  category: B_paloma_demo
+  text: PALOMA Smart Lock kompatibel dengan hampir semua jenis pintu, baik kayu, besi,
+    maupun aluminium.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_010
+  category: B_paloma_demo
+  text: Fitur auto-lock PALOMA Smart Lock otomatis mengunci pintu setelah beberapa
+    detik, nggak perlu khawatir lupa kunci.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_011
+  category: B_paloma_demo
+  text: PALOMA Smart Lock hadir dalam beberapa pilihan warna elegan yang cocok dengan
+    berbagai desain interior rumah.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_012
+  category: B_paloma_demo
+  text: Dengan teknologi enkripsi terkini, PALOMA Smart Lock memastikan data sidik
+    jari kalian aman dan tidak bisa dicuri.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_013
+  category: B_paloma_demo
+  text: PALOMA Smart Lock bisa menyimpan hingga 100 sidik jari berbeda, cocok buat
+    rumah dengan banyak penghuni.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_014
+  category: B_paloma_demo
+  text: Layar LCD PALOMA Smart Lock yang terang memudahkan pengoperasian bahkan di
+    kondisi gelap sekalipun.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_015
+  category: B_paloma_demo
+  text: PALOMA Smart Lock dilengkapi backup kunci mekanik darurat, jadi tetap bisa
+    dibuka kalau baterai habis.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_016
+  category: B_paloma_demo
+  text: Garansi resmi PALOMA Smart Lock selama dua tahun, jadi kalian bisa belanja
+    dengan tenang dan percaya diri.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_demo_017
+  category: B_paloma_demo
+  text: PALOMA Smart Lock sudah tersertifikasi dan diuji ribuan kali buka-tutup, kualitasnya
+    terjamin banget.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: neutral
+- id: B_paloma_demo_018
+  category: B_paloma_demo
+  text: Dengan PALOMA Smart Lock, rumah kalian naik level jadi smart home yang modern
+    dan berteknologi tinggi.
+  tags:
+  - paloma
+  - smart_lock
+  - demo
+  - product
+  emotion: happy
+- id: B_paloma_cta_001
+  category: B_paloma_cta
+  text: Yuk langsung order PALOMA Smart Lock sekarang, klik keranjang di bawah atau
+    ketik PALOMA di kolom chat!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_002
+  category: B_paloma_cta
+  text: Stok PALOMA Smart Lock terbatas lho, jangan sampai kehabisan! Order sekarang
+    sebelum terlambat.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_003
+  category: B_paloma_cta
+  text: Dapatkan PALOMA Smart Lock hari ini dan nikmati keamanan rumah yang lebih
+    canggih mulai malam ini juga.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_004
+  category: B_paloma_cta
+  text: Promo spesial PALOMA Smart Lock hanya berlaku selama live ini, jangan lewatkan
+    kesempatan emas ini!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_005
+  category: B_paloma_cta
+  text: Ketik PALOMA di chat sekarang dan tim kita siap bantu proses orderan kalian
+    dengan cepat.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_006
+  category: B_paloma_cta
+  text: PALOMA Smart Lock dengan harga spesial live, lebih hemat dibanding beli di
+    toko offline manapun.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_007
+  category: B_paloma_cta
+  text: Jangan tunda lagi, PALOMA Smart Lock adalah investasi keamanan terbaik untuk
+    rumah kalian.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: B_paloma_cta_008
+  category: B_paloma_cta
+  text: Klik tombol beli sekarang untuk PALOMA Smart Lock, pengiriman cepat ke seluruh
+    Indonesia!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_009
+  category: B_paloma_cta
+  text: Terbatas hanya untuk penonton live hari ini, PALOMA Smart Lock dengan bonus
+    aksesori eksklusif!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_010
+  category: B_paloma_cta
+  text: Sudah ribuan keluarga Indonesia mempercayai PALOMA Smart Lock, sekarang giliran
+    rumah kalian!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_011
+  category: B_paloma_cta
+  text: Order PALOMA Smart Lock sekarang dan dapatkan gratis ongkir ke seluruh wilayah
+    Indonesia.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_012
+  category: B_paloma_cta
+  text: Jangan sampai nyesel, PALOMA Smart Lock dengan harga live ini nggak akan ada
+    lagi setelah live selesai.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_013
+  category: B_paloma_cta
+  text: Yuk buruan order PALOMA Smart Lock, ketik BELI di chat dan kita proses langsung!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: B_paloma_cta_014
+  category: B_paloma_cta
+  text: PALOMA Smart Lock pilihan tepat untuk keamanan rumah modern, order sekarang
+    dan rasakan bedanya.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: B_paloma_cta_015
+  category: B_paloma_cta
+  text: Harga spesial PALOMA Smart Lock hanya untuk kalian yang nonton live sekarang,
+    jangan sampai kehabisan!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_016
+  category: B_paloma_cta
+  text: Klik keranjang belanja sekarang untuk PALOMA Smart Lock, stok hari ini sangat
+    terbatas!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: B_paloma_cta_017
+  category: B_paloma_cta
+  text: Investasi keamanan terbaik dimulai dari PALOMA Smart Lock, order sekarang
+    dan proteksi rumah kalian.
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: B_paloma_cta_018
+  category: B_paloma_cta
+  text: Yuk langsung checkout PALOMA Smart Lock, tim kita siap bantu dari order sampai
+    instalasi!
+  tags:
+  - paloma
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_demo_001
+  category: C_pintu_lipat_demo
+  text: Sekarang kita lihat Reaim Pintu Lipat, solusi cerdas untuk memaksimalkan ruang
+    di rumah kalian.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_002
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat ini bisa dilipat hingga 90 persen dari ukuran aslinya, hemat
+    tempat banget!
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_003
+  category: C_pintu_lipat_demo
+  text: Material Reaim Pintu Lipat menggunakan aluminium premium yang ringan tapi
+    kuat dan tahan lama.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_004
+  category: C_pintu_lipat_demo
+  text: Dengan Reaim Pintu Lipat, ruangan sempit pun bisa terasa lebih luas dan fungsional.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_005
+  category: C_pintu_lipat_demo
+  text: Sistem rel Reaim Pintu Lipat sangat halus dan senyap, nggak berisik sama sekali
+    saat dibuka tutup.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_006
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat tersedia dalam berbagai ukuran custom sesuai kebutuhan ruangan
+    kalian.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_007
+  category: C_pintu_lipat_demo
+  text: Finishing Reaim Pintu Lipat sangat rapi dan elegan, cocok untuk berbagai gaya
+    interior rumah.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_008
+  category: C_pintu_lipat_demo
+  text: Pemasangan Reaim Pintu Lipat mudah dan cepat, bisa selesai dalam hitungan
+    jam saja.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_009
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat ideal untuk kamar tidur, ruang kerja, dapur, atau area mana
+    saja yang butuh privasi.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_010
+  category: C_pintu_lipat_demo
+  text: Ketebalan panel Reaim Pintu Lipat dirancang optimal untuk kekuatan maksimal
+    dengan bobot minimal.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_011
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat hadir dalam pilihan warna dan motif yang beragam, bisa disesuaikan
+    selera kalian.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_012
+  category: C_pintu_lipat_demo
+  text: Sistem kunci Reaim Pintu Lipat aman dan mudah dioperasikan oleh semua anggota
+    keluarga.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_013
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat cocok untuk renovasi rumah lama maupun pembangunan rumah
+    baru.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_014
+  category: C_pintu_lipat_demo
+  text: Dengan Reaim Pintu Lipat, kalian bisa bagi ruangan besar menjadi dua area
+    fungsional dengan mudah.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_015
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat tahan terhadap kelembaban dan perubahan suhu, cocok untuk
+    iklim tropis Indonesia.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_016
+  category: C_pintu_lipat_demo
+  text: Desain Reaim Pintu Lipat yang minimalis modern akan memperindah tampilan interior
+    rumah kalian.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_demo_017
+  category: C_pintu_lipat_demo
+  text: Reaim Pintu Lipat sudah diuji kekuatannya dan terbukti tahan hingga puluhan
+    ribu kali buka tutup.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: neutral
+- id: C_pintu_lipat_demo_018
+  category: C_pintu_lipat_demo
+  text: Solusi pintu lipat terbaik untuk rumah Indonesia, Reaim Pintu Lipat kualitas
+    premium harga bersahabat.
+  tags:
+  - pintu_lipat
+  - reaim
+  - demo
+  - product
+  emotion: happy
+- id: C_pintu_lipat_cta_001
+  category: C_pintu_lipat_cta
+  text: Yuk order Reaim Pintu Lipat sekarang, ketik PINTU di chat atau klik keranjang
+    di bawah!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_002
+  category: C_pintu_lipat_cta
+  text: Stok Reaim Pintu Lipat terbatas, jangan sampai kehabisan! Order sekarang sebelum
+    sold out.
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: C_pintu_lipat_cta_003
+  category: C_pintu_lipat_cta
+  text: Dapatkan Reaim Pintu Lipat dengan harga spesial live, lebih hemat dari harga
+    normal!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_004
+  category: C_pintu_lipat_cta
+  text: Reaim Pintu Lipat solusi terbaik untuk rumah kalian, order sekarang dan transformasi
+    ruangan dimulai!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_005
+  category: C_pintu_lipat_cta
+  text: Ketik LIPAT di kolom chat sekarang dan tim kita akan bantu proses orderan
+    kalian segera.
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_006
+  category: C_pintu_lipat_cta
+  text: Promo Reaim Pintu Lipat hanya berlaku selama live ini, jangan lewatkan penawaran
+    terbatas ini!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: C_pintu_lipat_cta_007
+  category: C_pintu_lipat_cta
+  text: Klik tombol beli untuk Reaim Pintu Lipat sekarang, pengiriman ke seluruh Indonesia
+    tersedia!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_008
+  category: C_pintu_lipat_cta
+  text: Reaim Pintu Lipat dengan harga live eksklusif, hemat lebih banyak dibanding
+    beli offline!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_009
+  category: C_pintu_lipat_cta
+  text: Jangan tunda renovasi rumah kalian, Reaim Pintu Lipat siap dikirim ke alamat
+    kalian hari ini!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_010
+  category: C_pintu_lipat_cta
+  text: Order Reaim Pintu Lipat sekarang dan dapatkan bonus konsultasi desain gratis
+    dari tim kami!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_011
+  category: C_pintu_lipat_cta
+  text: Ribuan rumah di Indonesia sudah pakai Reaim Pintu Lipat, sekarang giliran
+    rumah kalian!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_012
+  category: C_pintu_lipat_cta
+  text: Harga spesial Reaim Pintu Lipat hanya untuk penonton live hari ini, buruan
+    order sebelum habis!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: C_pintu_lipat_cta_013
+  category: C_pintu_lipat_cta
+  text: Yuk langsung checkout Reaim Pintu Lipat, tim instalasi kami siap membantu
+    pemasangan di rumah kalian.
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_014
+  category: C_pintu_lipat_cta
+  text: Reaim Pintu Lipat investasi terbaik untuk kenyamanan dan estetika rumah kalian,
+    order sekarang!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: C_pintu_lipat_cta_015
+  category: C_pintu_lipat_cta
+  text: Klik keranjang belanja untuk Reaim Pintu Lipat, stok hari ini sangat terbatas
+    jangan sampai kehabisan!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: C_pintu_lipat_cta_016
+  category: C_pintu_lipat_cta
+  text: Transformasi ruangan kalian dengan Reaim Pintu Lipat, order sekarang dan rasakan
+    perbedaannya!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: C_pintu_lipat_cta_017
+  category: C_pintu_lipat_cta
+  text: Reaim Pintu Lipat dengan garansi resmi, order sekarang dan belanja dengan
+    tenang!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: C_pintu_lipat_cta_018
+  category: C_pintu_lipat_cta
+  text: Yuk buruan order Reaim Pintu Lipat, ketik BELI di chat dan kita proses langsung
+    sekarang!
+  tags:
+  - pintu_lipat
+  - reaim
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_demo_001
+  category: D_tnw_demo
+  text: Sekarang kita kenalan sama TNW Chopper Blender, blender serbaguna yang wajib
+    ada di dapur kalian!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_002
+  category: D_tnw_demo
+  text: TNW Chopper Blender ini bisa mencacah, menggiling, dan memblender berbagai
+    bahan makanan dalam hitungan detik.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_003
+  category: D_tnw_demo
+  text: Kapasitas TNW Chopper Blender cukup besar, bisa sekaligus proses bahan untuk
+    masakan satu keluarga.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_004
+  category: D_tnw_demo
+  text: Motor TNW Chopper Blender sangat bertenaga tapi tetap hemat listrik, cocok
+    untuk pemakaian sehari-hari.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_005
+  category: D_tnw_demo
+  text: Pisau TNW Chopper Blender terbuat dari stainless steel premium yang tajam
+    dan tidak mudah berkarat.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_006
+  category: D_tnw_demo
+  text: TNW Chopper Blender mudah dibersihkan, cukup isi air dan sabun lalu nyalakan
+    sebentar, bersih sempurna!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_007
+  category: D_tnw_demo
+  text: Desain TNW Chopper Blender compact dan elegan, tidak makan banyak tempat di
+    meja dapur kalian.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_008
+  category: D_tnw_demo
+  text: TNW Chopper Blender bisa digunakan untuk membuat jus, smoothie, saus, bumbu,
+    dan masih banyak lagi.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_009
+  category: D_tnw_demo
+  text: Tingkat kebisingan TNW Chopper Blender sangat rendah, nggak akan ganggu aktivitas
+    lain di rumah.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_010
+  category: D_tnw_demo
+  text: TNW Chopper Blender dilengkapi fitur keamanan otomatis yang mencegah penggunaan
+    yang tidak aman.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_011
+  category: D_tnw_demo
+  text: Material bowl TNW Chopper Blender food grade dan BPA free, aman untuk seluruh
+    keluarga termasuk anak-anak.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_012
+  category: D_tnw_demo
+  text: TNW Chopper Blender hadir dalam beberapa pilihan warna yang cerah dan modern
+    untuk dapur kalian.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_013
+  category: D_tnw_demo
+  text: Dengan TNW Chopper Blender, memasak jadi lebih cepat, mudah, dan menyenangkan
+    setiap harinya.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_demo_014
+  category: D_tnw_demo
+  text: TNW Chopper Blender cocok untuk ibu rumah tangga, chef rumahan, maupun pelaku
+    usaha kuliner.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_015
+  category: D_tnw_demo
+  text: Garansi resmi TNW Chopper Blender memberikan ketenangan pikiran dalam setiap
+    pembelian kalian.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_016
+  category: D_tnw_demo
+  text: TNW Chopper Blender sudah diuji dan terbukti tahan lama untuk pemakaian intensif
+    setiap hari.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_017
+  category: D_tnw_demo
+  text: Teknologi blade TNW Chopper Blender memastikan hasil cacahan yang merata dan
+    konsisten setiap saat.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: neutral
+- id: D_tnw_demo_018
+  category: D_tnw_demo
+  text: TNW Chopper Blender adalah partner memasak terbaik yang akan mengubah pengalaman
+    dapur kalian.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - demo
+  - product
+  emotion: happy
+- id: D_tnw_cta_001
+  category: D_tnw_cta
+  text: Yuk order TNW Chopper Blender sekarang, ketik TNW di chat atau klik keranjang
+    di bawah!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_002
+  category: D_tnw_cta
+  text: Stok TNW Chopper Blender terbatas, jangan sampai kehabisan! Order sekarang
+    sebelum sold out.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: D_tnw_cta_003
+  category: D_tnw_cta
+  text: Dapatkan TNW Chopper Blender dengan harga spesial live, lebih hemat dari harga
+    normal!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_004
+  category: D_tnw_cta
+  text: TNW Chopper Blender solusi dapur terbaik, order sekarang dan masak jadi lebih
+    mudah dan menyenangkan!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_005
+  category: D_tnw_cta
+  text: Ketik CHOPPER di kolom chat sekarang dan tim kita akan bantu proses orderan
+    kalian segera.
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_006
+  category: D_tnw_cta
+  text: Promo TNW Chopper Blender hanya berlaku selama live ini, jangan lewatkan penawaran
+    terbatas ini!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: D_tnw_cta_007
+  category: D_tnw_cta
+  text: Klik tombol beli untuk TNW Chopper Blender sekarang, pengiriman ke seluruh
+    Indonesia tersedia!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_008
+  category: D_tnw_cta
+  text: TNW Chopper Blender dengan harga live eksklusif, hemat lebih banyak dibanding
+    beli di toko offline!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_009
+  category: D_tnw_cta
+  text: Jangan tunda upgrade dapur kalian, TNW Chopper Blender siap dikirim ke alamat
+    kalian hari ini!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_010
+  category: D_tnw_cta
+  text: Order TNW Chopper Blender sekarang dan dapatkan bonus resep eksklusif dari
+    chef profesional kami!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_011
+  category: D_tnw_cta
+  text: Ribuan dapur di Indonesia sudah pakai TNW Chopper Blender, sekarang giliran
+    dapur kalian!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_012
+  category: D_tnw_cta
+  text: Harga spesial TNW Chopper Blender hanya untuk penonton live hari ini, buruan
+    order sebelum habis!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: D_tnw_cta_013
+  category: D_tnw_cta
+  text: Yuk langsung checkout TNW Chopper Blender, pengiriman cepat dan aman ke seluruh
+    Indonesia!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_014
+  category: D_tnw_cta
+  text: TNW Chopper Blender investasi terbaik untuk kemudahan memasak sehari-hari,
+    order sekarang!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: D_tnw_cta_015
+  category: D_tnw_cta
+  text: Klik keranjang belanja untuk TNW Chopper Blender, stok hari ini sangat terbatas
+    jangan kehabisan!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: dramatic
+- id: D_tnw_cta_016
+  category: D_tnw_cta
+  text: Upgrade dapur kalian dengan TNW Chopper Blender, order sekarang dan rasakan
+    kemudahannya!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: D_tnw_cta_017
+  category: D_tnw_cta
+  text: TNW Chopper Blender dengan garansi resmi, order sekarang dan belanja dengan
+    tenang dan percaya diri!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: neutral
+- id: D_tnw_cta_018
+  category: D_tnw_cta
+  text: Yuk buruan order TNW Chopper Blender, ketik BELI di chat dan kita proses langsung
+    sekarang!
+  tags:
+  - tnw
+  - chopper
+  - blender
+  - cta
+  - order
+  - beli
+  emotion: happy
+- id: E_reply_price_001
+  category: E_reply_price
+  text: Untuk harga produk ini, kalian bisa cek langsung di link bio atau ketik HARGA
+    di kolom chat ya!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_002
+  category: E_reply_price
+  text: Harga spesial live hari ini lebih murah dari harga normal, langsung klik keranjang
+    untuk lihat harganya!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_003
+  category: E_reply_price
+  text: Soal harga, kita kasih yang terbaik buat kalian! Cek di keranjang belanja
+    ya untuk harga terupdate.
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_004
+  category: E_reply_price
+  text: Harga produk ini sangat terjangkau dan worth it banget untuk kualitas yang
+    kalian dapatkan!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_005
+  category: E_reply_price
+  text: Untuk info harga lengkap, ketik HARGA di chat dan tim kita akan langsung balas
+    kalian ya!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_006
+  category: E_reply_price
+  text: Harga live kita selalu lebih murah, jadi jangan lewatkan kesempatan beli sekarang!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_007
+  category: E_reply_price
+  text: Soal harga jangan khawatir, kita selalu kasih harga terbaik dan paling kompetitif
+    di pasaran.
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_008
+  category: E_reply_price
+  text: Harga produk ini udah termasuk garansi resmi dan layanan purna jual yang memuaskan
+    lho!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_009
+  category: E_reply_price
+  text: Untuk harga grosir atau pembelian dalam jumlah banyak, DM kita ya di akun
+    interiorhack!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_010
+  category: E_reply_price
+  text: Harga yang kalian lihat di keranjang sudah termasuk diskon live eksklusif
+    hari ini!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_011
+  category: E_reply_price
+  text: Soal harga kita transparan banget, nggak ada biaya tersembunyi, yang kalian
+    lihat itu yang kalian bayar.
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_012
+  category: E_reply_price
+  text: Harga produk ini sangat kompetitif, coba bandingkan dengan toko lain pasti
+    kita lebih murah!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: E_reply_price_013
+  category: E_reply_price
+  text: Untuk pertanyaan harga lebih detail, kalian bisa chat langsung dengan tim
+    kita ya!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_014
+  category: E_reply_price
+  text: Harga spesial ini hanya untuk penonton live, jadi manfaatkan kesempatan ini
+    sebaik mungkin!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: dramatic
+- id: E_reply_price_015
+  category: E_reply_price
+  text: Soal harga kita fleksibel, ada berbagai pilihan paket yang bisa disesuaikan
+    dengan budget kalian.
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_016
+  category: E_reply_price
+  text: Harga terbaik ada di live kita hari ini, jangan sampai menyesal karena tidak
+    order sekarang!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: dramatic
+- id: E_reply_price_017
+  category: E_reply_price
+  text: Untuk info harga dan promo terbaru, follow akun kita dan aktifkan notifikasi
+    ya!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: neutral
+- id: E_reply_price_018
+  category: E_reply_price
+  text: Harga produk ini sudah sangat terjangkau untuk kualitas premium yang kalian
+    dapatkan, worth it banget!
+  tags:
+  - reply
+  - price
+  - harga
+  - promo
+  emotion: happy
+- id: Z_closing_001
+  category: Z_closing
+  text: Makasih banyak semuanya udah nemenin live kita hari ini, sampai jumpa di live
+    berikutnya ya!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_002
+  category: Z_closing
+  text: Terima kasih sudah hadir di live interiorhack, jangan lupa follow dan aktifkan
+    notifikasi untuk live selanjutnya!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_003
+  category: Z_closing
+  text: Live kita hari ini sampai di sini dulu, makasih buat semua yang udah join
+    dan support kita!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_004
+  category: Z_closing
+  text: Sampai jumpa di live berikutnya teman-teman! Jangan lupa share ke teman-teman
+    kalian ya.
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_005
+  category: Z_closing
+  text: Terima kasih sudah belanja dan support interiorhack, semoga produknya memuaskan
+    dan bermanfaat!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_006
+  category: Z_closing
+  text: Live selesai, makasih buat semua yang udah order hari ini! Pesanan kalian
+    segera kami proses.
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_007
+  category: Z_closing
+  text: Sampai ketemu lagi di live interiorhack berikutnya, stay tuned untuk promo
+    dan produk baru!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_008
+  category: Z_closing
+  text: Makasih udah setia nemenin live kita, kalian adalah penonton terbaik yang
+    pernah ada!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_009
+  category: Z_closing
+  text: Live hari ini resmi ditutup, terima kasih atas kepercayaan dan dukungan kalian
+    semua!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_010
+  category: Z_closing
+  text: Jangan lupa kasih bintang lima dan review positif ya, itu sangat membantu
+    kita berkembang!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_011
+  category: Z_closing
+  text: Sampai jumpa di live berikutnya, semoga hari kalian menyenangkan dan penuh
+    berkah!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_012
+  category: Z_closing
+  text: Terima kasih sudah menjadi bagian dari keluarga besar interiorhack, see you
+    next live!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_013
+  category: Z_closing
+  text: Live kita tutup dulu ya, makasih buat semua yang udah hadir dan berinteraksi
+    hari ini!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_014
+  category: Z_closing
+  text: Sampai ketemu lagi teman-teman, jaga kesehatan dan semoga produk interiorhack
+    bermanfaat untuk kalian!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_015
+  category: Z_closing
+  text: Terima kasih sudah setia menonton live interiorhack, sampai ketemu di live
+    berikutnya yang lebih seru!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy
+- id: Z_closing_016
+  category: Z_closing
+  text: Akhir kata, makasih banyak buat semua yang udah hadir dan berbelanja, kalian
+    luar biasa!
+  tags:
+  - closing
+  - goodbye
+  - terima_kasih
+  emotion: happy

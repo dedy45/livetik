@@ -1,0 +1,37 @@
+# Reply templates for Suggester — 3 variants per intent
+# Supports {product} and {user} interpolation
+
+price_question:
+  formal: "Harga {product} saat ini sangat kompetitif kak. Silakan cek di keranjang belanja atau ketik HARGA di chat untuk info lengkap."
+  casual: "Harga {product} terjangkau banget kak! Cek keranjang ya atau ketik HARGA di chat."
+  enthusiastic: "Wah {product} lagi ada promo nih kak! Langsung cek keranjang sekarang sebelum kehabisan!"
+
+stock_question:
+  formal: "Stok {product} masih tersedia kak. Silakan segera order sebelum habis."
+  casual: "Masih ada stok {product} kak, buruan order ya!"
+  enthusiastic: "Yeay stok {product} masih ada! Jangan sampai kehabisan, order sekarang kak!"
+
+greeting:
+  formal: "Selamat datang kak {user}! Terima kasih sudah hadir di live interiorhack kami."
+  casual: "Halo kak {user}! Makasih udah mampir ke live kita!"
+  enthusiastic: "Yeay ada kak {user}! Selamat datang di live interiorhack, seneng banget kalian hadir!"
+
+buying_intent:
+  formal: "Terima kasih atas minat kak {user}! Silakan klik keranjang belanja untuk order {product} sekarang."
+  casual: "Oke kak {user}, langsung klik keranjang ya buat order {product}!"
+  enthusiastic: "Mantap kak {user}! Buruan klik keranjang, {product} lagi ada harga spesial nih!"
+
+compatibility:
+  formal: "Produk {product} kompatibel dengan berbagai jenis instalasi kak. Tim kami siap membantu konsultasi lebih lanjut."
+  casual: "Bisa banget kak! {product} fleksibel dan mudah dipasang di berbagai kondisi."
+  enthusiastic: "Tenang kak, {product} pasti bisa! Sangat fleksibel dan mudah dipasang, nggak perlu khawatir!"
+
+how_to_use:
+  formal: "Untuk panduan penggunaan {product}, kami menyediakan manual lengkap dan video tutorial di bio kami kak."
+  casual: "Gampang banget kak pakai {product}! Ada video tutorialnya di bio kita ya."
+  enthusiastic: "Super gampang kak! {product} dirancang user-friendly banget, langsung bisa dipakai tanpa ribet!"
+
+objection:
+  formal: "Kami memahami kekhawatiran kak. {product} hadir dengan garansi resmi dan kualitas terjamin untuk kepuasan Anda."
+  casual: "Tenang kak, {product} kualitasnya bagus banget dan ada garansi resminya kok!"
+  enthusiastic: "Percaya deh kak! {product} udah dipakai ribuan pelanggan puas, kualitasnya nggak perlu diragukan lagi!"

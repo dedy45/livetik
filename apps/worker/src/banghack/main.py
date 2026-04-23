@@ -10,16 +10,24 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
-from typing import NoReturn
+from typing import Any, NoReturn
 
 import httpx
 import uvicorn
 from dotenv import load_dotenv
 
+from .adapters.audio_library import AudioLibraryAdapter
+from .core.classifier.rules import classify as rules_classify
+from .core.orchestrator.budget_guard import BudgetGuard
+from .core.orchestrator.reply_cache import ReplyCache
+from .core.orchestrator.director import LiveDirector
+from .core.orchestrator.suggester import Suggester
+from .core.classifier.llm_fallback import classify_with_llm
 from .adapters.cartesia_pool import CartesiaPool
 from .adapters.llm import LLMAdapter
 from .adapters.tiktok import TikTokAdapter, TTEvent
 from .adapters.tts import TTSAdapter
+from .core.audio_library.manager import AudioLibraryManager
 from .core.config_store import load_state, save_state, read_env, write_env
 from .core.cost import CostDay, CostTracker
 from .core.guardrail import Guardrail
@@ -55,9 +63,17 @@ _flags["REPLY_ENABLED"] = bool(_saved_state.get("reply_enabled", _flags["REPLY_E
 _flags["DRY_RUN"] = bool(_saved_state.get("dry_run", _flags["DRY_RUN"]))
 
 
-async def _run_http(llm: LLMAdapter) -> None:
+async def _run_http(llm: LLMAdapter, audio_lib_manager: Any = None, live_director: Any = None, cost: Any = None) -> None:
     """Run FastAPI HTTP server for config/model API."""
-    app = create_app(llm)
+    from .core.classifier.rules import _INTENTS
+    classifier_rules_count = len([i for i in _INTENTS if i[0] not in ("empty",)])
+    app = create_app(
+        llm,
+        audio_lib_manager=audio_lib_manager,
+        classifier_rules_count=classifier_rules_count,
+        live_director=live_director,
+        cost_tracker=cost,
+    )
     config = uvicorn.Config(
         app, host=HTTP_HOST, port=HTTP_PORT,
         log_level="warning", access_log=False,
@@ -130,6 +146,37 @@ async def main() -> NoReturn:
         log.warning("TTS disabled: %s", e)
 
     queue = ReplyQueue(maxsize=20)
+
+    # ── v0.4 Audio Library ──────────────────────────────────────────────────
+    _audio_index_path = Path(os.getenv("AUDIO_LIBRARY_DIR", "static/audio_library")) / "index.json"
+    audio_lib_manager = AudioLibraryManager(_audio_index_path)
+    await audio_lib_manager.load()
+    audio_lib_manager.start_hot_reload()
+    audio_lib_adapter = AudioLibraryAdapter(audio_lib_manager, ws.broadcast)
+    log.info("audio_library: %d clips loaded", audio_lib_manager.clip_count)
+
+    # ── v0.4 Budget Guard ───────────────────────────────────────────────────
+    budget_guard = BudgetGuard(cost, ws.broadcast)
+
+    # ── v0.4 Suggester ──────────────────────────────────────────────────────
+    _reply_cache = ReplyCache(
+        ttl_s=int(os.getenv("REPLY_CACHE_TTL_S", "300")),
+        similarity_threshold=float(os.getenv("REPLY_CACHE_SIMILARITY", "0.90")),
+    )
+    _templates_path = Path(os.getenv("REPLY_TEMPLATES_YAML", "config/reply_templates.yaml"))
+    suggester = Suggester(_reply_cache, budget_guard, llm, _templates_path)
+
+    # ── v0.4 Live Director ──────────────────────────────────────────────────
+    _products_yaml = Path(os.getenv("PRODUCTS_YAML", "config/products.yaml"))
+    _live_max_duration_s = int(os.getenv("LIVE_MAX_DURATION_S", "7200"))
+    live_director = LiveDirector(
+        products_yaml=_products_yaml,
+        audio_manager=audio_lib_manager,
+        audio_adapter=audio_lib_adapter,
+        ws_broadcast=ws.broadcast,
+        max_duration_s=_live_max_duration_s,
+    )
+    log.info("live_director: ready=%s, phases=%d", live_director.is_ready, len(live_director._runsheet))
 
     async def handle_reply(job: ReplyJob) -> None:
         if cost.is_over_budget():
@@ -634,6 +681,125 @@ async def main() -> NoReturn:
                     continue
         return {"rows": rows, "count": len(rows)}
 
+    # ── v0.4 Audio Library commands ─────────────────────────────────────────
+
+    async def cmd_audio_list(p: dict[str, object]) -> dict[str, object]:
+        tag = str(p.get("tag", "")).strip()
+        if tag:
+            clips = audio_lib_manager.search(tag)
+        else:
+            clips = audio_lib_manager.all_clips
+        return {
+            "clips": [
+                {
+                    "id": c.id,
+                    "category": c.category,
+                    "tags": c.tags,
+                    "duration_ms": c.duration_ms,
+                    "script": c.script,
+                    "scene_hint": c.scene_hint,
+                }
+                for c in clips
+            ]
+        }
+
+    async def cmd_audio_play(p: dict[str, object]) -> dict[str, object]:
+        clip_id = str(p.get("clip_id", "")).strip()
+        if not clip_id:
+            raise RuntimeError("clip_id required")
+        await audio_lib_adapter.play(clip_id)
+        return {"ok": True, "clip_id": clip_id}
+
+    async def cmd_audio_stop(_p: dict[str, object]) -> dict[str, object]:
+        await audio_lib_adapter.stop()
+        return {"ok": True}
+
+    # ── v0.4 Reply commands ──────────────────────────────────────────────────
+
+    async def cmd_reply_approve(p: dict[str, object]) -> dict[str, object]:
+        """Approve a reply suggestion — send to TTS queue."""
+        reply_text = str(p.get("reply", "")).strip()
+        if not reply_text:
+            raise RuntimeError("reply text required")
+        if not _flags["REPLY_ENABLED"]:
+            return {"ok": False, "reason": "REPLY_ENABLED=false"}
+        if tts and not _flags["DRY_RUN"]:
+            asyncio.create_task(_speak_reply(reply_text))
+        return {"ok": True, "reply": reply_text}
+
+    async def _speak_reply(text: str) -> None:
+        try:
+            await tts.speak(text)
+        except Exception as e:
+            log.error("TTS speak error: %s", e)
+
+    async def cmd_reply_reject(p: dict[str, object]) -> dict[str, object]:
+        """Reject a reply suggestion — no action needed."""
+        comment_id = str(p.get("comment_id", ""))
+        return {"ok": True, "comment_id": comment_id}
+
+    async def cmd_reply_regen(p: dict[str, object]) -> dict[str, object]:
+        """Regenerate reply suggestions for a comment."""
+        text = str(p.get("text", "")).strip()
+        intent = str(p.get("intent", "other")).strip()
+        product = str(p.get("product", "")).strip()
+        user = str(p.get("user", "")).strip()
+        if not text:
+            raise RuntimeError("text required")
+        result = await suggester.handle(text, intent, product=product, user=user)
+        return {
+            "ok": True,
+            "replies": result["replies"],
+            "source": result["source"],
+            "cached": result["cached"],
+        }
+
+    async def cmd_reply_suggest(p: dict[str, object]) -> dict[str, object]:
+        """Generate reply suggestions for a comment."""
+        text = str(p.get("text", "")).strip()
+        intent = str(p.get("intent", "other")).strip()
+        product = str(p.get("product", "")).strip()
+        user = str(p.get("user", "")).strip()
+        comment_id = str(p.get("comment_id", f"{user}_{int(time.time())}"))
+        if not text:
+            raise RuntimeError("text required")
+        result = await suggester.handle(text, intent, product=product, user=user)
+        return {
+            "comment_id": comment_id,
+            "replies": result["replies"],
+            "source": result["source"],
+            "cached": result["cached"],
+        }
+
+    async def cmd_budget_get(_p: dict[str, object]) -> dict[str, object]:
+        return budget_guard.snapshot()
+
+    # ── v0.4 Live Director commands ──────────────────────────────────────────
+
+    async def cmd_live_start(_p: dict[str, object]) -> dict[str, object]:
+        await live_director.start()
+        return {"ok": True, "state": live_director.get_state()}
+
+    async def cmd_live_pause(_p: dict[str, object]) -> dict[str, object]:
+        await live_director.pause()
+        return {"ok": True, "state": live_director.get_state()}
+
+    async def cmd_live_resume(_p: dict[str, object]) -> dict[str, object]:
+        await live_director.resume()
+        return {"ok": True, "state": live_director.get_state()}
+
+    async def cmd_live_stop(_p: dict[str, object]) -> dict[str, object]:
+        await live_director.stop()
+        return {"ok": True}
+
+    async def cmd_live_emergency_stop(p: dict[str, object]) -> dict[str, object]:
+        operator_id = str(p.get("operator_id", "operator"))
+        await live_director.emergency_stop(operator_id)
+        return {"ok": True}
+
+    async def cmd_live_get_state(_p: dict[str, object]) -> dict[str, object]:
+        return live_director.get_state()
+
     for cmd_name, cmd_handler, category in [
         # existing 19
         ("test_ffplay", cmd_test_ffplay, "system"),
@@ -670,10 +836,53 @@ async def main() -> NoReturn:
         # TTS generate with download/play
         ("generate_edge_tts", cmd_generate_edge_tts, "tts"),
         ("generate_cartesia_tts", cmd_generate_cartesia_tts, "tts"),
+        ("audio.list", cmd_audio_list, "audio"),
+        ("audio.play", cmd_audio_play, "audio"),
+        ("audio.stop", cmd_audio_stop, "audio"),
+        ("budget.get", cmd_budget_get, "cost"),
+        ("reply.approve", cmd_reply_approve, "reply"),
+        ("reply.reject", cmd_reply_reject, "reply"),
+        ("reply.regen", cmd_reply_regen, "reply"),
+        ("reply.suggest", cmd_reply_suggest, "reply"),
+        ("live.start", cmd_live_start, "director"),
+        ("live.pause", cmd_live_pause, "director"),
+        ("live.resume", cmd_live_resume, "director"),
+        ("live.stop", cmd_live_stop, "director"),
+        ("live.emergency_stop", cmd_live_emergency_stop, "director"),
+        ("live.get_state", cmd_live_get_state, "director"),
     ]:
         ws.register_command(cmd_name, _wrap_cmd(cmd_name, category, cmd_handler))
 
     # ── TikTok event handler ────────────────────────────────────────────────
+
+    _classifier_threshold = float(os.getenv("CLASSIFIER_LLM_THRESHOLD", "0.80"))
+
+    async def handle_comment(ev: TTEvent) -> None:
+        """Classify comment and broadcast comment.classified event."""
+        # Rule-first classification
+        intent = rules_classify(ev.text)
+
+        # LLM fallback for low-confidence non-forbidden
+        if intent.needs_llm and not intent.safe_to_skip:
+            intent = await classify_with_llm(ev.text, llm)
+            await ws.broadcast({
+                "type": "classifier.llm_used",
+                "ts": time.time(),
+                "comment_id": f"{ev.user}_{int(time.time())}",
+                "tokens_used": 20,  # approximate
+            })
+
+        await ws.broadcast({
+            "type": "comment.classified",
+            "ts": time.time(),
+            "comment_id": f"{ev.user}_{int(time.time())}",
+            "user": ev.user,
+            "text": ev.text,
+            "intent": intent.name,
+            "confidence": intent.confidence,
+            "reason": intent.reason,
+            "method": "rule" if not intent.needs_llm or intent.safe_to_skip else "llm",
+        })
 
     async def on_tt_event(ev: TTEvent) -> None:
         if ev.type == "connected":
@@ -684,6 +893,7 @@ async def main() -> NoReturn:
             state.status = "waiting_for_live"
         elif ev.type == "comment":
             state.comments += 1
+            asyncio.create_task(handle_comment(ev))
             if _flags["REPLY_ENABLED"]:
                 gr = guardrail.check(ev.user, ev.text)
                 if gr.accepted:
@@ -707,7 +917,7 @@ async def main() -> NoReturn:
     else:
         log.warning("TIKTOK_USERNAME not set — standby, connect via UI")
 
-    http_task = asyncio.create_task(_run_http(llm), name="http")
+    http_task = asyncio.create_task(_run_http(llm, audio_lib_manager, live_director, cost), name="http")
     log.info("HTTP API listening on http://%s:%d", HTTP_HOST, HTTP_PORT)
 
     _last_cost_log_hour = -1

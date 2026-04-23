@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { wsStore } from '$lib/stores/ws.svelte';
 	import TestButton from '$lib/components/TestButton.svelte';
+	import AudioLibraryGrid from '$lib/components/AudioLibraryGrid.svelte';
+	import DecisionStream from '$lib/components/DecisionStream.svelte';
+	import ReplySuggestions from '$lib/components/ReplySuggestions.svelte';
+	import TwoHourTimer from '$lib/components/TwoHourTimer.svelte';
+	import EmergencyStop from '$lib/components/EmergencyStop.svelte';
 
 	const m = $derived(wsStore.metrics);
 	const statusColor = $derived(
@@ -28,6 +33,12 @@
 			<span class="text-sm text-text-secondary">Uptime: {wsStore.uptime}</span>
 			<span class="px-3 py-1 bg-bg-elevated rounded-md text-sm">Queue: {m.queue_size}</span>
 		</div>
+	</div>
+
+	<!-- Live Director controls -->
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		<TwoHourTimer />
+		<EmergencyStop />
 	</div>
 
 	<!-- System Health card (P2-C) -->
@@ -238,4 +249,10 @@
 			</ul>
 		{/if}
 	</div>
+
+	<DecisionStream />
+
+	<ReplySuggestions />
+
+	<AudioLibraryGrid />
 </div>

@@ -1,0 +1,77 @@
+# Product rotation schedule for Live Director
+# Each product has demo/cta/hook clip tags and durations
+
+products:
+  - id: "PALOMA"
+    name: "PALOMA Smart Lock"
+    demo_clip_tag: "B_paloma_demo"
+    cta_clip_tag: "B_paloma_cta"
+    hook_clip_tag: "A_opening"
+    demo_duration_min: 10
+    cta_duration_min: 5
+
+  - id: "PINTU_LIPAT"
+    name: "Reaim Pintu Lipat"
+    demo_clip_tag: "C_pintu_lipat_demo"
+    cta_clip_tag: "C_pintu_lipat_cta"
+    hook_clip_tag: "A_opening"
+    demo_duration_min: 10
+    cta_duration_min: 5
+
+  - id: "TNW_CHOPPER"
+    name: "TNW Chopper Blender"
+    demo_clip_tag: "D_tnw_demo"
+    cta_clip_tag: "D_tnw_cta"
+    hook_clip_tag: "A_opening"
+    demo_duration_min: 10
+    cta_duration_min: 5
+
+# Runsheet phases (executed in order, then loops)
+runsheet:
+  - phase: "opening"
+    duration_s: 180
+    product: null
+    clip_category: "A_opening"
+    obs_scene: "scene_opening"
+
+  - phase: "paloma_demo"
+    duration_s: 600
+    product: "PALOMA"
+    clip_category: "B_paloma_demo"
+    obs_scene: "scene_product"
+
+  - phase: "paloma_cta"
+    duration_s: 300
+    product: "PALOMA"
+    clip_category: "B_paloma_cta"
+    obs_scene: "scene_cta"
+
+  - phase: "pintu_lipat_demo"
+    duration_s: 600
+    product: "PINTU_LIPAT"
+    clip_category: "C_pintu_lipat_demo"
+    obs_scene: "scene_product"
+
+  - phase: "pintu_lipat_cta"
+    duration_s: 300
+    product: "PINTU_LIPAT"
+    clip_category: "C_pintu_lipat_cta"
+    obs_scene: "scene_cta"
+
+  - phase: "tnw_demo"
+    duration_s: 600
+    product: "TNW_CHOPPER"
+    clip_category: "D_tnw_demo"
+    obs_scene: "scene_product"
+
+  - phase: "tnw_cta"
+    duration_s: 300
+    product: "TNW_CHOPPER"
+    clip_category: "D_tnw_cta"
+    obs_scene: "scene_cta"
+
+  - phase: "closing"
+    duration_s: 120
+    product: null
+    clip_category: "Z_closing"
+    obs_scene: "scene_closing"

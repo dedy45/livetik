@@ -6,9 +6,61 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased] — v0.4.0 planned
+## [0.4.1] — 2026-04-24 BUGFIX
 
-### Added (planned v0.4)
+### Fixed (v0.4.1 — SSR / SvelteKit errors)
+
+**Bug 1 — `$state is not defined` (SSR crash):**
+- Root cause: `live_state.ts` dan `audio_library.ts` menggunakan Svelte 5 runes (`$state`, `$derived`) di file `.ts` biasa yang tidak di-compile oleh Svelte compiler
+- Fix: rename ke `.svelte.ts` extension agar Svelte compiler memproses runes
+- Files: `stores/live_state.ts` → `stores/live_state.svelte.ts`, `stores/audio_library.ts` → `stores/audio_library.svelte.ts`
+- Updated imports di: `TwoHourTimer.svelte`, `EmergencyStop.svelte`, `AudioLibraryGrid.svelte`
+
+**Bug 2 — `window is not defined` (SSR crash di `ReplySuggestions.svelte:94`):**
+- Root cause: `onDestroy(() => window.removeEventListener(...))` dipanggil saat SSR cleanup di Node.js, di mana `window` tidak tersedia
+- Fix: pindahkan cleanup ke return value dari `onMount` (Svelte idiom yang benar — cleanup hanya jalan di client)
+- Pattern: `onMount(() => { window.addEventListener(...); return () => window.removeEventListener(...); })`
+- Same fix applied to `TwoHourTimer.svelte` (`onDestroy` → return dari `onMount`)
+
+**Bug 3 — `$effect` di module-level store (SSR crash):**
+- Root cause: `live_state.svelte.ts` menggunakan `$effect` di module-level untuk sync dari `wsStore.liveStateRaw`. `$effect` hanya valid di dalam komponen Svelte, bukan di store module
+- Fix: ganti `$effect` + `$state` dengan `$derived` yang langsung membaca `wsStore.liveStateRaw` — tidak perlu side effect
+- `audio_library.svelte.ts` disederhanakan menjadi pure type export (store tidak dipakai, `AudioLibraryGrid` sudah self-contained)
+
+## [0.4.0] — 2026-04-24 SHIPPED
+
+### Added (v0.4)
+
+**P0 — Audio Library (CC-LIVE-CLIP-001..005):**
+- `config/clips_script.yaml` — 160 script audio entries (9 categories)
+- `core/audio_library/manager.py` — `AudioLibraryManager`: load index.json, fuzzy search, hot-reload, anti-repeat
+- `adapters/audio_library.py` — `AudioLibraryAdapter`: sounddevice playback, serial queue
+- `scripts/gen_audio_library.py` + `.bat` — Cartesia round-robin generator
+- WS: `audio.list`, `audio.play`, `audio.stop` | `AudioLibraryGrid.svelte`
+
+**P1 — Comment Classifier (CC-LIVE-CLASSIFIER-001..003):**
+- `config/reply_templates.yaml` — 7 intents × 3 tone variants
+- `core/classifier/rules.py` — 11 intents, rule-first, <10ms
+- `core/classifier/llm_fallback.py` — LLM fallback with 5-min cache
+- WS event: `comment.classified` | `DecisionStream.svelte`
+
+**P2 — Suggested Reply (CC-LIVE-ORCH-001..005):**
+- `core/orchestrator/budget_guard.py` — `BudgetGuard`
+- `core/orchestrator/reply_cache.py` — cosine similarity cache
+- `core/orchestrator/suggester.py` — template-first + LLM + `_safe()` guardrail
+- WS: `reply.suggest`, `reply.approve`, `reply.reject`, `reply.regen` | `ReplySuggestions.svelte`
+
+**P3 — Live Director (CC-LIVE-DIRECTOR-001..005):**
+- `config/products.yaml` — 3 products + 8 runsheet phases
+- `core/orchestrator/director.py` — `LiveDirector` state machine, hard-stop, 30s tick
+- WS: `live.start/pause/resume/stop/emergency_stop/get_state` | `TwoHourTimer.svelte`, `EmergencyStop.svelte`
+
+**Health Check v0.4:**
+- `/health` extended: `audio_library_ready`, `classifier_ready`, `director_ready`, `budget_remaining_idr`, `worker_version: "0.4.0"`, HTTP 503 on degraded
+
+## [Unreleased] — v0.4.0 planned (archived)
+
+### Added (planned v0.4 — now shipped above)
 
 **Core v0.4 Features:**
 - **Live Director** state machine 2-jam (IDLE → HOOK → DEMO → CTA → REPLY → STOP@120min) — `core/orchestrator/director.py`

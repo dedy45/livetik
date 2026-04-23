@@ -201,3 +201,40 @@ Server push-only (controller mendengar). Payload JSON Lines:
 - **New LLM provider** → tambah adapter di `adapters/llm.py` implementing `LLMProvider` protocol
 - **New TTS voice** → edit `.env` `TTS_VOICE` — no code change
 - **New UI page** → tambah route di `apps/controller/src/routes/newpage/+page.svelte`
+
+---
+
+## 11. Svelte 5 SSR Rules (v0.4+)
+
+SvelteKit me-render komponen di server (Node.js) saat SSR. Aturan wajib:
+
+| Pattern | SSR-safe? | Keterangan |
+|---------|-----------|------------|
+| `.svelte.ts` dengan `$state`, `$derived` | ✅ | Svelte compiler memproses runes |
+| `.ts` biasa dengan `$state` | ❌ | Crash: `$state is not defined` |
+| `$effect` di module-level store | ❌ | Crash: hanya valid di dalam komponen |
+| `window.*` di `onMount` | ✅ | `onMount` tidak jalan di SSR |
+| `window.*` di `onDestroy` | ❌ | `onDestroy` jalan di SSR cleanup |
+| Cleanup di return value `onMount` | ✅ | Pattern yang benar untuk event listeners |
+
+**Pola benar untuk keyboard listener:**
+```typescript
+onMount(() => {
+  window.addEventListener('keydown', handler);
+  return () => window.removeEventListener('keydown', handler); // cleanup di client saja
+});
+```
+
+**Pola benar untuk store yang sync dari store lain:**
+```typescript
+// ✅ Gunakan $derived — tidak perlu $effect
+const liveState = $derived<LiveState>({
+  mode: (wsStore.liveStateRaw.mode as string) ?? 'IDLE',
+  // ...
+});
+```
+
+**File naming convention:**
+- Store dengan runes → `*.svelte.ts`
+- Store tanpa runes (pure types/writable) → `*.ts`
+- Komponen → `*.svelte`
