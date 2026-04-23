@@ -10,6 +10,25 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+**Documentation:**
+- Pulled Notion document "🎙️ Live Interaction Plan — 2 Jam Cartesia, Produk, Scene, Retensi" to `docs/live-interaction-plan-2-jam-cartesia.md`
+  - Comprehensive 2-hour live streaming strategy for TikTok affiliate
+  - 22 sections covering: theme, products, audio strategy, visual strategy, retention tactics, checklists
+  - Includes Cartesia TTS prompt template for 200 audio variations
+  - Production checklist and success metrics for first live test
+- Added `docs/AUDIO_ROUTING_TROUBLESHOOTING.md` — comprehensive troubleshooting guide for VoiceMeeter + VB-CABLE setup
+  - Step-by-step VoiceMeeter Banana configuration with screenshots descriptions
+  - Common issues and solutions (no audio, low volume, OBS not capturing, latency, crackling)
+  - Alternative setups and bypass options for testing
+  - Debug steps and verification checklist
+
+**Frontend — Audio Routing Setup:**
+- Enhanced `/config` page Audio Routing Setup section with:
+  - Prominent troubleshooting alert for "Audio Tidak Keluar" issue
+  - Link to comprehensive troubleshooting guide
+  - Expanded step-by-step instructions (7 detailed steps vs 4 brief steps)
+  - Clearer VoiceMeeter configuration instructions with exact UI element names
+
 **Frontend — TTS Output Test:**
 - 2 section terpisah untuk test TTS dengan download & play:
   - **Edge-TTS (Lokal Fallback)** — Voice selector (ArdiNeural/GadisNeural)

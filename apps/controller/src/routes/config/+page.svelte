@@ -761,33 +761,163 @@
 		</div>
 	</section>
 
-	<!-- === P3 · Audio Device === -->
+	<!-- === Audio Routing Info === -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
-		<h3 class="text-lg font-semibold mb-4">Audio Output Device</h3>
-		<div class="flex gap-2 items-end">
-			<div class="flex-1">
-				<label class="text-xs text-text-secondary">Device</label>
+		<h3 class="text-lg font-semibold mb-4">🔊 Audio Routing Setup</h3>
+		
+		<!-- Status Check -->
+		<div class="mb-4 p-4 bg-bg-elevated rounded-lg border-l-4 border-accent">
+			<div class="font-medium mb-2">Current Audio Flow:</div>
+			<div class="space-y-2 text-sm">
+				<div class="flex items-center gap-2">
+					<span class="text-text-secondary">1. Browser/TTS plays audio →</span>
+					<code class="px-2 py-0.5 bg-bg-primary rounded text-xs">Windows Default Output</code>
+				</div>
+				<div class="flex items-center gap-2">
+					<span class="text-text-secondary">2. Windows routes to →</span>
+					<code class="px-2 py-0.5 bg-bg-primary rounded text-xs">VoiceMeeter Input (VAIO)</code>
+				</div>
+				<div class="flex items-center gap-2">
+					<span class="text-text-secondary">3. VoiceMeeter splits to →</span>
+					<code class="px-2 py-0.5 bg-bg-primary rounded text-xs">A1: Speaker</code>
+					<span class="text-text-secondary">+</span>
+					<code class="px-2 py-0.5 bg-bg-primary rounded text-xs">A2: CABLE Input</code>
+				</div>
+				<div class="flex items-center gap-2">
+					<span class="text-text-secondary">4. OBS captures from →</span>
+					<code class="px-2 py-0.5 bg-bg-primary rounded text-xs">CABLE Output</code>
+				</div>
+			</div>
+		</div>
+
+		<!-- Troubleshooting Alert -->
+		<div class="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+			<div class="flex items-start gap-3">
+				<span class="text-2xl">⚠️</span>
+				<div class="flex-1">
+					<div class="font-medium text-yellow-200 mb-1">Audio Tidak Keluar Setelah Ganti ke VoiceMeeter?</div>
+					<p class="text-sm text-yellow-100/80 mb-2">
+						Ini normal! VoiceMeeter perlu dikonfigurasi dulu untuk route audio ke speaker fisik.
+					</p>
+					<a 
+						href="https://github.com/dedy45/livetik/blob/main/docs/AUDIO_ROUTING_TROUBLESHOOTING.md" 
+						target="_blank"
+						class="inline-flex items-center gap-1 text-sm text-yellow-200 hover:text-yellow-100 underline"
+					>
+						📖 Baca Troubleshooting Guide Lengkap
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Available Devices (Info Only) -->
+		<div class="space-y-3">
+			<div>
+				<div class="flex items-center justify-between mb-2">
+					<label class="text-sm font-medium">Available Audio Devices (Info Only)</label>
+					<button
+						onclick={loadAudioDevices}
+						disabled={!wsStore.connected}
+						class="px-2 py-1 text-xs border border-border rounded hover:bg-bg-elevated disabled:opacity-40"
+					>
+						🔄 Refresh
+					</button>
+				</div>
 				{#if audioDevices.length === 0}
-					<p class="mt-1 text-sm text-text-secondary">Loading devices...</p>
+					<p class="text-sm text-text-secondary">Loading devices...</p>
 				{:else}
-					<select bind:value={audioDeviceIndex} class="w-full mt-1 px-3 py-1.5 bg-bg-elevated border border-border rounded text-sm">
+					<div class="space-y-1">
 						{#each audioDevices as d}
-							<option value={d.index}>{d.name} {d.is_default ? '(default)' : ''} · {d.max_output_channels}ch</option>
+							<div class="flex items-center justify-between p-2 bg-bg-elevated rounded text-sm">
+								<span class="font-mono text-xs">{d.name}</span>
+								<div class="flex items-center gap-2 text-xs text-text-secondary">
+									{#if d.is_default}
+										<span class="px-2 py-0.5 bg-accent/20 text-accent rounded">Default</span>
+									{/if}
+									<span>{d.max_output_channels}ch</span>
+								</div>
+							</div>
 						{/each}
-					</select>
+					</div>
 				{/if}
 			</div>
-			<button
-				onclick={loadAudioDevices}
-				disabled={!wsStore.connected}
-				class="px-3 py-1.5 border border-border rounded text-sm hover:bg-bg-elevated disabled:opacity-40"
-			>
-				🔄 Refresh
-			</button>
+
+			<!-- Setup Instructions -->
+			<div class="p-4 bg-bg-elevated rounded border border-border">
+				<div class="font-medium mb-3 text-sm">⚙️ Setup Instructions (Step-by-Step):</div>
+				<ol class="space-y-3 text-xs text-text-secondary">
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">1.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">Windows: Set Default Output</div>
+							<div>Settings → System → Sound → Output → Choose: <code class="px-1 bg-bg-primary rounded">VoiceMeeter Input (VAIO)</code></div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">2.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">VoiceMeeter: Open Application</div>
+							<div>Start Menu → "VoiceMeeter Banana" → Run as Administrator</div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">3.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">VoiceMeeter: Set Hardware Output A1</div>
+							<div class="mb-1">Di bagian <b>HARDWARE OUT</b> (kanan atas), klik dropdown <b>A1</b></div>
+							<div>Pilih speaker fisik: <code class="px-1 bg-bg-primary rounded">Realtek Audio</code> / USB / HDMI / Bluetooth</div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">4.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">VoiceMeeter: Set Hardware Output A2</div>
+							<div>Klik dropdown <b>A2</b> → Pilih: <code class="px-1 bg-bg-primary rounded">CABLE Input (VB-Audio Virtual Cable)</code></div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">5.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">VoiceMeeter: Enable A1 & A2 for VAIO</div>
+							<div class="mb-1">Di bagian <b>HARDWARE INPUT</b> (kiri atas), cari row <b>VAIO</b></div>
+							<div>Klik tombol <b>A1</b> dan <b>A2</b> sampai menyala (hijau/kuning)</div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">6.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">OBS: Set Desktop Audio</div>
+							<div>Settings → Audio → Desktop Audio → Choose: <code class="px-1 bg-bg-primary rounded">CABLE Output (VB-Audio Virtual Cable)</code></div>
+						</div>
+					</li>
+					<li class="flex gap-2">
+						<span class="font-bold text-accent min-w-[20px]">7.</span>
+						<div class="flex-1">
+							<div class="font-medium text-text-primary mb-1">Test Audio Flow</div>
+							<div>Generate TTS di atas → Audio harus keluar di speaker <b>DAN</b> OBS meter bergerak</div>
+						</div>
+					</li>
+				</ol>
+			</div>
+
+			<!-- Quick Links -->
+			<div class="flex gap-2 text-xs">
+				<a
+					href="https://vb-audio.com/Voicemeeter/banana.htm"
+					target="_blank"
+					class="px-3 py-1.5 bg-bg-elevated border border-border rounded hover:bg-bg-primary"
+				>
+					📥 Download VoiceMeeter
+				</a>
+				<a
+					href="https://vb-audio.com/Cable/"
+					target="_blank"
+					class="px-3 py-1.5 bg-bg-elevated border border-border rounded hover:bg-bg-primary"
+				>
+					📥 Download VB-CABLE
+				</a>
+			</div>
 		</div>
-		<p class="text-xs text-text-secondary mt-2">
-			💡 Untuk VB-CABLE routing: pilih <b>CABLE Input (VB-Audio)</b> sebagai Windows default (Sound settings), lalu set OBS capture dari <b>CABLE Output</b>.
-		</p>
 	</section>
 
 	{:else if activeTab === 'tiktok'}
