@@ -14,6 +14,7 @@
 | M3 | Polish | Week 2 | Telemetry, fallback, hot-reload, dry-run |
 | M4 | v0.2 Features | Week 2 | Gift/Follow reply, Claude fallback, session export |
 | M5 | v0.3 Features | Week 3 | TikFinity, OBS scene switch |
+| M6 | v0.4 Live Orchestrator | Week 4–5 | Audio Library + Classifier + Suggested Reply + 2-hour Director |
 
 ---
 
@@ -224,3 +225,147 @@ M3: TEL-001 → TEL-002
 ```
 
 Agent harus ambil tiket urut dependency graph. Jangan skip ke M2 sebelum M1 selesai.
+
+---
+
+## 2b. Tiket v0.4 (M6 — Live Orchestrator, NEW)
+
+> 🔴 Semua tiket v0.4 mengacu ke `docs/LIVE_PLAN.md` + `docs/ORCHESTRATOR.md`. Phase strict order: P0 → P1 → P2 → P3. Jangan loncat fase sebelum acceptance criteria terpenuhi.
+
+### P0 · Audio Library Player
+
+### CC-LIVE-CLIP-001 | Audio library index schema + loader
+
+- **Fase**: M6-P0 • **Est**: 2h
+- **DoD**: `core/audio_library/manager.py` load `static/audio_library/index.json` (schema: id, tag[], duration_ms, voice_id, script, scene_hint), fuzzy match by tag, test dengan 160 entry dummy
+- **Files**: `core/audio_library/manager.py`, `static/audio_library/index.json`, `tests/test_audio_library.py`
+
+### CC-LIVE-CLIP-002 | Generate 160–220 clip Cartesia
+
+- **Fase**: M6-P0 • **Est**: 4h (batch job)
+- **DoD**: script `scripts/gen_audio_library.py` pakai Cartesia pool + script dari `config/clips_script.yaml`, output `.wav` + update `index.json`, progress log, skip kalau sudah ada
+- **Files**: `scripts/gen_audio_library.py`, `scripts/gen_audio_library.bat`, `apps/worker/config/clips_script.yaml`
+
+### CC-LIVE-CLIP-003 | Audio playback adapter
+
+- **Fase**: M6-P0 • **Est**: 2h
+- **DoD**: `adapters/audio_library.py` playback via `sounddevice` ke virtual cable, queue-driven (tidak overlap), emit event `audio.playing` / `audio.done`
+- **Files**: `adapters/audio_library.py`
+
+### CC-LIVE-CLIP-004 | WS command audio.list / play / stop
+
+- **Fase**: M6-P0 • **Est**: 1h
+- **DoD**: 3 command baru di `ipc/ws_server.py`, return JSON schema terdokumentasi
+- **Files**: `ipc/ws_server.py`
+
+### CC-LIVE-CLIP-005 | Svelte AudioLibraryGrid panel
+
+- **Fase**: M6-P0 • **Est**: 2.5h
+- **DoD**: `lib/components/AudioLibraryGrid.svelte` grid 160 clip, search by tag, klik = play, latency target <200ms
+- **Files**: `apps/controller/src/lib/components/AudioLibraryGrid.svelte`
+- **Acceptance P0**: klik clip di dashboard → audio keluar <200ms, 0 LLM call, 160 clip ter-index
+
+### P1 · Comment Classifier
+
+### CC-LIVE-CLASSIFIER-001 | Rule-first classifier 7 kategori
+
+- **Fase**: M6-P1 • **Est**: 3h
+- **DoD**: `core/classifier/rules.py` regex + keyword dict Bahasa Indonesia untuk: price, stock, how_to_use, objection, greeting, spam, other. Return `(category, confidence)`. Test minimal 50 case.
+- **Files**: `core/classifier/rules.py`, `core/classifier/keywords.yaml`, `tests/test_classifier_rules.py`
+
+### CC-LIVE-CLASSIFIER-002 | LLM fallback dengan guardrail
+
+- **Fase**: M6-P1 • **Est**: 2h
+- **DoD**: `core/classifier/llm_fallback.py` lewat `guardrail/runtime.py`, hanya dipanggil kalau rule confidence < 0.8, hasil di-cache 5 menit
+- **Files**: `core/classifier/llm_fallback.py`
+
+### CC-LIVE-CLASSIFIER-003 | Badge di Live Comments feed
+
+- **Fase**: M6-P1 • **Est**: 1h
+- **DoD**: extend panel Live Comments existing, tampil badge kategori + confidence, filter dropdown
+- **Files**: `apps/controller/src/routes/live/+page.svelte`
+
+### CC-LIVE-CLASSIFIER-004 | WS event comment.classified
+
+- **Fase**: M6-P1 • **Est**: 30m
+- **DoD**: event baru `comment.classified` emit dari worker setelah setiap comment
+- **Files**: `ipc/ws_server.py`
+- **Acceptance P1**: 80%+ comment ter-klasifikasi rule-only, cost panel tunjukkan penghematan token
+
+### P2 · Suggested Reply (semi-auto)
+
+### CC-LIVE-ORCH-001 | Suggester engine 3-opsi
+
+- **Fase**: M6-P2 • **Est**: 3h
+- **DoD**: `core/orchestrator/suggester.py` generate 3 reply dari template + LLM (via guardrail + cache), latency target <2s
+- **Files**: `core/orchestrator/suggester.py`, `config/reply_templates.yaml`
+
+### CC-LIVE-ORCH-002 | Reply cache (cosine similarity)
+
+- **Fase**: M6-P2 • **Est**: 2h
+- **DoD**: `core/orchestrator/reply_cache.py` cache reply 5 menit, match comment mirip (cosine > 0.9) pakai hasil cached
+- **Files**: `core/orchestrator/reply_cache.py`
+
+### CC-LIVE-ORCH-003 | Svelte ReplySuggestions panel
+
+- **Fase**: M6-P2 • **Est**: 2h
+- **DoD**: `lib/components/ReplySuggestions.svelte` 3 tombol, operator klik pilih, WS `reply.suggest` / `reply.pick`
+- **Files**: `apps/controller/src/lib/components/ReplySuggestions.svelte`
+
+### CC-LIVE-ORCH-004 | Human-in-the-loop flag
+
+- **Fase**: M6-P2 • **Est**: 1h
+- **DoD**: `REPLY_ENABLED=false` tetap supported, REPLY_AUTO_AFTER_PICK=true opsi auto-send setelah pick
+- **Files**: `.env.example`, `core/orchestrator/suggester.py`
+- **Acceptance P2**: latency suggest <2s, human-in-the-loop, REPLY_ENABLED=false tidak break flow
+
+### P3 · Live Director (2-jam state machine)
+
+### CC-LIVE-DIRECTOR-001 | State machine skeleton
+
+- **Fase**: M6-P3 • **Est**: 3h
+- **DoD**: `core/orchestrator/director.py` state machine IDLE → HOOK → DEMO → CTA → REPLY → STOP@120min, transition handler, log tiap transition
+- **Files**: `core/orchestrator/director.py`, `tests/test_director.py`
+
+### CC-LIVE-DIRECTOR-002 | Products rotation config
+
+- **Fase**: M6-P3 • **Est**: 1.5h
+- **DoD**: `config/products.yaml` dengan daftar produk + slot waktu + CTA, loader + validator Pydantic
+- **Files**: `apps/worker/config/products.yaml`, `core/config_store.py` extend
+
+### CC-LIVE-DIRECTOR-003 | 2-hour timer + hard stop
+
+- **Fase**: M6-P3 • **Est**: 1.5h
+- **DoD**: timer countdown 120 menit, auto-stop director + TTS announcement, emit `director.stopped`
+- **Files**: `core/orchestrator/director.py`
+
+### CC-LIVE-DIRECTOR-004 | WS director.start / stop / state
+
+- **Fase**: M6-P3 • **Est**: 1h
+- **DoD**: 3 command + 1 broadcast event
+- **Files**: `ipc/ws_server.py`
+
+### CC-LIVE-DIRECTOR-005 | Svelte DecisionStream panel
+
+- **Fase**: M6-P3 • **Est**: 2h
+- **DoD**: `lib/components/DecisionStream.svelte` live feed keputusan, color-code by state
+- **Files**: `apps/controller/src/lib/components/DecisionStream.svelte`
+
+### CC-LIVE-DIRECTOR-006 | TwoHourTimer panel
+
+- **Fase**: M6-P3 • **Est**: 1h
+- **DoD**: `lib/components/TwoHourTimer.svelte` countdown besar, warning di 10 menit terakhir
+- **Files**: `apps/controller/src/lib/components/TwoHourTimer.svelte`
+
+### CC-LIVE-DIRECTOR-007 | EmergencyStop button
+
+- **Fase**: M6-P3 • **Est**: 30m
+- **DoD**: `lib/components/EmergencyStop.svelte` tombol merah besar, konfirmasi modal
+- **Files**: `apps/controller/src/lib/components/EmergencyStop.svelte`
+
+### CC-LIVE-DIRECTOR-008 | Health check extension
+
+- **Fase**: M6-P3 • **Est**: 1h
+- **DoD**: HTTP `/health` tambah probe `audio_library_ready`, `classifier_ready`, `director_ready`, `budget_remaining_idr`
+- **Files**: `ipc/http_api.py`
+- **Acceptance P3**: live 2 jam tanpa intervensi, hard-stop di 120 menit, semua keputusan ter-log

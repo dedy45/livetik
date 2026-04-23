@@ -1,6 +1,6 @@
 # 📋 01 · PRD — Product Requirements Document
 
-> **Canonical source** untuk apa yang dibangun & tidak dibangun di `tiklivenotion` v0.1.0–v0.3.0. Mirror dari Notion.
+> **Canonical source** untuk apa yang dibangun & tidak dibangun di `livetik` v0.1.0–v0.4.0. Mirror dari Notion.
 
 ---
 
@@ -155,3 +155,25 @@
 - Spam reply tanpa rate limit
 - Scraping data user TikTok di luar event stream
 - Penggunaan TikTok API resmi (tidak tersedia publik)
+
+---
+
+## 10. v0.4 Goals — Live Orchestrator (2-Hour Director)
+
+### ✅ Goals v0.4 (Week 4–5)
+
+- G12. **Pre-generated Audio Library**: 160–220 clip Cartesia dengan index JSON, fuzzy match by tag, hot-reload
+- G13. **Comment Classifier**: rule-first (7 kategori ID: price, stock, how_to_use, objection, greeting, spam, other) + LLM fallback via guardrail
+- G14. **Suggested Reply**: semi-auto 3-opsi dari template + LLM (via guardrail + cache), human-in-the-loop
+- G15. **Live Director**: state machine 2-jam (IDLE → HOOK → DEMO → CTA → REPLY → STOP@120min), products rotation, hard-stop timer
+- G16. **Svelte Dashboard Extension**: panel Audio Library Grid, Decision Stream, Reply Suggestions, 2-Hour Timer, Emergency Stop
+- G17. **Guardrail Token Saving**: classifier rule-first (skip LLM kalau confidence > 0.8), reply cache (cosine > 0.9), daily budget check
+
+### Success Metrics v0.4
+
+- ✅ Live publik 2 jam tanpa intervensi manual
+- ✅ Hard-stop di 120 menit (auto-announcement + disconnect)
+- ✅ 80%+ comment ter-klasifikasi rule-only (hemat token)
+- ✅ Latency suggest reply <2s
+- ✅ 160 clip ter-index, klik dashboard → audio <200ms
+- ✅ Cost ≤Rp 5.000 per 2-jam live (dengan guardrail aktif)

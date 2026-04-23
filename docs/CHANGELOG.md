@@ -6,9 +6,37 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [Unreleased] — v0.4.0 planned
 
-### Added
+### Added (planned v0.4)
+
+**Core v0.4 Features:**
+- **Live Director** state machine 2-jam (IDLE → HOOK → DEMO → CTA → REPLY → STOP@120min) — `core/orchestrator/director.py`
+- **Pre-generated Audio Library** 160–220 clip Cartesia dengan index.json + fuzzy match — `core/audio_library/manager.py`, `adapters/audio_library.py`, `static/audio_library/`
+- **Comment Classifier** rule-first (7 kategori ID: price, stock, how_to_use, objection, greeting, spam, other) + LLM fallback via guardrail — `core/classifier/{rules,llm_fallback}.py`
+- **Suggested Reply** (semi-auto, human-in-the-loop) — `core/orchestrator/suggester.py`
+- **Reply Cache** dengan cosine similarity > 0.9 (5 menit TTL) — `core/orchestrator/reply_cache.py`
+- **2-hour hard-stop timer** dengan emergency stop manual
+- **Products rotation config** — `config/products.yaml` (PALOMA, Reaim, TNW Chopper, CCTV, Aluflex, Locksworth, Senter XHP160, DINGS)
+
+**Svelte Dashboard v0.4:**
+- `AudioLibraryGrid.svelte` — grid 160 clip, search by tag, klik = play, latency <200ms
+- `DecisionStream.svelte` — live feed keputusan director, color-code by state
+- `ReplySuggestions.svelte` — 3 tombol opsi reply, operator klik pilih
+- `TwoHourTimer.svelte` — countdown besar, warning di 10 menit terakhir
+- `EmergencyStop.svelte` — tombol merah besar, konfirmasi modal
+
+**Documentation v0.4:**
+- `docs/LIVE_PLAN.md` — spec 2-jam Cartesia live, script host-led, 160–220 clip
+- `docs/ORCHESTRATOR.md` — spec Python worker + Svelte control center, guardrail token-saving, LLM key pool
+
+**Ticket prefixes v0.4:**
+- `CC-LIVE-CLIP-xxx` (audio library)
+- `CC-LIVE-CLASSIFIER-xxx` (comment classifier)
+- `CC-LIVE-ORCH-xxx` (suggested reply + orchestrator)
+- `CC-LIVE-DIRECTOR-xxx` (2-hour director state machine)
+
+### Added (v0.3.0 shipped)
 
 **Documentation:**
 - Pulled Notion document "🎙️ Live Interaction Plan — 2 Jam Cartesia, Produk, Scene, Retensi" to `docs/live-interaction-plan-2-jam-cartesia.md`

@@ -21,6 +21,8 @@
 | 10 | Structure | [STRUCTURE.md](docs/STRUCTURE.md) | Dev | Cari file/folder |
 | 11 | Troubleshooting | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Dev | Fix errors |
 | 12 | Kiro Guide | [KIRO_GUIDE.md](docs/KIRO_GUIDE.md) | Kiro IDE users | Development workflow |
+| 13 | **Live Plan** | [LIVE_PLAN.md](docs/LIVE_PLAN.md) | **v0.4 Live** | **Spec 2-jam Cartesia live** |
+| 14 | **Orchestrator** | [ORCHESTRATOR.md](docs/ORCHESTRATOR.md) | **v0.4 Live** | **Python worker + Svelte control** |
 
 ---
 
@@ -145,6 +147,8 @@ REM Controller: http://localhost:5173
 - [STRUCTURE.md](docs/STRUCTURE.md)
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 - [KIRO_GUIDE.md](docs/KIRO_GUIDE.md)
+- **[LIVE_PLAN.md](docs/LIVE_PLAN.md)** ← 🆕 v0.4 Live interaction 2 jam
+- **[ORCHESTRATOR.md](docs/ORCHESTRATOR.md)** ← 🆕 v0.4 Python worker + Svelte control
 
 ---
 

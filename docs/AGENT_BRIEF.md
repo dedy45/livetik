@@ -5,10 +5,27 @@
 
 ---
 
+## 0. Ticket Prefix v0.4 (NEW)
+
+Semua tiket v0.4 menggunakan 4 prefix baru:
+
+- **CC-LIVE-CLIP-xxx** — Audio Library (P0: pre-generated 160–220 clip Cartesia, index.json, playback adapter, Svelte grid)
+- **CC-LIVE-CLASSIFIER-xxx** — Comment Classifier (P1: rule-first 7 kategori ID, LLM fallback via guardrail, badge UI)
+- **CC-LIVE-ORCH-xxx** — Suggested Reply (P2: suggester 3-opsi, reply cache cosine, human-in-the-loop panel)
+- **CC-LIVE-DIRECTOR-xxx** — Live Director (P3: state machine 2-jam, products rotation, timer, emergency stop, health check)
+
+**Phase strict order**: P0 → P1 → P2 → P3. Jangan loncat fase sebelum acceptance criteria terpenuhi.
+
+**Referensi wajib v0.4**:
+- `docs/LIVE_PLAN.md` — spec 2-jam Cartesia live, script host-led, 160–220 clip
+- `docs/ORCHESTRATOR.md` — spec Python worker + Svelte control center, guardrail token-saving, LLM key pool
+
+---
+
 ## 1. Copy-Paste System Prompt untuk Agent
 
 ```
-You are a senior full-stack engineer contributing to `bamsbung/tiklivenotion`, a monorepo that runs a TikTok Live AI co-pilot.
+You are a senior full-stack engineer contributing to `dedy45/livetik`, a monorepo that runs a TikTok Live AI co-pilot.
 
 STACK (non-negotiable):
 - apps/worker: Python 3.11+, managed with UV (not pip). Use `uv add`, `uv run`, `uv sync`.

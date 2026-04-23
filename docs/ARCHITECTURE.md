@@ -58,10 +58,18 @@ flowchart TB
 | llm | adapters/llm.py | DeepSeek primary + Claude fallback | In: prompt+msg; Out: reply text + tokens |
 | tts | adapters/tts.py | Edge-TTS synthesize + ffplay serial | In: text; Out: audio playback |
 | obs | adapters/obs.py | Atomic write last_reply.txt | In: text; Out: file |
+| audio_library | adapters/audio_library.py | Playback pre-generated clips via sounddevice | In: clip_id; Out: audio playback |
 | persona | core/persona.py | Load + render system prompt | In: file path; Out: string |
 | guardrail | core/guardrail.py | Regex blocklist check | In: text; Out: (ok, reason) |
+| guardrail/runtime | core/guardrail/runtime.py | LLM call wrapper with budget check + cache | In: LLM params; Out: response + cost |
 | queue | core/queue.py | Rate-limit + dedup + priority | In: events; Out: throttled events |
 | events | core/events.py | Domain event dataclasses | Pure types |
+| audio_library/manager | core/audio_library/manager.py | Load index.json, fuzzy match by tag | In: tag query; Out: clip metadata |
+| classifier/rules | core/classifier/rules.py | Rule-first 7-kategori classifier | In: comment text; Out: (category, confidence) |
+| classifier/llm_fallback | core/classifier/llm_fallback.py | LLM fallback via guardrail (confidence < 0.8) | In: comment text; Out: category |
+| orchestrator/director | core/orchestrator/director.py | 2-hour state machine (IDLE→HOOK→DEMO→CTA→REPLY→STOP) | In: events; Out: state transitions |
+| orchestrator/suggester | core/orchestrator/suggester.py | Generate 3 reply options (template + LLM) | In: comment + category; Out: 3 replies |
+| orchestrator/reply_cache | core/orchestrator/reply_cache.py | Cache reply 5 min, cosine match > 0.9 | In: comment; Out: cached reply or None |
 | ws_server | ipc/ws_server.py | WebSocket broadcast | In: events; Out: WS push |
 | http_api | ipc/http_api.py | FastAPI REST endpoints | In: HTTP; Out: JSON |
 | logger | telemetry/logger.py | Structured JSON logs | In: log calls; Out: JSONL files |
