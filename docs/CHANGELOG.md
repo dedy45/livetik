@@ -8,6 +8,18 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+**Frontend — Persona Page:**
+- Auto-load persona content saat page mount (tidak perlu klik "Load dari file" manual)
+- Persona sekarang persist setelah refresh — content yang disimpan muncul kembali
+- Editor menampilkan full content (bukan hanya preview 200 karakter)
+- Fix: `reload_persona` dan `save_persona` sekarang return full content
+
+**Backend — Persona Commands:**
+- `cmd_reload_persona`: Return full content via field `content` (selain `preview` 200 char)
+- `cmd_save_persona`: Return full content dalam response untuk sync dengan editor
+
 ### Changed
 
 **Frontend — UI Improvement:**

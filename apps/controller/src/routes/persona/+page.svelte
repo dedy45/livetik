@@ -12,13 +12,18 @@
 	let lastSavedLen = $state(0);
 
 	$effect(() => {
-		if (loadResult?.ok && loadResult.result?.preview !== undefined) {
-			// reload_persona only returns 200-char preview; for full content we use save_persona echo
-			// On first load, populate editor with preview (user can expand manually)
-			if (!isDirty) {
-				editorContent = loadResult.result.preview ?? '';
-				lastSavedLen = loadResult.result.char_count ?? 0;
-			}
+		if (loadResult?.ok && loadResult.result?.content !== undefined) {
+			// Use full content instead of preview
+			editorContent = loadResult.result.content ?? '';
+			lastSavedLen = loadResult.result.char_count ?? 0;
+			isDirty = false; // Mark as clean after loading
+		}
+	});
+
+	// Auto-load persona on connect
+	$effect(() => {
+		if (wsStore.connected && !editorContent && !loadReqId) {
+			loadPersona();
 		}
 	});
 
@@ -30,6 +35,10 @@
 		if (saveResult?.ok) {
 			isDirty = false;
 			lastSavedLen = saveResult.result?.char_count ?? editorContent.length;
+			// Update editor with saved content to ensure sync
+			if (saveResult.result?.content) {
+				editorContent = saveResult.result.content;
+			}
 		}
 	});
 

@@ -312,7 +312,7 @@ async def main() -> NoReturn:
         nonlocal persona_text
         new_text = load_persona("config/persona.md")
         persona_text = new_text
-        return {"char_count": len(new_text), "preview": new_text[:200]}
+        return {"char_count": len(new_text), "content": new_text, "preview": new_text[:200]}
 
     async def cmd_save_persona(p: dict[str, object]) -> dict[str, object]:
         """Save persona text to config/persona.md and hot-reload into memory."""
@@ -325,7 +325,7 @@ async def main() -> NoReturn:
         persona_path.write_text(content, encoding="utf-8")
         persona_text = content
         log.info("persona saved (%d chars) and hot-reloaded", len(content))
-        return {"saved": True, "char_count": len(content), "preview": content[:200]}
+        return {"saved": True, "char_count": len(content), "content": content, "preview": content[:200]}
 
     async def cmd_test_reply(p: dict[str, object]) -> dict[str, object]:
         user = str(p.get("user", "TestUser"))
