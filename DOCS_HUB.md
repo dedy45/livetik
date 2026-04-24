@@ -56,7 +56,7 @@ livetik/
 │               ├── components/        # AudioLibraryGrid, DecisionStream, ReplySuggestions, TwoHourTimer, EmergencyStop (v0.4)
 │               └── stores/            # ws, live_state, audio_library (v0.4)
 ├── docs/                              # ← semua dokumen ini
-├── scripts/                           # dev.bat, install.bat, gen_audio_library.py/.bat (v0.4)
+├── scripts/                           # dev.bat, install.bat, gen_audio_library.py/.bat, gen_audio_library_edgets.py/.bat (v0.4.3)
 ├── .github/workflows/ci.yml
 ├── .vscode/
 ├── .env.example

@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import edge_tts
-from cartesia import AsyncCartesia
 
 from .cartesia_pool import CartesiaPool, KeySlot
 
@@ -70,6 +69,7 @@ class TTSAdapter:
 
     async def _cartesia_speak(self, text: str, emotion: str = "neutral") -> TTSResult:
         import time
+        import httpx
         if not self.voice_id:
             raise RuntimeError("CARTESIA_VOICE_ID not set")
         slot: KeySlot = await self.pool.acquire()
@@ -77,24 +77,45 @@ class TTSAdapter:
         # Normalise emotion — fall back to neutral if unknown
         safe_emotion = emotion if emotion in self.VALID_EMOTIONS else "neutral"
         try:
-            async with AsyncCartesia(api_key=slot.key) as client:
-                audio_bytes = b""
-                async for chunk in client.tts.bytes(
-                    model_id=self.model_id,
-                    transcript=text,
-                    voice={
-                        "mode": "id",
-                        "id": self.voice_id,
-                        "experimental_controls": {"emotions": [safe_emotion]},
-                    },
-                    language="id",
-                    output_format={
-                        "container": "wav",
-                        "encoding": "pcm_f32le",   # matches tested working script
-                        "sample_rate": 44100,       # matches tested working script
-                    },
-                ):
-                    audio_bytes += chunk
+            # Use HTTP API directly (same as scripts/voice/tts_lib.py)
+            payload = {
+                "model_id": self.model_id,
+                "transcript": text,
+                "voice": {
+                    "mode": "id",
+                    "id": self.voice_id
+                },
+                "output_format": {
+                    "container": "wav",
+                    "encoding": "pcm_f32le",
+                    "sample_rate": 44100
+                },
+                "language": "id",
+                "speed": "normal",
+                "generation_config": {
+                    "speed": 0.98,
+                    "volume": 1.14,
+                    "emotion": safe_emotion
+                }
+            }
+            
+            headers = {
+                "Cartesia-Version": "2026-03-01",
+                "X-API-Key": slot.key,
+                "Content-Type": "application/json"
+            }
+            
+            async with httpx.AsyncClient(timeout=60) as client:
+                response = await client.post(
+                    "https://api.cartesia.ai/tts/bytes",
+                    headers=headers,
+                    json=payload
+                )
+                
+                if response.status_code != 200:
+                    raise RuntimeError(f"HTTP {response.status_code}: {response.text[:200]}")
+                
+                audio_bytes = response.content
         except Exception as e:
             # Distinguish quota/auth from transient errors
             msg = str(e).lower()

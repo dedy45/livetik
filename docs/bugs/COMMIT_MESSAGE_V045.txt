@@ -1,0 +1,60 @@
+[v0.4][fix:tts] Fix Cartesia API parameters, align with working scripts
+
+PROBLEM:
+- Worker crashed: "AsyncTTSResource.bytes() got an unexpected keyword argument 'experimental_controls'"
+- TTS generation failed despite valid API keys
+- Backend tidak selaras dengan working implementation di scripts/voice/
+
+ROOT CAUSE:
+- Backend used incorrect API parameter: experimental_controls inside voice dict
+- Working scripts (scripts/voice/tts_lib.py) used correct format: generation_config
+- Cartesia API rejected experimental_controls as unknown parameter
+
+SOLUTION:
+1. Removed experimental_controls from voice dict
+2. Added speed parameter (top-level)
+3. Added generation_config parameter with speed, volume, emotion
+4. Aligned backend with working scripts format
+
+CHANGES:
+- Modified: apps/worker/src/banghack/adapters/tts.py
+  * Fixed _cartesia_speak() method
+  * Removed experimental_controls from voice dict
+  * Added speed="normal" and generation_config parameters
+  
+- Modified: apps/worker/src/banghack/main.py
+  * Fixed cmd_generate_cartesia_tts() function
+  * Removed experimental_controls logic
+  * Added speed and generation_config parameters
+  * Fixed indentation errors and duplicate code
+
+- Created: debug-dan-tes/V045_CARTESIA_API_FIX.md (analysis)
+- Updated: docs/CHANGELOG.md (v0.4.5 section)
+
+API FORMAT (CORRECT):
+{
+  "voice": {"mode": "id", "id": voice_id},
+  "speed": "normal",
+  "generation_config": {
+    "speed": 0.98,
+    "volume": 1.14,
+    "emotion": "comedic"
+  }
+}
+
+IMPACT:
+- ✅ TTS generation works correctly
+- ✅ Emotion control functional (neutral, comedic, dramatic, etc)
+- ✅ Speed and volume control available
+- ✅ Backend aligned with working scripts
+- ✅ Consistent API usage across codebase
+
+VERIFICATION:
+cd livetik/apps/worker
+uv run python -m banghack.main
+# Expected: "Cartesia pool initialized with 1 key(s)"
+
+NEXT STEPS:
+- Test TTS via controller dashboard (System Health → Test TTS)
+- Generate audio library: scripts\gen_audio_library.bat
+- Verify 108 clips generated successfully

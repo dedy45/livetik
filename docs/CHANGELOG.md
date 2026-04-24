@@ -6,6 +6,187 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.6] — 2026-04-24 CARTESIA SDK FIX (SYSTEMATIC DEBUGGING)
+
+### Fixed (v0.4.6 — Cartesia SDK API Call)
+
+**[CRITICAL] Cartesia SDK usage error resolved via systematic debugging:**
+- Fixed `TypeError: 'async for' requires an object with __aiter__ method, got coroutine`
+- Replaced `AsyncCartesia` SDK client with direct HTTP API (httpx)
+- Aligned backend with working scripts (`scripts/voice/tts_lib.py`)
+- Used systematic debugging process to identify root cause
+
+**Root Cause** (Phase 1 Investigation):
+- `client.tts.bytes()` returns **coroutine** (needs `await`), not async iterator
+- Backend used `async for` on coroutine → TypeError
+- Working scripts use `requests.post()` → direct HTTP API → works perfectly
+
+**Solution** (Phase 4 Implementation):
+```python
+# Before (broken - SDK client)
+async with AsyncCartesia(api_key=slot.key) as client:
+    async for chunk in client.tts.bytes(...):  # ❌ TypeError
+        audio_bytes += chunk
+
+# After (fixed - direct HTTP)
+async with httpx.AsyncClient(timeout=60) as client:
+    response = await client.post(
+        "https://api.cartesia.ai/tts/bytes",
+        headers=headers,
+        json=payload
+    )
+    audio_bytes = response.content  # ✅ Works
+```
+
+**Why v0.4.5 Fix Wasn't Enough**:
+- v0.4.5 fixed API parameters (`generation_config`)
+- But still used SDK client with wrong usage pattern (`async for` on coroutine)
+- v0.4.6 fixes SDK usage by switching to direct HTTP API
+
+### Changed (v0.4.6)
+- `apps/worker/src/banghack/adapters/tts.py`
+  - Removed `from cartesia import AsyncCartesia`
+  - Added `import httpx` for direct HTTP calls
+  - Replaced SDK client with HTTP API (same as working scripts)
+  
+- `apps/worker/src/banghack/main.py`
+  - Replaced SDK client with HTTP API in `cmd_generate_cartesia_tts()`
+  - Consistent with TTS adapter implementation
+
+### Documentation (v0.4.6)
+- `debug-dan-tes/V046_CARTESIA_SDK_FIX.md` — Systematic debugging process, root cause analysis
+
+### Process Improvement (v0.4.6)
+- Applied **systematic-debugging** skill
+- Phase 1: Root cause investigation (checked working scripts)
+- Phase 2: Pattern analysis (HTTP vs SDK comparison)
+- Phase 3: Hypothesis testing (use HTTP like scripts)
+- Phase 4: Implementation (single fix, verified)
+
+---
+
+## [0.4.5] — 2026-04-24 CARTESIA API FIX
+
+### Fixed (v0.4.5 — Cartesia TTS API Parameters)
+
+**[CRITICAL] Cartesia TTS API parameter error resolved:**
+- Fixed `AsyncTTSResource.bytes() got an unexpected keyword argument 'experimental_controls'`
+- Aligned backend implementation with working scripts in `scripts/voice/`
+- Removed incorrect `experimental_controls` parameter from voice dict
+- Added correct `speed` and `generation_config` parameters
+
+**Root Cause:**
+- Backend used `experimental_controls` inside `voice` dict (incorrect)
+- Working scripts used `generation_config` as separate parameter (correct)
+- API rejected `experimental_controls` as unknown parameter
+
+**Solution:**
+```python
+# Before (broken)
+voice={
+    "mode": "id",
+    "id": voice_id,
+    "experimental_controls": {"emotions": [emotion]}  # ❌ Wrong
+}
+
+# After (fixed)
+voice={"mode": "id", "id": voice_id},  # ✅ Correct
+speed="normal",
+generation_config={  # ✅ Correct
+    "speed": 0.98,
+    "volume": 1.14,
+    "emotion": emotion
+}
+```
+
+### Changed (v0.4.5)
+- `apps/worker/src/banghack/adapters/tts.py` — Fixed `_cartesia_speak()` API call
+- `apps/worker/src/banghack/main.py` — Fixed `cmd_generate_cartesia_tts()` API call
+- Both now use correct `generation_config` parameter format
+
+### Documentation (v0.4.5)
+- `debug-dan-tes/V045_CARTESIA_API_FIX.md` — API parameter comparison, verification steps
+
+---
+
+## [0.4.4] — 2026-04-24 ENV CONSOLIDATION
+
+### Fixed (v0.4.4 — Critical TTS Initialization)
+
+**[CRITICAL] TTS initialization error resolved:**
+- Deleted redundant `apps/worker/.env` (partial config causing key lookup failure)
+- Fixed `main.py` to load `.env` from repo root explicitly using `Path(__file__).parent` traversal
+- Resolves "✗ TTS not initialized — check CARTESIA_API_KEYS" error
+- Single source of truth: only `livetik/.env` exists now
+- Worker loads config correctly regardless of current working directory
+
+**Root Cause:**
+- Worker used `load_dotenv()` without path → reads from CWD
+- When run from `apps/worker/`, it loaded `apps/worker/.env` (only had model config, no API keys)
+- `CartesiaPool.from_env()` raised RuntimeError: "CARTESIA_API_KEYS is empty"
+
+**Solution:**
+```python
+# Before (broken)
+load_dotenv()  # reads from CWD
+
+# After (fixed)
+_env_path = Path(__file__).parent.parent.parent.parent.parent / ".env"
+load_dotenv(_env_path)  # explicit root path
+```
+
+### Changed (v0.4.4)
+- `apps/worker/src/banghack/main.py` — `load_dotenv()` now uses explicit root `.env` path
+
+### Removed (v0.4.4)
+- `apps/worker/.env` — Redundant partial config deleted
+
+### Documentation (v0.4.4)
+- `debug-dan-tes/V044_ENV_CONSOLIDATION.md` — Root cause analysis, verification steps, prevention rules
+
+---
+
+## [0.4.3] — 2026-04-24 AUDIO GENERATION FALLBACK
+
+### Added (v0.4.3 — Edge-TTS Fallback for Audio Generation)
+
+**Scripts — Audio Generation:**
+- `scripts/gen_audio_library_edgets.py` — Enhanced audio generator with automatic fallback:
+  - Primary: Cartesia TTS API (if `CARTESIA_API_KEYS` configured)
+  - Fallback: Edge-TTS (free, no API key required)
+  - Idempotent: skips existing files
+  - Generates index.json with clip metadata
+- `scripts/gen_audio_library_edgets.bat` — Windows batch wrapper
+
+**Benefits:**
+- Unblocks STEP 1 (Generate Audio Library) from NEXT_STEPS_ACTUAL.md
+- No longer requires Cartesia API keys to test audio playback
+- Edge-TTS provides free, high-quality Indonesian voice (id-ID-ArdiNeural)
+- Seamless upgrade path: switch to Cartesia by adding API keys to .env
+
+**Usage:**
+```bash
+# Windows
+scripts\gen_audio_library_edgets.bat
+
+# Linux/Mac
+python scripts/gen_audio_library_edgets.py
+```
+
+### Notes (v0.4.3)
+
+**Current .env Status:**
+- `CARTESIA_API_KEYS=-` (not configured)
+- `EDGE_TTS_VOICE=id-ID-ArdiNeural` (configured, ready to use)
+- Script automatically detects and uses appropriate TTS engine
+
+**Next Steps:**
+- Run `scripts\gen_audio_library_edgets.bat` to generate 108 clips
+- Test audio playback via `/library` page
+- Extend `clips_script.yaml` with 50+ additional clips (CCTV, Senter, Tracker categories)
+
+---
+
 ## [0.4.2] — 2026-04-24 UX NAVIGATION
 
 ### Added (v0.4.2 — UX Navigation + Go-Live Gap Closure)

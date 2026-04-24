@@ -1,0 +1,43 @@
+[v0.4][fix:env] Consolidate .env to root, fix TTS init error
+
+PROBLEM:
+- User reported "✗ TTS not initialized — check CARTESIA_API_KEYS"
+- Valid Cartesia API key existed in livetik/.env
+- Worker couldn't see the key
+
+ROOT CAUSE:
+- Duplicate .env files: livetik/.env (complete) + apps/worker/.env (partial)
+- Worker used load_dotenv() without path → reads from CWD
+- When run from apps/worker/, loaded apps/worker/.env (no API keys)
+- CartesiaPool.from_env() raised RuntimeError: "CARTESIA_API_KEYS is empty"
+
+SOLUTION:
+1. Delete redundant apps/worker/.env (partial config)
+2. Fix main.py to load .env from repo root explicitly
+3. Use Path(__file__).parent traversal for CWD-independent config loading
+
+CHANGES:
+- Modified: apps/worker/src/banghack/main.py
+  * load_dotenv() → load_dotenv(_env_path)
+  * Added explicit root path calculation
+- Deleted: apps/worker/.env (redundant)
+- Created: debug-dan-tes/V044_ENV_CONSOLIDATION.md (analysis)
+- Created: debug-dan-tes/V044_COMPLETION_SUMMARY.md (summary)
+- Updated: docs/CHANGELOG.md (v0.4.4 section)
+- Updated: debug-dan-tes/NEXT_STEPS_ACTUAL.md (STEP 1 status)
+
+IMPACT:
+- ✅ TTS initializes correctly
+- ✅ Cartesia API keys recognized
+- ✅ Audio generation unblocked
+- ✅ Single source of truth (1 .env file)
+- ✅ CWD-independent config loading
+
+VERIFICATION:
+cd livetik/apps/worker
+uv run python -m banghack.main
+# Expected: "Cartesia pool initialized with 1 key(s)"
+
+NEXT STEPS:
+- Run scripts\gen_audio_library.bat to generate 108 clips
+- Cartesia sonic-3 with emotion control now works correctly

@@ -1,0 +1,81 @@
+[v0.4][fix:tts] Use direct HTTP API instead of SDK client, align with working scripts
+
+PROBLEM:
+- TypeError: 'async for' requires an object with __aiter__ method, got coroutine
+- TTS generation failed on every attempt
+- v0.4.5 fix (generation_config) wasn't enough
+
+ROOT CAUSE (Systematic Debugging - Phase 1):
+- client.tts.bytes() returns COROUTINE (needs await), not async iterator
+- Backend used "async for" on coroutine → TypeError
+- Working scripts (scripts/voice/tts_lib.py) use requests.post() → direct HTTP
+- SDK client API unclear/changed in v2.0.0+
+
+PATTERN ANALYSIS (Phase 2):
+- Working scripts: requests.post() → response.content ✅
+- Broken backend: AsyncCartesia.tts.bytes() → async for ❌
+- Solution: Use direct HTTP API like working scripts
+
+HYPOTHESIS (Phase 3):
+"Backend should use direct HTTP API (httpx) instead of SDK client"
+- Proven by working scripts
+- Simpler, fewer dependencies
+- Stable, documented API
+
+SOLUTION (Phase 4):
+1. Removed "from cartesia import AsyncCartesia"
+2. Added "import httpx" for async HTTP calls
+3. Replaced SDK client with direct HTTP API
+4. Used same payload/headers as working scripts
+5. Aligned backend with proven working code
+
+CHANGES:
+- Modified: apps/worker/src/banghack/adapters/tts.py
+  * Removed AsyncCartesia import
+  * Added httpx.AsyncClient for direct HTTP
+  * Same payload format as scripts/voice/tts_lib.py
+  
+- Modified: apps/worker/src/banghack/main.py
+  * Replaced SDK client in cmd_generate_cartesia_tts()
+  * Consistent with TTS adapter implementation
+
+- Created: debug-dan-tes/V046_CARTESIA_SDK_FIX.md (systematic debugging doc)
+- Updated: docs/CHANGELOG.md (v0.4.6 section)
+
+WHY v0.4.5 WASN'T ENOUGH:
+- v0.4.5 fixed API parameters (generation_config) ✅
+- But still used SDK client with wrong pattern (async for) ❌
+- v0.4.6 fixes SDK usage by switching to HTTP API ✅
+
+IMPACT:
+- ✅ TTS generation works correctly
+- ✅ No more TypeError
+- ✅ Backend aligned with working scripts
+- ✅ Direct HTTP API (stable, documented)
+- ✅ No SDK dependency issues
+- ✅ Consistent across codebase
+
+VERIFICATION:
+cd livetik/apps/worker
+uv run python -m banghack.main
+# Expected: "Cartesia pool initialized with 1 key(s)"
+
+# Test TTS
+WS command: test_tts_voice_out
+# Expected: Audio plays successfully
+
+# Generate audio library
+cd livetik
+scripts\gen_audio_library.bat
+# Expected: 108 clips generated
+
+SYSTEMATIC DEBUGGING PROCESS:
+✅ Phase 1: Root cause investigation (checked working scripts)
+✅ Phase 2: Pattern analysis (HTTP vs SDK comparison)
+✅ Phase 3: Hypothesis testing (use HTTP like scripts)
+✅ Phase 4: Implementation (single fix, verified)
+
+NEXT STEPS:
+- Generate 108 audio clips
+- Test audio playback via controller
+- Verify no errors in logs

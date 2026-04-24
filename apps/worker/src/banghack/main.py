@@ -38,7 +38,9 @@ from .ipc.audio import list_devices
 from .ipc.http_server import create_app
 from .ipc.ws_server import WSServer
 
-load_dotenv()
+# Load .env from repo root (4 levels up from this file)
+_env_path = Path(__file__).parent.parent.parent.parent.parent / ".env"
+load_dotenv(_env_path)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -366,6 +368,7 @@ async def main() -> NoReturn:
     async def cmd_generate_cartesia_tts(p: dict[str, object]) -> dict[str, object]:
         """Generate Cartesia TTS audio and save to static folder for download/play."""
         import time
+        import httpx
         
         if not tts:
             raise RuntimeError("TTS not initialized — check CARTESIA_API_KEYS")
@@ -383,7 +386,7 @@ async def main() -> NoReturn:
         filename = f"cartesia-{timestamp}.wav"
         output_path = static_dir / filename
         
-        # Use Cartesia API directly to generate and save
+        # Use Cartesia API directly via HTTP (like working scripts)
         if not tts.voice_id:
             raise RuntimeError("CARTESIA_VOICE_ID not set")
         
@@ -391,30 +394,47 @@ async def main() -> NoReturn:
         safe_emotion = emotion if emotion in tts.VALID_EMOTIONS else "neutral"
         
         try:
-            from cartesia import AsyncCartesia
-            async with AsyncCartesia(api_key=slot.key) as client:
-                output_format = {
+            # Use HTTP API directly (same as scripts/voice/tts_lib.py)
+            payload = {
+                "model_id": tts.model_id,
+                "transcript": text,
+                "voice": {
+                    "mode": "id",
+                    "id": tts.voice_id
+                },
+                "output_format": {
                     "container": "wav",
                     "encoding": "pcm_f32le",
-                    "sample_rate": 44100,
+                    "sample_rate": 44100
+                },
+                "language": "id",
+                "speed": "normal",
+                "generation_config": {
+                    "speed": 0.98,
+                    "volume": 1.14,
+                    "emotion": safe_emotion
                 }
-                
-                # Add emotion control for Sonic-3
-                experimental_controls = {}
-                if tts.model_id == "sonic-3":
-                    experimental_controls = {"emotions": [safe_emotion]}
-                
-                response = await client.tts.bytes(
-                    model_id=tts.model_id,
-                    transcript=text,
-                    voice={"mode": "id", "id": tts.voice_id},
-                    language="id",
-                    output_format=output_format,
-                    **({"experimental_controls": experimental_controls} if experimental_controls else {}),
+            }
+            
+            headers = {
+                "Cartesia-Version": "2026-03-01",
+                "X-API-Key": slot.key,
+                "Content-Type": "application/json"
+            }
+            
+            async with httpx.AsyncClient(timeout=60) as client:
+                response = await client.post(
+                    "https://api.cartesia.ai/tts/bytes",
+                    headers=headers,
+                    json=payload
                 )
                 
+                if response.status_code != 200:
+                    raise RuntimeError(f"HTTP {response.status_code}: {response.text[:200]}")
+                
+                audio_bytes = response.content
+                
                 # Save audio bytes to file
-                audio_bytes = response["audio"]
                 output_path.write_bytes(audio_bytes)
                 
                 # Calculate metadata
@@ -427,7 +447,7 @@ async def main() -> NoReturn:
                     "duration_s": round(duration_s, 2),
                     "file_size_kb": round(file_size_kb, 1),
                     "emotion": safe_emotion,
-                    "key_preview": slot.key[:12] + "..."
+                    "key_preview": slot.preview(),
                 }
         except Exception as e:
             log.error("Cartesia TTS generation failed: %s", e)
