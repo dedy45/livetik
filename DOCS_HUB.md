@@ -97,11 +97,14 @@ livetik/
 |-------|------|---------|-------|
 | Worker runtime | Python | 3.11+ | asyncio, type hints wajib |
 | Worker deps | UV | latest | pyproject.toml, bukan pip |
-| TikTok scrape | TikTokLive | ≥5.0.8,<6.0 | isaackogan/TikTokLive |
-| LLM primary | DeepSeek | deepseek-chat | openai SDK + base_url |
-| LLM fallback | Claude Haiku | claude-3-haiku | anthropic SDK |
-| TTS | Edge-TTS | latest | id-ID-ArdiNeural |
-| Audio play | ffplay | FFmpeg bundle | subprocess |
+| TikTok scrape | TikTokLive | ≥6.4.0 | isaackogan/TikTokLive |
+| LLM router | LiteLLM | latest | 3-tier: 9router → DeepSeek → Claude |
+| LLM tier 1 | 9router | free | Rate-limited, primary |
+| LLM tier 2 | DeepSeek | deepseek-chat | Cheap fallback ~Rp 1.5/reply |
+| LLM tier 3 | Claude Haiku | claude-3-haiku | Premium fallback ~Rp 5/reply |
+| TTS primary | Cartesia | sonic-3 | Multi-key pool, id language |
+| TTS fallback | Edge-TTS | latest | id-ID-ArdiNeural |
+| Audio play | sounddevice | latest | Python audio playback |
 | Controller | Svelte 5 | 5.x | runes: $state, $derived |
 | CSS | Tailwind | v4 | CSS-first @theme |
 | Build | Vite + SvelteKit | latest | pnpm |

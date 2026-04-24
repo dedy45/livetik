@@ -62,3 +62,6 @@ Thumbs.db
 
 # Notion sync cache
 .notion_sync_cache.json
+
+# Audio Library (generated files - do not commit)
+apps/worker/static/audio_library/*.wav

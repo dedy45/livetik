@@ -1,40 +1,26 @@
-"""Reply Cache — cosine similarity cache for generated replies."""
+"""Reply Cache — similarity-based cache for generated replies using rapidfuzz."""
 from __future__ import annotations
 
 import logging
 import time
-from collections import Counter
+
+from rapidfuzz import fuzz
 
 log = logging.getLogger(__name__)
 
 
-def _tokenize(text: str) -> list[str]:
-    """Simple whitespace tokenizer, lowercase."""
-    return text.lower().split()
-
-
-def _cosine_similarity(a: str, b: str) -> float:
-    """Compute cosine similarity between two texts using TF bag-of-words."""
-    tokens_a = _tokenize(a)
-    tokens_b = _tokenize(b)
-    if not tokens_a or not tokens_b:
+def _similarity(a: str, b: str) -> float:
+    """Compute similarity between two texts using rapidfuzz token_sort_ratio.
+    
+    Returns float 0.0-1.0 where 1.0 is identical.
+    """
+    if not a or not b:
         return 0.0
-
-    count_a = Counter(tokens_a)
-    count_b = Counter(tokens_b)
-
-    dot = sum(count_a[t] * count_b[t] for t in count_a if t in count_b)
-    mag_a = sum(v * v for v in count_a.values()) ** 0.5
-    mag_b = sum(v * v for v in count_b.values()) ** 0.5
-
-    if mag_a == 0 or mag_b == 0:
-        return 0.0
-
-    return dot / (mag_a * mag_b)
+    return fuzz.token_sort_ratio(a.lower(), b.lower()) / 100.0
 
 
 class ReplyCache:
-    """Cache for generated replies, keyed by (text, intent) with cosine similarity lookup."""
+    """Cache for generated replies, keyed by (text, intent) with similarity lookup."""
 
     def __init__(self, ttl_s: int = 300, similarity_threshold: float = 0.9) -> None:
         self._ttl_s = ttl_s
@@ -54,7 +40,7 @@ class ReplyCache:
         for cached_text, cached_intent, replies, _ in self._entries:
             if cached_intent != intent:
                 continue
-            sim = _cosine_similarity(text, cached_text)
+            sim = _similarity(text, cached_text)
             if sim >= self._threshold:
                 self._hits += 1
                 log.debug("reply_cache hit (sim=%.3f) for: %s", sim, text[:40])

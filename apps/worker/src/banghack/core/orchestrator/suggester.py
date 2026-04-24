@@ -66,6 +66,10 @@ class Suggester:
 
         Returns dict with keys: replies (list[str]), source (template|llm|cache), cached (bool)
         """
+        # Fallback for empty product/user
+        product = product or "produk ini"
+        user = user or "kak"
+        
         cached = self._cache.lookup(text, intent)
         if cached:
             self._guard.record_cache_hit()

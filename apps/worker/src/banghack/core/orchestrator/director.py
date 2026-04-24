@@ -167,23 +167,31 @@ class LiveDirector:
 
             await self._broadcast_state(f"phase:{phase.phase}")
 
-            # Play a clip for this phase (anti-repeat: prefer not-recently-played)
-            clips = self._audio_manager.by_category(phase.clip_category)
-            not_played = self._audio_manager.not_played_since(window_s=1200)
-            not_played_ids = {c.id for c in not_played}
-            candidates = [c for c in clips if c.id in not_played_ids] or clips
-            if candidates:
-                clip = random.choice(candidates)
-                asyncio.create_task(self._audio_adapter.play(clip.id))
-
-            # Wait for phase duration
+            # Play clips continuously during this phase
             elapsed_in_phase = 0
+            next_clip_at = 0
+            
             while elapsed_in_phase < phase.duration_s:
                 if self._state.mode == LiveMode.STOPPED:
                     return
                 if self.elapsed_s >= self._max_duration_s:
                     await self._do_stop("max_duration_reached")
                     return
+                
+                # Play a new clip if it's time and we're running
+                if elapsed_in_phase >= next_clip_at and self._state.mode == LiveMode.RUNNING:
+                    clips = self._audio_manager.by_category(phase.clip_category)
+                    not_played = self._audio_manager.not_played_since(window_s=600)
+                    not_played_ids = {c.id for c in not_played}
+                    candidates = [c for c in clips if c.id in not_played_ids] or clips
+                    
+                    if candidates:
+                        clip = random.choice(candidates)
+                        asyncio.create_task(self._audio_adapter.play(clip.id))
+                        # Schedule next clip: clip duration + 5 second gap
+                        clip_duration_s = max(15, clip.duration_ms // 1000)
+                        next_clip_at = elapsed_in_phase + clip_duration_s + 5
+                
                 await asyncio.sleep(1)
                 if self._state.mode != LiveMode.PAUSED:
                     elapsed_in_phase += 1
