@@ -15,13 +15,13 @@
 
 **Baru pertama kali?** Baca urutan ini:
 
-1. **[QUICKSTART.md](QUICKSTART.md)** — Setup sistem dalam 15 menit ⚡
+1. **[README.md](README.md)** — Overview sistem + quick start
 2. **[WORKFLOW_ACTUAL.md](WORKFLOW_ACTUAL.md)** — Workflow sebenarnya (OBS + VB-Cable) 🎬
 3. **[docs/CHANGELOG.md](docs/CHANGELOG.md)** — Status sistem v0.4.6 📋
 
 **Sudah setup?** Langsung:
 ```bash
-QUICK_START.bat   # Windows
+scripts\dev.bat   # Windows - Start worker + controller
 ```
 
 ---
@@ -109,28 +109,21 @@ Full diagram: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 ### 1. Install Dependencies
 
 ```bash
-# Worker
-cd apps/worker && uv sync && cd ../..
-
-# Controller
-cd apps/controller && pnpm install && cd ../..
+# Run install script
+scripts\install.bat
 ```
 
 ### 2. Configure
 
 ```bash
 cp .env.example .env
-# Edit .env: set TIKTOK_USERNAME, API keys (optional)
+# Edit .env: set TIKTOK_USERNAME, CARTESIA_API_KEYS
 ```
 
 ### 3. Generate Audio Library (WAJIB)
 
 ```bash
-# Windows
 scripts\gen_audio_library_edgets.bat
-
-# Linux/Mac
-python scripts/gen_audio_library_edgets.py
 ```
 
 Ini akan generate 108 audio clips (~8-12 menit). **Tanpa ini, worker tidak bisa play audio!**
@@ -144,12 +137,8 @@ Ini akan generate 108 audio clips (~8-12 menit). **Tanpa ini, worker tidak bisa 
 ### 5. Start System
 
 ```bash
-# Windows
-QUICK_START.bat
-
-# Manual (2 terminal)
-# Terminal 1: cd apps/worker && uv run python -m banghack
-# Terminal 2: cd apps/controller && pnpm dev
+# Start worker + controller (opens 2 windows)
+scripts\dev.bat
 ```
 
 ### 6. Open Dashboard
@@ -157,8 +146,6 @@ QUICK_START.bat
 http://localhost:5173
 
 **Test audio:** Audio Library page → Click play button → Audio harus terdengar di OBS
-
-**Detail lengkap:** [QUICKSTART.md](QUICKSTART.md)
 
 ---
 
@@ -192,9 +179,10 @@ livetik/
 ## 📚 Dokumentasi
 
 ### Mulai dari sini
-- **[QUICKSTART.md](QUICKSTART.md)** — Setup sistem dalam 15 menit ⚡
+- **[README.md](README.md)** — Overview sistem + quick start ⚡
 - **[WORKFLOW_ACTUAL.md](WORKFLOW_ACTUAL.md)** — Workflow sebenarnya (OBS + VB-Cable) 🎬
-- **[QUICK_START.bat](QUICK_START.bat)** — Windows quick start script
+- **[DOCS_HUB.md](DOCS_HUB.md)** — Peta navigasi semua dokumentasi 🗺️
+- **[scripts/dev.bat](scripts/dev.bat)** — Start worker + controller
 
 ### Spesifikasi
 - [PRD](docs/PRD.md) — Product requirements (apa yang dibangun & tidak)

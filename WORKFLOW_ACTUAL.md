@@ -215,7 +215,170 @@
 
 ---
 
-## 📁 STATIC FOLDER PURPOSE
+## 🎬 LIVE DIRECTOR (ORCHESTRATOR) — Auto-Rotate Audio
+
+### ✅ STATUS: SUDAH BERFUNGSI
+
+**File:** `apps/worker/src/banghack/core/orchestrator/director.py`
+
+**Fungsi:** Agent yang auto-rotate audio clips berdasarkan phase (8 phases × 2 jam)
+
+### Cara Kerja
+
+1. **Load Runsheet** dari `config/products.yaml`
+   - 8 phases: opening → hook → demo → cta → reply → rotate → closing
+   - Setiap phase punya `clip_category` dan `duration_s`
+
+2. **Auto-Rotate Clips**
+   - Director pick random clip dari category phase saat ini
+   - Anti-repeat: tidak play clip yang sama dalam 10 menit terakhir
+   - Gap 5 detik antar clip (tidak overlap)
+
+3. **Auto-Advance Phase**
+   - Setelah `duration_s` habis → advance ke phase berikutnya
+   - Loop 8 phases sampai 120 menit (hard-stop)
+
+4. **Play Audio**
+   - `audio_adapter.play(clip.id)` → sounddevice → VB-CABLE → OBS
+
+### Command WebSocket
+
+| Command | Fungsi | Dashboard Button |
+|---------|--------|------------------|
+| `live.start` | Start 2-hour session | "▶ Start Live" |
+| `live.pause` | Pause (audio stop, timer pause) | "⏸ Pause" |
+| `live.resume` | Resume (audio lanjut) | "▶ Resume" |
+| `live.stop` | Stop manual | "⏹ Stop Live" |
+| `live.emergency_stop` | Emergency stop (immediate) | "🚨 Emergency Stop" |
+| `live.get_state` | Get current state | Auto-refresh |
+
+### Dashboard Integration
+
+**TwoHourTimer.svelte:**
+- Countdown 2 jam
+- Current phase indicator
+- Elapsed / remaining time
+
+**EmergencyStop.svelte:**
+- Big red button
+- Confirmation modal
+
+**DecisionStream.svelte:**
+- Live feed phase transitions
+- Color-coded by state
+
+### Auto-Rotation Logic (Simplified)
+
+```python
+# Load runsheet (8 phases)
+runsheet = load_from_yaml("config/products.yaml")
+
+# Loop phases
+for phase in runsheet:
+    elapsed_in_phase = 0
+    
+    while elapsed_in_phase < phase.duration_s:
+        # Pick random clip from category
+        clips = audio_manager.by_category(phase.clip_category)
+        not_played = audio_manager.not_played_since(window_s=600)
+        candidates = [c for c in clips if c not in not_played] or clips
+        
+        clip = random.choice(candidates)
+        audio_adapter.play(clip.id)  # → VB-CABLE → OBS
+        
+        # Wait: clip duration + 5 second gap
+        await asyncio.sleep(clip.duration_s + 5)
+        elapsed_in_phase += clip.duration_s + 5
+    
+    # Advance to next phase
+    broadcast_state(f"phase:{phase.phase}")
+
+# Hard-stop at 120 minutes
+```
+
+### Runsheet Example (config/products.yaml)
+
+```yaml
+runsheet:
+  - phase: opening
+    duration_s: 180        # 3 minutes
+    clip_category: A_opening
+    product: null
+  
+  - phase: hook
+    duration_s: 240        # 4 minutes
+    clip_category: B_reset
+    product: null
+  
+  - phase: demo_paloma
+    duration_s: 300        # 5 minutes
+    clip_category: C_paloma
+    product: PALOMA Smart Lock
+  
+  - phase: cta
+    duration_s: 120        # 2 minutes
+    clip_category: D_cta
+    product: null
+  
+  - phase: reply_window
+    duration_s: 300        # 5 minutes
+    clip_category: E_reply
+    product: null
+  
+  - phase: demo_cctv
+    duration_s: 300        # 5 minutes
+    clip_category: F_cctv
+    product: CCTV V380
+  
+  - phase: demo_senter
+    duration_s: 300        # 5 minutes
+    clip_category: G_senter
+    product: Senter XHP160
+  
+  - phase: closing
+    duration_s: 180        # 3 minutes
+    clip_category: Z_closing
+    product: null
+```
+
+**Total:** 8 phases = 1920 seconds = 32 minutes per loop  
+**Loops:** 120 min / 32 min = ~3.75 loops  
+**Hard-stop:** 120 minutes (2 jam)
+
+### Verification
+
+**Check if director is ready:**
+```bash
+curl http://localhost:8766/health
+# Should return: "director_ready": true
+```
+
+**Start live via dashboard:**
+1. Open http://localhost:5173
+2. Click "▶ Start Live"
+3. Watch phase transitions in DecisionStream
+4. Audio should play automatically (VB-CABLE → OBS)
+
+**Check logs:**
+```
+director: loaded 8 runsheet phases
+director: start() → mode=RUNNING
+director: phase:opening
+director: phase:hook
+director: phase:demo_paloma
+...
+director: hard stop at max_duration_s=7200
+```
+
+### Cost (Auto-Rotation)
+
+**Audio playback:** Rp 0 (pre-generated clips, local files)  
+**Phase transitions:** Rp 0 (deterministic, no LLM)  
+**Total:** Rp 0 per 2-hour session (audio only)
+
+**With dynamic replies:** ~Rp 11 per 2-hour session (LLM + TTS)
+
+---
 
 ### `apps/worker/static/audio_library/`
 
