@@ -178,23 +178,22 @@ livetik/
 
 ## 📚 Dokumentasi
 
-### Mulai dari sini
+### Core Docs
 - **[README.md](README.md)** — Overview sistem + quick start ⚡
 - **[WORKFLOW_ACTUAL.md](WORKFLOW_ACTUAL.md)** — Workflow sebenarnya (OBS + VB-Cable) 🎬
-- **[DOCS_HUB.md](DOCS_HUB.md)** — Peta navigasi semua dokumentasi 🗺️
-- **[scripts/dev.bat](scripts/dev.bat)** — Start worker + controller
+- **[QUICK_START.bat](QUICK_START.bat)** — Windows quick start script
 
-### Spesifikasi
-- [PRD](docs/PRD.md) — Product requirements (apa yang dibangun & tidak)
-- [LIVE_PLAN](docs/LIVE_PLAN.md) — Strategi 2-hour live (tema, produk, script, runsheet)
-- [Architecture](docs/ARCHITECTURE.md) — Diagram C4, data flow, IPC, audio routing
-- [Design](docs/DESIGN.md) — UX controller, component library
+### Specifications
+- [PRD](docs/PRD.md) — Product requirements
+- [LIVE_PLAN](docs/LIVE_PLAN.md) — Strategi 2-hour live
+- [ARCHITECTURE](docs/ARCHITECTURE.md) — System architecture
+- [DESIGN](docs/DESIGN.md) — UX design
 
 ### Development
 - [CHANGELOG](docs/CHANGELOG.md) — v0.0.1 → v0.4.6 history
-- [Plan](docs/PLAN.md) — Roadmap + tiket coding CC-LIVE-xxx
-- [Error Handling](docs/ERROR_HANDLING.md) — Matriks error + recovery
-- [Agent Brief](docs/AGENT_BRIEF.md) — Instruksi untuk Claude Code/Cursor
+- [PLAN](docs/PLAN.md) — Roadmap + tickets
+- [ERROR_HANDLING](docs/ERROR_HANDLING.md) — Error matrix
+- [AGENT_BRIEF](docs/AGENT_BRIEF.md) — Agent instructions
 
 ### Status Sistem (v0.4.6)
 - **Status:** 85% ready (1 blocker: generate audio library)

@@ -2,26 +2,24 @@
 	import { wsStore } from '$lib/stores/ws.svelte';
 	import type { ClipMeta } from '$lib/stores/audio_library.svelte';
 
-	let clips = $state<ClipMeta[]>([]);
-	let loading = $state(true);
+	let listReqId = $state<string | null>(null);
+	const listResult = $derived(listReqId ? wsStore.testResults.get(listReqId) : undefined);
+
+	// Reactive: clips update otomatis begitu worker jawab
+	const clips = $derived<ClipMeta[]>(
+		listResult?.ok && listResult.result?.clips ? listResult.result.clips : []
+	);
+	const loading = $derived(listReqId !== null && !listResult);
+
 	let filterCategory = $state('');
 	let filterProduct = $state('');
 	let searchTag = $state('');
 	let notPlayedRecently = $state(false);
 
-	// Load clips from audio.list command
+	// Auto-load saat connect, reload saat reconnect
 	$effect(() => {
-		if (wsStore.connected) {
-			const reqId = wsStore.sendCommand('audio.list', {});
-			// Wait for result
-			setTimeout(() => {
-				const result = wsStore.getResult(reqId);
-				if (result?.ok && result.result?.clips) {
-					clips = result.result.clips;
-					loading = false;
-					wsStore.clearResult(reqId);
-				}
-			}, 500);
+		if (wsStore.connected && !listReqId) {
+			listReqId = wsStore.sendCommand('audio.list', {});
 		}
 	});
 
@@ -43,16 +41,7 @@
 	}
 
 	function refreshList() {
-		loading = true;
-		const reqId = wsStore.sendCommand('audio.list', {});
-		setTimeout(() => {
-			const result = wsStore.getResult(reqId);
-			if (result?.ok && result.result?.clips) {
-				clips = result.result.clips;
-				loading = false;
-				wsStore.clearResult(reqId);
-			}
-		}, 500);
+		listReqId = wsStore.sendCommand('audio.list', {});
 	}
 </script>
 
