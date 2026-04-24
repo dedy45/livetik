@@ -1,2 +1,0 @@
-import yaml
-print('hello')

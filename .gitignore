@@ -85,3 +85,6 @@ apps/worker/static/audio_library/Z_closing_staged/
 
 # Keep index.json
 !apps/worker/static/audio_library/index.json
+*.env.bak.*
+.env.bak*
+apps/worker/.state.json
