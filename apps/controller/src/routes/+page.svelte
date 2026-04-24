@@ -254,5 +254,37 @@
 
 	<ReplySuggestions />
 
+	<!-- Error Log Panel -->
+	<div class="bg-bg-panel border border-error rounded-lg p-6">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold text-error">Error Log</h3>
+			<span class="text-xs px-2 py-1 rounded bg-error text-bg">
+				{wsStore.errorLog.length} error{wsStore.errorLog.length !== 1 ? 's' : ''}
+			</span>
+		</div>
+		{#if wsStore.errorLog.length === 0}
+			<p class="text-text-secondary text-sm">✓ No errors</p>
+		{:else}
+			<ul class="space-y-3 text-sm max-h-96 overflow-auto">
+				{#each wsStore.errorLog.slice(0, 50) as err (err.ts)}
+					<li class="border-l-4 border-error pl-3 py-2 bg-bg-elevated rounded">
+						<div class="flex items-baseline gap-2 mb-1">
+							<span class="text-error font-mono text-xs shrink-0">
+								{new Date(err.ts).toLocaleTimeString('id-ID')}
+							</span>
+							<span class="font-semibold text-error">[{err.category}]</span>
+							{#if err.user}
+								<span class="text-text-secondary text-xs">user: {err.user}</span>
+							{/if}
+						</div>
+						<div class="text-text-primary font-mono text-xs whitespace-pre-wrap">
+							{err.detail}
+						</div>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
+
 	<AudioLibraryGrid />
 </div>
