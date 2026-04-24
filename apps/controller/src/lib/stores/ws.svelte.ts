@@ -1,301 +1,204 @@
-// Svelte 5 runes store — import via `import { wsStore } from '$lib/stores/ws.svelte';`
-type Metrics = {
-	status: string;
-	uptime_s: number;
+// apps/controller/src/lib/stores/ws.svelte.ts
+export type Metrics = {
+	status: 'idle' | 'connecting' | 'live' | 'paused' | 'stopped' | 'error';
 	viewers: number;
 	comments: number;
-	replies: number;
 	gifts: number;
 	joins: number;
+	replies: number;
 	queue_size: number;
 	latency_p95_ms: number;
 	cost_idr: number;
 	budget_idr: number;
 	budget_pct: number;
 	over_budget: boolean;
-	mode: string;
 	reply_enabled: boolean;
 	dry_run: boolean;
-	cartesia_pool: Array<{
-		key: string;
-		calls: number;
-		total_errors: number;
-		exhausted: boolean;
-		cooldown_s: number;
-	}>;
-	llm_models: Array<{
-		id: string;
-		model: string;
-		api_base: string;
-		timeout: number;
-	}>;
-	by_tier: Record<string, number>;
-	llm_calls: number;
-	tts_calls: number;
+	cartesia_pool: { key: string; calls: number; exhausted: boolean; cooldown_s: number }[];
+	llm_models: { id: string; model: string; tier: string }[];
 };
 
-type ReplyEntry = {
-	ts: number;
+export type LiveState = {
+	mode: 'idle' | 'running' | 'paused' | 'stopped';
+	session_id: string | null;
+	elapsed_s: number;
+	max_s: number;
+	phase: string | null;
+	product: string | null;
+	phase_idx: number;
+	phase_total: number;
+};
+
+export type Suggestion = {
+	suggestion_id: string;
 	user: string;
-	comment: string;
-	reply: string;
-	tier: string;
-	tts: string;
-	latency_ms: number;
-};
-
-type TikTokEntry = {
-	ts: number;
-	event_type: string;
-	user: string;
-	text: string;
-	count: number;
-};
-
-type TestResult = {
-	req_id: string;
-	name: string;
-	ok: boolean;
-	latency_ms?: number;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	result?: any;
-	error?: string;
-	ts: number;
-};
-
-type ErrorEntry = {
-	ts: number;
-	category: string;
-	user?: string;
-	detail: string;
-};
-
-type ClassifiedComment = {
-	ts: number;
-	comment_id: string;
-	user: string;
-	text: string;
-	intent: string;
-	confidence: number;
-	reason: string;
-	method: string;
-};
-
-type ReplySuggestion = {
-	ts: number;
 	comment_id: string;
 	comment_text: string;
-	user: string;
 	intent: string;
 	replies: string[];
-	source: string;
-	cached: boolean;
+	source: 'template' | 'cache' | 'llm';
+	ts: number;
 };
 
-const DEFAULTS: Metrics = {
-	status: 'disconnected',
-	uptime_s: 0,
-	viewers: 0,
-	comments: 0,
-	replies: 0,
-	gifts: 0,
-	joins: 0,
-	queue_size: 0,
-	latency_p95_ms: 0,
-	cost_idr: 0,
-	budget_idr: 0,
-	budget_pct: 0,
-	over_budget: false,
-	mode: 'unknown',
-	reply_enabled: false,
-	dry_run: false,
-	cartesia_pool: [],
-	llm_models: [],
-	by_tier: {},
-	llm_calls: 0,
-	tts_calls: 0
-};
+type CmdResult = { ok: boolean; result?: any; error?: string; latency_ms?: number };
 
-function fmtUptime(s: number): string {
-	const h = Math.floor(s / 3600).toString().padStart(2, '0');
-	const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
-	const sec = Math.floor(s % 60).toString().padStart(2, '0');
-	return `${h}:${m}:${sec}`;
-}
-
-export function createWsStore(url = 'ws://127.0.0.1:8765') {
+function createStore() {
+	let ws = $state<WebSocket | null>(null);
 	let connected = $state(false);
-	let metrics = $state<Metrics>({ ...DEFAULTS });
-	let lastEventTs = $state(0);
-	let comments = $state<TikTokEntry[]>([]);
-	let tiktokEvents = $state<TikTokEntry[]>([]);
-	let replies = $state<ReplyEntry[]>([]);
-	let events = $state<Array<{ ts: number; type: string; payload: unknown }>>([]);
-	let testResults = $state<Map<string, TestResult>>(new Map());
-	let errorLog = $state<ErrorEntry[]>([]);
-	let classifiedComments = $state<ClassifiedComment[]>([]);
-	let replySuggestions = $state<ReplySuggestion[]>([]);
-	let availableCommands = $state<string[]>([]);
-	let audioNow = $state<string | null>(null);
-	let liveStateRaw = $state<Record<string, unknown>>({});
-	let ws: WebSocket | null = null;
-	let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+	let connectedAt = $state<number | null>(null);
+
+	const metrics = $state<Metrics>({
+		status: 'idle', viewers: 0, comments: 0, gifts: 0, joins: 0, replies: 0,
+		queue_size: 0, latency_p95_ms: 0, cost_idr: 0, budget_idr: 50000, budget_pct: 0,
+		over_budget: false, reply_enabled: false, dry_run: true,
+		cartesia_pool: [], llm_models: [],
+	});
+
+	const liveState = $state<LiveState>({
+		mode: 'idle', session_id: null, elapsed_s: 0, max_s: 7200,
+		phase: null, product: null, phase_idx: -1, phase_total: 0,
+	});
+
+	const events = $state<{ ts: number; type: string; data?: any }[]>([]);
+	const comments = $state<{ ts: number; user: string; text: string; intent?: string }[]>([]);
+	const replies = $state<{ ts: number; user: string; comment: string; reply: string; tier: string; tts: string; latency_ms: number }[]>([]);
+	const suggestions = $state<Suggestion[]>([]);
+	const tiktokEvents = $state<{ ts: number; event_type: string; user: string; text: string; count: number }[]>([]);
+	const errorLog = $state<{ ts: number; category: string; user?: string; detail: string }[]>([]);
+	const decisions = $state<{ ts: number; kind: string; input: string; output: string; reasoning: string }[]>([]);
+	const audioClips = $state<any[]>([]);
+	const testResults = $state(new Map<string, CmdResult>());
+
+	let nowPlaying = $state<{ clip_id: string; category: string; text: string; product?: string; ts: number } | null>(null);
+	let reqIdSeq = 0;
 
 	function connect() {
-		if (typeof window === 'undefined') return;
-		ws = new WebSocket(url);
+		try {
+			ws = new WebSocket('ws://127.0.0.1:8765');
+		} catch (e) {
+			setTimeout(connect, 2000);
+			return;
+		}
 		ws.onopen = () => {
 			connected = true;
+			connectedAt = Date.now();
+			// on connect, minta state awal
+			sendCommand('audio.list', {});
+			sendCommand('live.get_state', {});
+			sendCommand('budget.get', {});
 		};
-		ws.onclose = () => {
-			connected = false;
-			metrics = { ...DEFAULTS };
-			reconnectTimer = setTimeout(connect, 2000);
-		};
-		ws.onerror = () => ws?.close();
+		ws.onclose = () => { connected = false; setTimeout(connect, 2000); };
+		ws.onerror = () => { connected = false; };
 		ws.onmessage = (ev) => {
-			try {
-				const msg = JSON.parse(ev.data);
-				lastEventTs = Date.now();
-				if (msg.type === 'metrics') {
-					metrics = { ...metrics, ...msg };
-				} else if (msg.type === 'tiktok_event') {
-					const entry: TikTokEntry = {
-						ts: lastEventTs,
-						event_type: msg.event_type,
-						user: msg.user,
-						text: msg.text,
-						count: msg.count
-					};
-					tiktokEvents = [entry, ...tiktokEvents].slice(0, 200);
-					if (entry.event_type === 'comment') {
-						comments = [entry, ...comments].slice(0, 100);
-					}
-				} else if (msg.type === 'reply_event') {
-					const r: ReplyEntry = {
-						ts: lastEventTs,
-						user: msg.user,
-						comment: msg.comment,
-						reply: msg.reply,
-						tier: msg.tier,
-						tts: msg.tts,
-						latency_ms: msg.latency_ms
-					};
-					replies = [r, ...replies].slice(0, 50);
-				} else if (msg.type === 'hello') {
-					availableCommands = msg.commands ?? [];
-				} else if (msg.type === 'cmd_result') {
-					const r: TestResult = {
-						req_id: msg.req_id,
-						name: msg.name ?? 'unknown',
-						ok: msg.ok,
-						latency_ms: msg.latency_ms,
-						result: msg.result,
-						error: msg.error,
-						ts: Date.now()
-					};
-					testResults.set(msg.req_id, r);
-					testResults = new Map(testResults); // trigger reactivity
-				} else if (msg.type === 'error_event') {
-					errorLog = [
-						{ ts: lastEventTs, category: msg.category, user: msg.user, detail: msg.detail },
-						...errorLog
-					].slice(0, 200);
-				} else if (msg.type === 'audio.now') {
-					audioNow = (msg.clip_id as string) ?? null;
-				} else if (msg.type === 'audio.done' || msg.type === 'error.audio_playback') {
-					audioNow = null;
-				} else if (msg.type === 'comment.classified') {
-					const cc: ClassifiedComment = {
-						ts: lastEventTs,
-						comment_id: (msg.comment_id as string) ?? '',
-						user: (msg.user as string) ?? '',
-						text: (msg.text as string) ?? '',
-						intent: (msg.intent as string) ?? 'other',
-						confidence: (msg.confidence as number) ?? 0,
-						reason: (msg.reason as string) ?? '',
-						method: (msg.method as string) ?? 'rule',
-					};
-					classifiedComments = [cc, ...classifiedComments].slice(0, 200);
-				} else if (msg.type === 'reply.suggestion') {
-					const rs: ReplySuggestion = {
-						ts: lastEventTs,
-						comment_id: (msg.comment_id as string) ?? '',
-						comment_text: (msg.comment_text as string) ?? '',
-						user: (msg.user as string) ?? '',
-						intent: (msg.intent as string) ?? 'other',
-						replies: (msg.replies as string[]) ?? [],
-						source: (msg.source as string) ?? 'template',
-						cached: (msg.cached as boolean) ?? false,
-					};
-					replySuggestions = [rs, ...replySuggestions].slice(0, 50);
-				} else if (msg.type === 'live.state' || msg.type === 'live.tick') {
-					liveStateRaw = {
-						mode: (msg.mode as string) ?? 'IDLE',
-						phase: (msg.phase as string) ?? '',
-						phase_idx: (msg.phase_idx as number) ?? 0,
-						phase_total: (msg.phase_total as number) ?? 0,
-						product: (msg.product as string) ?? '',
-						elapsed_s: (msg.elapsed_s as number) ?? 0,
-						remaining_s: (msg.remaining_s as number) ?? 7200,
-						total_decisions: (msg.total_decisions as number) ?? 0,
-					};
-				}
-				events = [{ ts: lastEventTs, type: msg.type, payload: msg }, ...events].slice(0, 50);
-			} catch (e) {
-				console.error('ws parse error', e);
-			}
+			try { handleMessage(JSON.parse(ev.data)); } catch (e) { console.error('ws parse', e); }
 		};
 	}
 
-	connect();
+	function handleMessage(msg: any) {
+		events.unshift({ ts: Date.now(), type: msg.type, data: msg });
+		if (events.length > 200) events.length = 200;
 
-	function sendCommand(name: string, params: Record<string, unknown> = {}): string {
-		const req_id = `${name}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-		if (ws?.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'cmd', name, req_id, params }));
-		} else {
-			testResults.set(req_id, {
-				req_id, name, ok: false, error: 'WebSocket not connected', ts: Date.now()
-			});
-			testResults = new Map(testResults);
+		switch (msg.type) {
+			case 'metrics':
+				Object.assign(metrics, msg.data ?? msg);
+				break;
+			case 'live.state':
+				Object.assign(liveState, {
+					mode: msg.mode, session_id: msg.session_id, elapsed_s: msg.elapsed_s ?? 0,
+					max_s: msg.max_s ?? 7200, phase: msg.phase, product: msg.product,
+					phase_idx: msg.phase_idx ?? -1, phase_total: msg.phase_total ?? 0,
+				});
+				break;
+			case 'tiktok.comment':
+				comments.unshift({ ts: Date.now(), user: msg.user, text: msg.text, intent: msg.intent });
+				tiktokEvents.unshift({ ts: Date.now(), event_type: 'comment', user: msg.user, text: msg.text, count: 1 });
+				break;
+			case 'comment.classified':
+				decisions.unshift({
+					ts: Date.now(), kind: 'classify',
+					input: msg.text ?? '',
+					output: `intent=${msg.intent} conf=${(msg.confidence ?? 0).toFixed(2)}`,
+					reasoning: msg.source === 'rules' ? `rule:${msg.rule_id ?? msg.reason}` : `llm:${msg.model ?? ''}`,
+				});
+				break;
+			case 'reply.suggestion':
+				suggestions.unshift({
+					suggestion_id: msg.suggestion_id, user: msg.user, comment_id: msg.comment_id,
+					comment_text: msg.comment_text, intent: msg.intent, replies: msg.replies ?? [],
+					source: msg.source ?? 'llm', ts: Date.now(),
+				});
+				decisions.unshift({
+					ts: Date.now(), kind: 'suggest',
+					input: msg.comment_text ?? '',
+					output: (msg.replies?.[0] ?? '').slice(0, 60),
+					reasoning: `src=${msg.source} intent=${msg.intent}`,
+				});
+				if (suggestions.length > 30) suggestions.length = 30;
+				break;
+			case 'reply.sent':
+				replies.unshift({ ts: Date.now(), ...msg });
+				suggestions.splice(0, suggestions.length, ...suggestions.filter(s => s.suggestion_id !== msg.suggestion_id));
+				break;
+			case 'audio.list.ok':
+				audioClips.splice(0, audioClips.length, ...(msg.clips ?? []));
+				break;
+			case 'audio.now':
+				nowPlaying = { clip_id: msg.clip_id, category: msg.category, text: msg.text, product: msg.product, ts: Date.now() };
+				decisions.unshift({
+					ts: Date.now(), kind: 'clip.play',
+					input: msg.category ?? '',
+					output: msg.clip_id ?? '',
+					reasoning: (msg.text ?? '').slice(0, 80),
+				});
+				break;
+			case 'audio.done':
+				if (nowPlaying?.clip_id === msg.clip_id) nowPlaying = null;
+				break;
+			case 'error':
+				errorLog.unshift({ ts: Date.now(), category: msg.category ?? 'unknown', user: msg.user, detail: msg.detail ?? JSON.stringify(msg) });
+				break;
+			case 'cmd_result':
+				if (msg.req_id) testResults.set(msg.req_id, { ok: msg.ok, result: msg.result, error: msg.error, latency_ms: msg.latency_ms });
+				break;
 		}
-		return req_id;
+		if (decisions.length > 100) decisions.length = 100;
+		if (errorLog.length > 200) errorLog.length = 200;
+		if (comments.length > 100) comments.length = 100;
+		if (replies.length > 50) replies.length = 50;
+		if (tiktokEvents.length > 200) tiktokEvents.length = 200;
 	}
 
-	function getResult(req_id: string): TestResult | undefined {
-		return testResults.get(req_id);
+	function sendCommand(name: string, params: any = {}): string {
+		const reqId = `req-${++reqIdSeq}`;
+		if (ws?.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({ type: 'cmd', name, req_id: reqId, params }));
+		}
+		return reqId;
 	}
 
-	function clearResult(req_id: string): void {
-		testResults.delete(req_id);
-		testResults = new Map(testResults);
-	}
+	if (typeof window !== 'undefined') connect();
 
 	return {
 		get connected() { return connected; },
+		get uptime() {
+			if (!connectedAt) return '--';
+			const s = Math.floor((Date.now() - connectedAt) / 1000);
+			return `${Math.floor(s / 60)}m${s % 60}s`;
+		},
 		get metrics() { return metrics; },
-		get uptime() { return fmtUptime(metrics.uptime_s); },
+		get liveState() { return liveState; },
 		get events() { return events; },
 		get comments() { return comments; },
-		get tiktokEvents() { return tiktokEvents; },
 		get replies() { return replies; },
-		get lastEventTs() { return lastEventTs; },
-		get testResults() { return testResults; },
+		get suggestions() { return suggestions; },
+		get tiktokEvents() { return tiktokEvents; },
 		get errorLog() { return errorLog; },
-		get classifiedComments() { return classifiedComments; },
-		get replySuggestions() { return replySuggestions; },
-		get availableCommands() { return availableCommands; },
-		get audioNow() { return audioNow; },
-		get liveStateRaw() { return liveStateRaw; },
+		get decisions() { return decisions; },
+		get audioClips() { return audioClips; },
+		get nowPlaying() { return nowPlaying; },
+		testResults,
 		sendCommand,
-		getResult,
-		clearResult,
-		dispose() {
-			if (reconnectTimer) clearTimeout(reconnectTimer);
-			ws?.close();
-		}
 	};
 }
 
-export const wsStore = createWsStore();
+export const wsStore = createStore();

@@ -737,15 +737,64 @@ async def main() -> NoReturn:
     # ── v0.4 Reply commands ──────────────────────────────────────────────────
 
     async def cmd_reply_approve(p: dict[str, object]) -> dict[str, object]:
-        """Approve a reply suggestion — send to TTS queue."""
-        reply_text = str(p.get("reply", "")).strip()
-        if not reply_text:
-            raise RuntimeError("reply text required")
+        """Approve a reply suggestion — send to TTS and broadcast reply.sent."""
+        suggestion_id = str(p.get("suggestion_id", "")).strip()
+        variant = int(p.get("variant", 0))
+        
+        if not suggestion_id:
+            raise RuntimeError("suggestion_id required")
+        
+        sug = _pending_suggestions.pop(suggestion_id, None)
+        if not sug:
+            raise RuntimeError(f"suggestion {suggestion_id} not found")
+        
+        if not (0 <= variant < len(sug["replies"])):
+            raise RuntimeError(f"invalid variant {variant}")
+        
+        reply_text = sug["replies"][variant]
+        user = sug["user"]
+        comment_text = sug["comment_text"]
+        
+        t0 = time.monotonic()
+        tts_engine = "skipped"
+        
         if not _flags["REPLY_ENABLED"]:
-            return {"ok": False, "reason": "REPLY_ENABLED=false"}
-        if tts and not _flags["DRY_RUN"]:
-            asyncio.create_task(_speak_reply(reply_text))
-        return {"ok": True, "reply": reply_text}
+            log.info("[REPLY_DISABLED] Would reply to %s: %r", user, reply_text)
+        elif _flags["DRY_RUN"]:
+            log.info("[DRY_RUN] Would reply to %s: %r", user, reply_text)
+        elif tts:
+            try:
+                tts_result = await tts.speak(reply_text)
+                tts_engine = tts_result.engine
+                idr_tts = cost.record_tts(tts_engine, tts_result.char_count)
+                log.info("[tts:%s] %d chars (+Rp %.2f)", tts_engine, tts_result.char_count, idr_tts)
+            except Exception as e:
+                log.error("TTS error: %s", e)
+                await ws.broadcast({
+                    "type": "error",
+                    "ts": time.time(),
+                    "category": "tts",
+                    "user": user,
+                    "detail": str(e)[:300],
+                })
+        
+        latency_ms = int((time.monotonic() - t0) * 1000)
+        state.replies += 1
+        state.record_latency(latency_ms)
+        
+        await ws.broadcast({
+            "type": "reply.sent",
+            "ts": time.time(),
+            "suggestion_id": suggestion_id,
+            "user": user,
+            "comment": comment_text,
+            "reply": reply_text,
+            "tier": sug["source"],
+            "tts": tts_engine,
+            "latency_ms": latency_ms,
+        })
+        
+        return {"ok": True, "reply": reply_text, "user": user}
 
     async def _speak_reply(text: str) -> None:
         try:
@@ -754,24 +803,52 @@ async def main() -> NoReturn:
             log.error("TTS speak error: %s", e)
 
     async def cmd_reply_reject(p: dict[str, object]) -> dict[str, object]:
-        """Reject a reply suggestion — no action needed."""
-        comment_id = str(p.get("comment_id", ""))
-        return {"ok": True, "comment_id": comment_id}
+        """Reject a reply suggestion — remove from pending."""
+        suggestion_id = str(p.get("suggestion_id", "")).strip()
+        if suggestion_id in _pending_suggestions:
+            _pending_suggestions.pop(suggestion_id)
+        return {"ok": True, "suggestion_id": suggestion_id}
 
     async def cmd_reply_regen(p: dict[str, object]) -> dict[str, object]:
         """Regenerate reply suggestions for a comment."""
-        text = str(p.get("text", "")).strip()
-        intent = str(p.get("intent", "other")).strip()
-        product = str(p.get("product", "")).strip()
-        user = str(p.get("user", "")).strip()
-        if not text:
-            raise RuntimeError("text required")
-        result = await suggester.handle(text, intent, product=product, user=user)
-        return {
-            "ok": True,
+        import uuid
+        suggestion_id = str(p.get("suggestion_id", "")).strip()
+        hint = str(p.get("hint", "")).strip()
+        
+        if not suggestion_id or suggestion_id not in _pending_suggestions:
+            raise RuntimeError("suggestion_id not found")
+        
+        sug = _pending_suggestions[suggestion_id]
+        text = sug["comment_text"]
+        intent = sug["intent"]
+        user = sug["user"]
+        
+        # For now, ignore hint and just regenerate
+        # TODO: incorporate hint into LLM prompt
+        current_product = live_director.get_state().get("product", "PALOMA")
+        result = await suggester.handle(text, intent, product=current_product, user=user)
+        
+        # Update existing suggestion
+        sug["replies"] = result["replies"]
+        sug["source"] = result["source"]
+        
+        await ws.broadcast({
+            "type": "reply.suggestion",
+            "ts": time.time(),
+            "suggestion_id": suggestion_id,
+            "user": user,
+            "comment_id": sug["comment_id"],
+            "comment_text": text,
+            "intent": intent,
             "replies": result["replies"],
             "source": result["source"],
-            "cached": result["cached"],
+        })
+        
+        return {
+            "ok": True,
+            "suggestion_id": suggestion_id,
+            "replies": result["replies"],
+            "source": result["source"],
         }
 
     async def cmd_reply_suggest(p: dict[str, object]) -> dict[str, object]:
@@ -876,9 +953,22 @@ async def main() -> NoReturn:
     # ── TikTok event handler ────────────────────────────────────────────────
 
     _classifier_threshold = float(os.getenv("CLASSIFIER_LLM_THRESHOLD", "0.80"))
+    _pending_suggestions: dict[str, dict[str, Any]] = {}  # suggestion_id -> {user, comment_id, text, intent, replies, source}
 
     async def handle_comment(ev: TTEvent) -> None:
-        """Classify comment and broadcast comment.classified event."""
+        """Classify comment, generate suggestions, and broadcast events."""
+        # Guardrail check first
+        gr = guardrail.check(ev.user, ev.text)
+        if not gr.accepted:
+            await ws.broadcast({
+                "type": "tiktok.comment",
+                "ts": time.time(),
+                "user": ev.user,
+                "text": ev.text,
+                "intent": f"dropped:{gr.reason}",
+            })
+            return
+
         # Rule-first classification
         intent = rules_classify(ev.text)
 
@@ -892,6 +982,15 @@ async def main() -> NoReturn:
                 "tokens_used": 20,  # approximate
             })
 
+        # Broadcast comment with intent
+        await ws.broadcast({
+            "type": "tiktok.comment",
+            "ts": time.time(),
+            "user": ev.user,
+            "text": ev.text,
+            "intent": intent.name,
+        })
+
         await ws.broadcast({
             "type": "comment.classified",
             "ts": time.time(),
@@ -903,6 +1002,46 @@ async def main() -> NoReturn:
             "reason": intent.reason,
             "method": "rule" if not intent.needs_llm or intent.safe_to_skip else "llm",
         })
+
+        # Generate suggestions for valuable comments
+        if not intent.safe_to_skip:
+            import uuid
+            comment_id = f"c_{uuid.uuid4().hex[:8]}"
+            suggestion_id = f"s_{uuid.uuid4().hex[:8]}"
+            
+            try:
+                current_product = live_director.get_state().get("product", "PALOMA")
+                result = await suggester.handle(ev.text, intent.name, product=current_product, user=ev.user)
+                
+                _pending_suggestions[suggestion_id] = {
+                    "user": ev.user,
+                    "comment_id": comment_id,
+                    "comment_text": ev.text,
+                    "intent": intent.name,
+                    "replies": result["replies"],
+                    "source": result["source"],
+                }
+                
+                await ws.broadcast({
+                    "type": "reply.suggestion",
+                    "ts": time.time(),
+                    "suggestion_id": suggestion_id,
+                    "user": ev.user,
+                    "comment_id": comment_id,
+                    "comment_text": ev.text,
+                    "intent": intent.name,
+                    "replies": result["replies"],
+                    "source": result["source"],
+                })
+            except Exception as e:
+                log.error("Failed to generate suggestion for %s: %s", ev.user, e)
+                await ws.broadcast({
+                    "type": "error",
+                    "ts": time.time(),
+                    "category": "suggester",
+                    "user": ev.user,
+                    "detail": str(e)[:200],
+                })
 
     async def on_tt_event(ev: TTEvent) -> None:
         if ev.type == "connected":
