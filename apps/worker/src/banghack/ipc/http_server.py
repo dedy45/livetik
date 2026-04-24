@@ -34,10 +34,15 @@ def create_app(
     """
     app = FastAPI(title="Bang Hack API", version="0.4.0")
 
-    # CORS for local development
+    # CORS for local development (Svelte controller)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:4321", "http://127.0.0.1:4321"],
+        allow_origins=[
+            "http://localhost:4321",
+            "http://127.0.0.1:4321",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -119,6 +124,7 @@ def create_app(
             "director_state": director_state,
             "budget_remaining_idr": round(budget_remaining, 2),
             "worker_version": "0.4.0",
+            "static_url": "http://localhost:8766/static",  # URL untuk akses static files
         }
         return JSONResponse(content=body, status_code=status_code)
 

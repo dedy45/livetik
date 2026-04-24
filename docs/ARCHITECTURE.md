@@ -1,7 +1,74 @@
 # 🏗️ 02 · Architecture — Sistem & Data Flow
 
-> **Canonical**: arsitektur monorepo + data flow event. Mirror dari Notion.  
-> Baca sebelum bikin modul baru.
+> **Canonical**: arsitektur monorepo + data flow event v0.4.6  
+> **PENTING**: Baca [`WORKFLOW_ACTUAL.md`](../WORKFLOW_ACTUAL.md) untuk workflow sebenarnya (OBS + VB-Cable)
+
+---
+
+## 0. CRITICAL: Audio Flow Architecture
+
+**WORKFLOW SEBENARNYA (v0.4.6):**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  AUDIO LIBRARY (Pre-generated)                         │
+│  apps/worker/static/audio_library/                     │
+│  - 108 .wav files (Cartesia/Edge-TTS)                  │
+│  - index.json (metadata)                                │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Load at startup
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  AUDIO LIBRARY MANAGER                                  │
+│  core/audio_library/manager.py                         │
+│  - Load index.json                                      │
+│  - Search clips by category/tag                        │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Request clip
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  LIVE DIRECTOR                                          │
+│  core/orchestrator/director.py                         │
+│  - Phase-based selection (opening → hook → demo → etc) │
+│  - Pick random clip from category                      │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Play clip
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  AUDIO ADAPTER                                          │
+│  adapters/audio_library.py                             │
+│  1. Load .wav file from disk (file system access)      │
+│  2. Play via sounddevice library                       │
+│  3. Output to VB-CABLE (virtual audio device)          │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Virtual audio cable
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  VB-CABLE (Virtual Audio Device)                       │
+│  - Acts as virtual speaker                              │
+│  - OBS captures this as audio input                    │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Audio input
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  OBS STUDIO                                             │
+│  - Audio Input: VB-CABLE                                │
+│  - Mix with background music (optional)                │
+│  - Stream to TikTok via RTMP                           │
+└─────────────────────────────────────────────────────────┘
+```
+
+**PENTING:**
+- ❌ **BUKAN HTTP serving** ke browser
+- ❌ **BUKAN audio playback** di dashboard
+- ✅ **File system access** oleh worker (local files)
+- ✅ **sounddevice playback** → VB-CABLE → OBS
+- ✅ **Dashboard hanya monitoring** (metadata only)
 
 ---
 
@@ -163,12 +230,27 @@ Server push-only (controller mendengar). Payload JSON Lines:
 
 ## 7. Storage & Files
 
-- `.env` — secrets (tidak di-commit)
+- `.env` — secrets (tidak di-commit), **single source of truth** di repo root
 - `config/persona.md` — system prompt (editable via UI)
+- `config/clips_script.yaml` — 108 audio scripts (9 categories)
+- `config/products.yaml` — 3 products + 8 runsheet phases
+- `config/reply_templates.yaml` — 7 intents × 3 tone variants
+- `apps/worker/static/audio_library/` — **108 pre-generated audio clips**
+  - `*.wav` files (Cartesia or Edge-TTS)
+  - `index.json` — clip metadata (id, path, duration, script, category, product, tags)
+  - **Access method:** Direct file system read by worker (NOT HTTP)
+  - **Playback:** sounddevice → VB-CABLE → OBS
 - `obs/last_reply.txt` — text overlay bridge (ephemeral)
 - `logs/banghack-YYYY-MM-DD.log` — JSONL logs
 - `logs/session-<timestamp>.json` — full session export
 - `_out.mp3` — TTS temp file (di-overwrite)
+
+**CRITICAL - Audio Library:**
+- Generated once via `scripts/gen_audio_library_edgets.bat`
+- Worker loads `index.json` at startup
+- Clips played via `adapters/audio_library.py` → sounddevice → VB-CABLE
+- Dashboard shows metadata only (NOT plays audio itself)
+- No HTTP serving needed (worker and files on same machine)
 
 ---
 

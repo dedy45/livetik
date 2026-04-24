@@ -64,4 +64,23 @@ Thumbs.db
 .notion_sync_cache.json
 
 # Audio Library (generated files - do not commit)
-apps/worker/static/audio_library/*.wav
+apps/worker/static/audio_library/**/*.wav
+apps/worker/static/audio_library/**/*.mp3
+apps/worker/static/audio_library/**/*.ogg
+apps/worker/static/audio_library/**/*.flac
+apps/worker/static/audio_library/A_opening/
+apps/worker/static/audio_library/B_reset/
+apps/worker/static/audio_library/C_paloma/
+apps/worker/static/audio_library/D_cctv/
+apps/worker/static/audio_library/E_senter/
+apps/worker/static/audio_library/F_tracker/
+apps/worker/static/audio_library/G_question_hooks/
+apps/worker/static/audio_library/H_price_safe/
+apps/worker/static/audio_library/I_trust_safety/
+apps/worker/static/audio_library/J_idle_filler/
+apps/worker/static/audio_library/R_reaction_kit/
+apps/worker/static/audio_library/T_bridge/
+apps/worker/static/audio_library/Z_closing_staged/
+
+# Keep index.json
+!apps/worker/static/audio_library/index.json

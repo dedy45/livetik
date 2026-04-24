@@ -6,6 +6,41 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 📌 Current Version: v0.4.6 (2026-04-24)
+
+**Status:** 85% ready for live test  
+**Blocker:** Generate audio library (8-12 min, run `scripts\gen_audio_library_edgets.bat`)
+
+### What Works (v0.4.6)
+✅ Audio library manager (108 clips)  
+✅ Live director (2-hour state machine)  
+✅ Comment classifier (rule-first + LLM fallback)  
+✅ Reply suggester (template + cache + LLM)  
+✅ TikTok listener (read-only scrape)  
+✅ Svelte dashboard (monitoring & control)  
+✅ Audio playback via sounddevice → VB-CABLE → OBS  
+✅ Text overlay via obs/last_reply.txt  
+✅ Guardrail (budget cap, forbidden patterns)  
+✅ Cost tracking (~Rp 11 per 2-hour session)
+
+### Critical Fixes (v0.4.4 → v0.4.6)
+- v0.4.6: Fixed Cartesia SDK usage (switched to direct HTTP API)
+- v0.4.5: Fixed Cartesia API parameters (`generation_config`)
+- v0.4.4: Fixed TTS initialization (consolidated .env to repo root)
+
+### Architecture (ACTUAL)
+```
+Worker → sounddevice → VB-CABLE → OBS → TikTok Live
+```
+
+**NOT:** HTTP serving to browser  
+**NOT:** Audio playback in dashboard  
+**NOT:** LLM-based audio selection (deterministic phase-based)
+
+See [`WORKFLOW_ACTUAL.md`](../WORKFLOW_ACTUAL.md) for complete workflow.
+
+---
+
 ## [0.4.6] — 2026-04-24 CARTESIA SDK FIX (SYSTEMATIC DEBUGGING)
 
 ### Fixed (v0.4.6 — Cartesia SDK API Call)

@@ -1,0 +1,52 @@
+{
+  "api_key": "sk_car_6Wwbb1Pc94iA7Ubt4qp5uh",
+  "default_voice_id": "280171e4-eeb5-4d26-862e-bb6a072beef7",
+  "default_settings": {
+    "speed": 0.98,
+    "volume": 1.14,
+    "emotion": "comedic",
+    "language": "id",
+    "sample_rate": 44100
+  },
+  "presets": {
+    "hook": {
+      "name": "Hook (TikTok)",
+      "description": "Untuk hook video TikTok - cepat, energetic, comedic",
+      "speed": 1.05,
+      "volume": 1.2,
+      "emotion": "comedic"
+    },
+    "content": {
+      "name": "Content (Standard)",
+      "description": "Untuk konten utama - normal, clear, neutral",
+      "speed": 0.98,
+      "volume": 1.14,
+      "emotion": "neutral"
+    },
+    "cta": {
+      "name": "CTA (Call to Action)",
+      "description": "Untuk call to action - dramatic, loud, impactful",
+      "speed": 1.0,
+      "volume": 1.3,
+      "emotion": "dramatic"
+    },
+    "narration": {
+      "name": "Narration (Slow)",
+      "description": "Untuk narasi panjang - slow, clear, neutral",
+      "speed": 0.9,
+      "volume": 1.1,
+      "emotion": "neutral"
+    },
+    "excitement": {
+      "name": "Excitement",
+      "description": "Untuk konten exciting - fast, loud, happy",
+      "speed": 1.15,
+      "volume": 1.3,
+      "emotion": "happy"
+    }
+  },
+  "voices": {
+    "default": "280171e4-eeb5-4d26-862e-bb6a072beef7",
+    "voice1": "280171e4-eeb5-4d26-862e-bb6a072beef7"
+  }
+}
