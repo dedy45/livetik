@@ -7,7 +7,8 @@
 
 	const nav = [
 		{ href: '/', label: 'Dashboard', icon: '📊' },
-		{ href: '/live', label: 'Live Monitor', icon: '🎙️' },
+		{ href: '/live', label: 'Live Cockpit', icon: '🎙️' },
+		{ href: '/library', label: 'Audio Library', icon: '🎵' },
 		{ href: '/errors', label: 'Errors', icon: '⚠️' },
 		{ href: '/persona', label: 'Persona', icon: '🎭' },
 		{ href: '/config', label: 'Config', icon: '⚙️' },
@@ -21,7 +22,7 @@
 		<!-- Header -->
 		<div class="px-4 py-5 border-b border-border">
 			<h1 class="text-lg font-bold text-accent">🎙️ Bang Hack</h1>
-			<p class="text-xs text-text-secondary">v0.1.0-dev</p>
+			<p class="text-xs text-text-secondary">v0.4.0-dev</p>
 		</div>
 
 		<!-- Navigation -->

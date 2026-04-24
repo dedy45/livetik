@@ -34,18 +34,29 @@ livetik/
 │   ├── worker/                        # Python 3.11+ (UV managed)
 │   │   ├── pyproject.toml
 │   │   ├── src/banghack/
-│   │   │   ├── adapters/              # tiktok, llm, tts, obs
-│   │   │   ├── core/                  # persona, guardrail, queue, events
-│   │   │   ├── ipc/                   # ws_server, http_api, state
-│   │   │   ├── config/                # persona.md, settings.py
-│   │   │   └── telemetry/             # logger, cost
+│   │   │   ├── adapters/              # tiktok, llm, tts, obs, audio_library, cartesia_pool
+│   │   │   ├── core/
+│   │   │   │   ├── audio_library/     # manager.py (v0.4)
+│   │   │   │   ├── classifier/        # rules.py, llm_fallback.py (v0.4)
+│   │   │   │   ├── orchestrator/      # director.py, suggester.py, budget_guard.py, reply_cache.py (v0.4)
+│   │   │   │   ├── models.py          # LiveState, CommentDecision, AudioJob dataclasses (v0.4)
+│   │   │   │   ├── persona.py
+│   │   │   │   ├── guardrail.py
+│   │   │   │   ├── queue.py
+│   │   │   │   ├── cost.py
+│   │   │   │   └── config_store.py
+│   │   │   ├── ipc/                   # ws_server, http_server, main
+│   │   │   └── config/                # persona.md, clips_script.yaml, products.yaml, reply_templates.yaml
+│   │   ├── static/audio_library/      # Generated .wav files + index.json (v0.4)
 │   │   └── tests/
 │   └── controller/                    # Svelte 5 + Tailwind v4
 │       └── src/
-│           ├── routes/                # dashboard, live, errors, persona, config, cost
-│           └── lib/                   # components, stores, api
+│           ├── routes/                # dashboard, live, library, errors, persona, config, cost
+│           └── lib/
+│               ├── components/        # AudioLibraryGrid, DecisionStream, ReplySuggestions, TwoHourTimer, EmergencyStop (v0.4)
+│               └── stores/            # ws, live_state, audio_library (v0.4)
 ├── docs/                              # ← semua dokumen ini
-├── scripts/                           # dev.bat, install.bat
+├── scripts/                           # dev.bat, install.bat, gen_audio_library.py/.bat (v0.4)
 ├── .github/workflows/ci.yml
 ├── .vscode/
 ├── .env.example

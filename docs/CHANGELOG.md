@@ -6,6 +6,57 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.2] — 2026-04-24 UX NAVIGATION
+
+### Added (v0.4.2 — UX Navigation + Go-Live Gap Closure)
+
+**Frontend — New Routes:**
+- `/library` page — Audio Library Manager with:
+  - Stats panel (total clips, categories, filtered count, avg duration)
+  - Filter bar (category, product, tag search)
+  - Clips grid with play buttons
+  - Refresh functionality
+  - Integration with `audio.list` and `audio.play` WS commands
+
+**Frontend — Layout Updates:**
+- Navigation: Renamed "Live Monitor" → "Live Cockpit"
+- Navigation: Added "Audio Library" menu item
+- Version label: Updated from `v0.1.0-dev` → `v0.4.0-dev`
+
+**Documentation:**
+- Updated `DOCS_HUB.md` folder structure to reflect v0.4 additions:
+  - `core/audio_library/`, `core/classifier/`, `core/orchestrator/`
+  - `core/models.py` dataclasses
+  - `static/audio_library/` directory
+  - v0.4 Svelte components and stores
+  - `scripts/gen_audio_library.py/.bat`
+
+### Changed (v0.4.2)
+
+**Frontend — Dashboard:**
+- Dashboard now includes v0.4 components (AudioLibraryGrid, DecisionStream, ReplySuggestions, TwoHourTimer, EmergencyStop)
+- All components properly wired to WS events
+
+**Frontend — Component Status:**
+- All 5 v0.4 components exist and are functional (not placeholders)
+- All 3 v0.4 stores exist and are properly implemented
+- Build no longer crashes on missing imports
+
+### Notes (v0.4.2)
+
+**Review Document Status:**
+- Review document "🎨 18 · UX Navigation + Go-Live Gap Closure" was written before components were created
+- All components listed as "404" in review are now present and functional
+- Build crash issue mentioned in review has been resolved
+- Components use proper Svelte 5 runes and SSR-safe patterns
+
+**Remaining Work (from review):**
+- Audio library generation: User needs to run `scripts\gen_audio_library.bat` to populate clips
+- Content extension: Add 50+ clips for missing products (CCTV, Senter, Tracker, etc.)
+- Live Cockpit redesign: Implement 3-panel layout as specified in review document
+
+---
+
 ## [0.4.1] — 2026-04-24 BUGFIX
 
 ### Fixed (v0.4.1 — SSR / SvelteKit errors)
