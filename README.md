@@ -128,11 +128,35 @@ scripts\gen_audio_library_edgets.bat
 
 Ini akan generate 108 audio clips (~8-12 menit). **Tanpa ini, worker tidak bisa play audio!**
 
-### 4. Setup VB-CABLE di OBS
+### 4. Setup Audio Routing untuk OBS
 
-1. Install VB-CABLE dari https://vb-audio.com/Cable/
-2. OBS → Settings → Audio → Desktop Audio = "CABLE Output"
-3. Restart OBS
+**PENTING:** Audio harus route ke OBS via VB-CABLE, bukan ke speaker laptop!
+
+```bash
+# 1. Install VB-CABLE
+# Download: https://vb-audio.com/Cable/
+# Extract → jalankan VBCABLE_Setup_x64.exe as Admin
+# RESTART WINDOWS (wajib!)
+
+# 2. List audio devices
+python scripts/list_audio_devices.py
+
+# 3. Configure .env (tambahkan salah satu):
+AUDIO_OUTPUT_DEVICE=CABLE Input
+# atau gunakan index langsung:
+# AUDIO_OUTPUT_DEVICE_INDEX=5
+
+# 4. Test audio routing
+python scripts/test_audio_routing.py
+# Cek apakah test tone keluar di OBS audio meter
+
+# 5. Setup OBS
+# - Add source: Audio Input Capture
+# - Device: CABLE Output (VB-Audio Virtual Cable)
+# - Advanced Audio Properties → Monitor: Monitor and Output
+```
+
+**Dokumentasi lengkap:** [`docs/AUDIO_ROUTING_IMPLEMENTATION.md`](docs/AUDIO_ROUTING_IMPLEMENTATION.md)
 
 ### 5. Start System
 

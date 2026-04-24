@@ -1,6 +1,6 @@
 """TTS adapter — Cartesia primary (5-key pool) + edge-tts id-ID fallback.
 
-Output flow: synth bytes → temp file (WAV/MP3) → ffplay subprocess → VB-CABLE.
+Output flow: synth bytes → temp file (WAV/MP3) → sounddevice → configured output device.
 """
 from __future__ import annotations
 
@@ -16,6 +16,40 @@ import edge_tts
 from .cartesia_pool import CartesiaPool, KeySlot
 
 log = logging.getLogger(__name__)
+
+
+def _resolve_output_device() -> int | None:
+    """Resolve audio output device from env vars.
+    
+    Returns device index or None for system default.
+    Priority: AUDIO_OUTPUT_DEVICE_INDEX > AUDIO_OUTPUT_DEVICE (name match) > None
+    """
+    import sounddevice as sd  # type: ignore
+    
+    # Try explicit index first
+    idx_env = os.getenv("AUDIO_OUTPUT_DEVICE_INDEX", "").strip()
+    if idx_env.isdigit():
+        idx = int(idx_env)
+        log.info("tts: using device index %d from AUDIO_OUTPUT_DEVICE_INDEX", idx)
+        return idx
+    
+    # Try name match
+    name_env = os.getenv("AUDIO_OUTPUT_DEVICE", "").strip()
+    if not name_env:
+        log.info("tts: no AUDIO_OUTPUT_DEVICE set, using system default")
+        return None
+    
+    # Search for device by name (case-insensitive substring match)
+    devices = sd.query_devices()
+    for i, d in enumerate(devices):
+        if d.get("max_output_channels", 0) > 0:
+            device_name = d.get("name", "").lower()
+            if name_env.lower() in device_name:
+                log.info("tts: matched device %d: %s", i, d.get("name"))
+                return i
+    
+    log.warning("tts: device '%s' not found, using system default", name_env)
+    return None
 
 
 @dataclass(slots=True)
@@ -162,11 +196,19 @@ class TTSAdapter:
 
     @staticmethod
     async def _play_file(path: str) -> None:
-        """Play audio via ffplay (blocks until done)."""
-        proc = await asyncio.create_subprocess_exec(
-            "ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", path,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
-        await proc.wait()
+        """Play audio via sounddevice (routed to configured output device)."""
+        import sounddevice as sd  # type: ignore
+        import soundfile as sf  # type: ignore
+        
+        # Resolve output device from env
+        device = _resolve_output_device()
+        
+        # Load audio file
+        data, samplerate = sf.read(path, dtype="float32")
+        
+        # Play with device routing
+        sd.play(data, samplerate, device=device)
+        
+        # Wait for playback to complete
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, sd.wait)

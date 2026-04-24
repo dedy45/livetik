@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Awaitable
 
@@ -10,6 +11,40 @@ if TYPE_CHECKING:
     from banghack.core.audio_library.manager import AudioLibraryManager
 
 log = logging.getLogger(__name__)
+
+
+def _resolve_output_device() -> int | None:
+    """Resolve audio output device from env vars.
+    
+    Returns device index or None for system default.
+    Priority: AUDIO_OUTPUT_DEVICE_INDEX > AUDIO_OUTPUT_DEVICE (name match) > None
+    """
+    import sounddevice as sd  # type: ignore
+    
+    # Try explicit index first
+    idx_env = os.getenv("AUDIO_OUTPUT_DEVICE_INDEX", "").strip()
+    if idx_env.isdigit():
+        idx = int(idx_env)
+        log.info("audio_library: using device index %d from AUDIO_OUTPUT_DEVICE_INDEX", idx)
+        return idx
+    
+    # Try name match
+    name_env = os.getenv("AUDIO_OUTPUT_DEVICE", "").strip()
+    if not name_env:
+        log.info("audio_library: no AUDIO_OUTPUT_DEVICE set, using system default")
+        return None
+    
+    # Search for device by name (case-insensitive substring match)
+    devices = sd.query_devices()
+    for i, d in enumerate(devices):
+        if d.get("max_output_channels", 0) > 0:
+            device_name = d.get("name", "").lower()
+            if name_env.lower() in device_name:
+                log.info("audio_library: matched device %d: %s", i, d.get("name"))
+                return i
+    
+    log.warning("audio_library: device '%s' not found, using system default", name_env)
+    return None
 
 
 class AudioLibraryAdapter:
@@ -85,7 +120,9 @@ class AudioLibraryAdapter:
                 "script_preview": clip.script[:80],
                 "duration_ms": clip.duration_ms,
             })
-            sd.play(data, samplerate)
+            # Resolve output device from env
+            device = _resolve_output_device()
+            sd.play(data, samplerate, device=device)
             # Run blocking wait in executor with 30s timeout
             loop = asyncio.get_event_loop()
             try:

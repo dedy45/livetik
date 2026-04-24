@@ -108,8 +108,13 @@
 │  adapters/audio_library.py                                 │
 │                                                             │
 │  1. Load .wav file from disk                               │
-│  2. Play via sounddevice library                           │
-│  3. Output to VB-CABLE (virtual audio device)              │
+│  2. Resolve output device from .env:                       │
+│     - AUDIO_OUTPUT_DEVICE=CABLE Input                      │
+│     - or AUDIO_OUTPUT_DEVICE_INDEX=5                       │
+│  3. Play via sounddevice.play(device=X)                    │
+│  4. Output to configured device (VB-CABLE)                 │
+│                                                             │
+│  📚 Implementation: docs/AUDIO_ROUTING_IMPLEMENTATION.md   │
 └─────────────────────────────────────────────────────────────┘
                            │
                            │ Virtual audio cable

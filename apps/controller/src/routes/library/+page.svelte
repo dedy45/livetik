@@ -17,9 +17,15 @@
 	let notPlayedRecently = $state(false);
 
 	// Auto-load saat connect, reload saat reconnect
+	// Add delay to ensure worker is fully initialized
 	$effect(() => {
 		if (wsStore.connected && !listReqId) {
-			listReqId = wsStore.sendCommand('audio.list', {});
+			// Delay 500ms to ensure worker audio library is loaded
+			setTimeout(() => {
+				if (wsStore.connected && !listReqId) {
+					listReqId = wsStore.sendCommand('audio.list', {});
+				}
+			}, 500);
 		}
 	});
 
@@ -41,7 +47,10 @@
 	}
 
 	function refreshList() {
-		listReqId = wsStore.sendCommand('audio.list', {});
+		listReqId = null; // Reset first
+		setTimeout(() => {
+			listReqId = wsStore.sendCommand('audio.list', {});
+		}, 100);
 	}
 </script>
 

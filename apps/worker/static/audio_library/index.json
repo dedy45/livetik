@@ -1,4 +1,1801 @@
 {
   "version": "1.0",
-  "clips": []
+  "clips": [
+    {
+      "id": "A_opening1",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening10",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening11",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening12",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening2",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening3",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening4",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening5",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening6",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening7",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening8",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "A_opening9",
+      "category": "A_opening",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Pembukaan live - sapa viewer dan intro tema",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer1",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer2",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer3",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer4",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer5",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "B_reset_viewer6",
+      "category": "B_reset",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Hook - problem statement dan curiosity",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma-cta1",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma-cta2",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma-cta3",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma-cta4",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma-cta5",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma1",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma10",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma2",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma3",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma4",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma5",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma6",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma7",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma8",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "C_paloma9",
+      "category": "C_paloma",
+      "tags": [
+        "paloma"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Paloma Smart Lock",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_001",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_002",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_003",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_004",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_005",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_006",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_007",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_008",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_009",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_010",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_011",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_012",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_013",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_014",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_015",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_016",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_017",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_context_018",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_cta_001",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_cta_002",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_cta_003",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_safety_001",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_safety_002",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_safety_003",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "D_cctv_safety_004",
+      "category": "D_cctv",
+      "tags": [
+        "cctv"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk CCTV Security",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_001",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_002",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_003",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_004",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_005",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_006",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_007",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_008",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_009",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_010",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_011",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_012",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_013",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_014",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_context_015",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_cta_001",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_cta_002",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_safety_001",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_safety_002",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "E_senter_safety_003",
+      "category": "E_senter",
+      "tags": [
+        "senter"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk Senter Multifungsi",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_001",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_002",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_003",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_004",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_005",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_006",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_007",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_008",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_009",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_010",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_011",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_012",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_013",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_context_014",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_cta_001",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_cta_002",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_safety_001",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "F_tracker_safety_002",
+      "category": "F_tracker",
+      "tags": [
+        "tracker"
+      ],
+      "duration_ms": 15000,
+      "script": "Demo produk GPS Tracker",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_001",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_002",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_003",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_004",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_005",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_006",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_007",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_008",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_009",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_010",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_011",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_012",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_013",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_014",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_015",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_016",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_017",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_018",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_019",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "G_question_hooks_020",
+      "category": "G_question_hooks",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Question hooks untuk engagement",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_001",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_002",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_003",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_004",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_005",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "H_price_safe_006",
+      "category": "H_price_safe",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Penjelasan harga dan value",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_001",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_002",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_003",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_004",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_005",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_006",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_007",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_008",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_009",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "I_trust_safety_010",
+      "category": "I_trust_safety",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Trust building dan safety",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_001",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_002",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_003",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_004",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_005",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_006",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_007",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_008",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_009",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_010",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_011",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_012",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_013",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_014",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "J_idle_filler_015",
+      "category": "J_idle_filler",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Idle filler saat menunggu",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_005",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_follow_006",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_005",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_006",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_007",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_gift_008",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_005",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_join_006",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_merged_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_merged_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_merged_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_merged_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_milestone_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_milestone_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_milestone_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_milestone_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_milestone_005",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_001",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_002",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_003",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_004",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_005",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "R_reaction_kit_share_006",
+      "category": "R_reaction_kit",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Reaction kit untuk interaksi",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_cctv_senter_001",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_cctv_senter_002",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_cctv_senter_003",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_opening_paloma_001",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_opening_paloma_002",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_opening_paloma_003",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_paloma_cctv_001",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_paloma_cctv_002",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_paloma_cctv_003",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_product_qa_001",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_product_qa_002",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_product_qa_003",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_senter_tracker_001",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_senter_tracker_002",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "T_bridge_senter_tracker_003",
+      "category": "T_bridge",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Bridge transition antar segment",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t0_001",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t10_001",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t10_002",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t2_001",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t2_002",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t30s_001",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t5_001",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    },
+    {
+      "id": "Z_closing_staged_t5_002",
+      "category": "Z_closing_staged",
+      "tags": [],
+      "duration_ms": 15000,
+      "script": "Closing - thank you dan next schedule",
+      "scene_hint": ""
+    }
+  ]
 }
