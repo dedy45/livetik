@@ -709,7 +709,7 @@ async def main() -> NoReturn:
             clips = audio_lib_manager.search(tag)
         else:
             clips = audio_lib_manager.all_clips
-        return {
+        result = {
             "clips": [
                 {
                     "id": c.id,
@@ -722,6 +722,9 @@ async def main() -> NoReturn:
                 for c in clips
             ]
         }
+        # PATCH 1: Broadcast audio.list.ok untuk sync ke frontend
+        await ws.broadcast({"type": "audio.list.ok", "clips": result["clips"]})
+        return result
 
     async def cmd_audio_play(p: dict[str, object]) -> dict[str, object]:
         clip_id = str(p.get("clip_id", "")).strip()
@@ -895,7 +898,10 @@ async def main() -> NoReturn:
         return {"ok": True}
 
     async def cmd_live_get_state(_p: dict[str, object]) -> dict[str, object]:
-        return live_director.get_state()
+        # PATCH 4a: Broadcast live.state untuk sync ke frontend
+        state = live_director.get_state()
+        await ws.broadcast({"type": "live.state", **state})
+        return state
 
     for cmd_name, cmd_handler, category in [
         # existing 19
@@ -1001,6 +1007,8 @@ async def main() -> NoReturn:
             "confidence": intent.confidence,
             "reason": intent.reason,
             "method": "rule" if not intent.needs_llm or intent.safe_to_skip else "llm",
+            # PATCH 4b: Tambah source field untuk DecisionStream reasoning
+            "source": "rules" if not intent.needs_llm or intent.safe_to_skip else "llm",
         })
 
         # Generate suggestions for valuable comments

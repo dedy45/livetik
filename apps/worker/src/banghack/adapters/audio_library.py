@@ -114,11 +114,15 @@ class AudioLibraryAdapter:
         self._current_clip_id = clip_id
         try:
             data, samplerate = sf.read(clip.file_path, dtype="float32")
+            # PATCH 2: Tambah category dan text (full script) untuk DecisionStream
             await self._broadcast({
                 "type": "audio.now",
                 "clip_id": clip_id,
+                "category": clip.category,
+                "text": clip.script,
                 "script_preview": clip.script[:80],
                 "duration_ms": clip.duration_ms,
+                "product": getattr(clip, "product", None),
             })
             # Resolve output device from env
             device = _resolve_output_device()

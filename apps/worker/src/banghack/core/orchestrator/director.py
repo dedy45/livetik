@@ -20,10 +20,11 @@ log = logging.getLogger(__name__)
 
 
 class LiveMode(str, Enum):
-    IDLE = "IDLE"
-    RUNNING = "RUNNING"
-    PAUSED = "PAUSED"
-    STOPPED = "STOPPED"
+    # PATCH 3: Lowercase values untuk match frontend expectations
+    IDLE = "idle"
+    RUNNING = "running"
+    PAUSED = "paused"
+    STOPPED = "stopped"
 
 
 @dataclass
