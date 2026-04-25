@@ -1,3 +1,6 @@
+---
+inclusion: always
+---
 # Tech Stack — Bang Hack Worker
 
 ## Stack Lock (do not change without explicit approval)

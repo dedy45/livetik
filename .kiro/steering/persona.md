@@ -1,3 +1,6 @@
+---
+inclusion: always
+---
 # Agent Coding Persona — livetik project
 
 ## Siapa kamu

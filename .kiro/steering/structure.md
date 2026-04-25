@@ -1,4 +1,7 @@
-# Project Structure — livetik monorepo
+---
+inclusion: always
+---
+ Project Structure — livetik monorepo
 
 ```
 livetik/
