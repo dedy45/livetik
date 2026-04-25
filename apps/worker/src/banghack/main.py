@@ -709,22 +709,22 @@ async def main() -> NoReturn:
             clips = audio_lib_manager.search(tag)
         else:
             clips = audio_lib_manager.all_clips
-        result = {
-            "clips": [
-                {
-                    "id": c.id,
-                    "category": c.category,
-                    "tags": c.tags,
-                    "duration_ms": c.duration_ms,
-                    "script": c.script,
-                    "scene_hint": c.scene_hint,
-                }
-                for c in clips
-            ]
-        }
-        # PATCH 1: Broadcast audio.list.ok untuk sync ke frontend
-        await ws.broadcast({"type": "audio.list.ok", "clips": result["clips"]})
-        return result
+        payload = [
+            {
+                "id": c.id,
+                "category": c.category,
+                "tags": c.tags,
+                "duration_ms": c.duration_ms,
+                "text": c.script,           # FIX: controller baca field `text`
+                "script": c.script,          # keep back-compat
+                "scene_hint": c.scene_hint,
+                "product": getattr(c, "product", None),
+            }
+            for c in clips
+        ]
+        # FIX: broadcast `audio.list.ok` supaya audioClips store di controller ke-isi
+        await ws.broadcast({"type": "audio.list.ok", "ts": time.time(), "clips": payload})
+        return {"clips": payload, "count": len(payload)}
 
     async def cmd_audio_play(p: dict[str, object]) -> dict[str, object]:
         clip_id = str(p.get("clip_id", "")).strip()
