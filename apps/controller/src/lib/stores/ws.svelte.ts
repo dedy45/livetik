@@ -8,6 +8,9 @@ export type Metrics = {
 	by_tier?: Record<string, number>;
 	llm_calls?: number; tts_calls?: number;
 	cartesia_pool: { key: string; calls: number; exhausted: boolean; cooldown_s: number }[];
+	cartesia_voice_id?: string;
+	cartesia_model?: string;
+	cartesia_default_emotion?: string;
 	llm_models: { id: string; model: string; tier: string }[];
 	tiktok_username?: string;
 	tiktok_running?: boolean;
@@ -74,7 +77,7 @@ function createStore() {
 	const errorLog = $state<{ ts: number; category: string; user?: string; detail: string }[]>([]);
 	const decisions = $state<{ ts: number; kind: string; input: string; output: string; reasoning: string }[]>([]);
 	const audioClips = $state<any[]>([]);
-	const testResults = $state(new Map<string, CmdResult>());
+	let testResults = $state<Record<string, CmdResult>>({});
 	const toasts = $state<Toast[]>([]);
 
 	let nowPlaying = $state<any | null>(null);
@@ -154,10 +157,10 @@ function createStore() {
 			ws.send(JSON.stringify({ type: 'cmd', name, req_id: reqId, params }));
 			// Start timeout
 			const t = setTimeout(() => {
-				const existing = testResults.get(reqId);
+				const existing = testResults[reqId];
 				if (!existing || existing.pending) {
 					const timed: CmdResult = { ok: false, error: `timeout ${CMD_TIMEOUT_MS}ms`, timedOut: true };
-					testResults.set(reqId, timed);
+					testResults[reqId] = timed;
 					pushToast({ kind: 'error', title: `⏱ ${name} timeout`, detail: 'Worker tidak balas dalam 10 detik' });
 					const aw = awaiters.get(reqId);
 					if (aw) { aw(timed); awaiters.delete(reqId); }
@@ -276,7 +279,7 @@ function createStore() {
 				const cr: CmdResult = {
 					ok: msg.ok, result: msg.result, error: msg.error, latency_ms: msg.latency_ms,
 				};
-				if (rid) testResults.set(rid, cr);
+				if (rid) testResults[rid] = cr;
 				const aw = awaiters.get(rid);
 				if (aw) { aw(cr); awaiters.delete(rid); }
 				if (msg.ok) {
@@ -291,7 +294,7 @@ function createStore() {
 
 	function sendCommand(name: string, params: any = {}): string {
 		const reqId = `req-${++reqIdSeq}`;
-		testResults.set(reqId, { ok: false, pending: true });
+		testResults[reqId] = { ok: false, pending: true };
 		if (ws?.readyState === WebSocket.OPEN) {
 			_rawSend(name, reqId, params);
 		} else {

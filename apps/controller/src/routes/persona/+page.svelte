@@ -4,7 +4,7 @@
 
 	// ── Load current persona ──────────────────────────────────────────────
 	let loadReqId = $state<string | null>(null);
-	const loadResult = $derived(loadReqId ? wsStore.testResults.get(loadReqId) : undefined);
+	const loadResult = $derived(loadReqId ? wsStore.testResults[loadReqId] : undefined);
 
 	// Editor state — populated when load result arrives
 	let editorContent = $state('');
@@ -29,7 +29,7 @@
 
 	// ── Save persona ──────────────────────────────────────────────────────
 	let saveReqId = $state<string | null>(null);
-	const saveResult = $derived(saveReqId ? wsStore.testResults.get(saveReqId) : undefined);
+	const saveResult = $derived(saveReqId ? wsStore.testResults[saveReqId] : undefined);
 
 	$effect(() => {
 		if (saveResult?.ok) {
@@ -60,7 +60,7 @@
 	let testUser = $state('Bang Rizky');
 	let testText = $state('bang rangkanya kuat nggak?');
 	let replyReqId = $state<string | null>(null);
-	const replyResult = $derived(replyReqId ? wsStore.testResults.get(replyReqId) : undefined);
+	const replyResult = $derived(replyReqId ? wsStore.testResults[replyReqId] : undefined);
 
 	function testReply() {
 		replyReqId = wsStore.sendCommand('test_reply', { user: testUser, text: testText });

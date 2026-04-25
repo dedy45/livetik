@@ -29,7 +29,7 @@
 	// 9router model list (fetched on demand)
 	let nineRouterModels = $state<Array<{ id: string; litellm_model: string }>>([]);
 	let loadModelsReqId = $state<string | null>(null);
-	const loadModelsResult = $derived(loadModelsReqId ? wsStore.testResults.get(loadModelsReqId) : undefined);
+	const loadModelsResult = $derived(loadModelsReqId ? wsStore.testResults[loadModelsReqId] : undefined);
 
 	$effect(() => {
 		if (loadModelsResult?.ok && loadModelsResult.result?.models) {
@@ -56,20 +56,20 @@
 	let edgeTtsText = $state('Halo bos, Bang Hack di sini');
 	let edgeTtsVoice = $state('id-ID-ArdiNeural');
 	let edgeTtsReqId = $state<string | null>(null);
-	const edgeTtsResult = $derived(edgeTtsReqId ? wsStore.testResults.get(edgeTtsReqId) : undefined);
+	const edgeTtsResult = $derived(edgeTtsReqId ? wsStore.testResults[edgeTtsReqId] : undefined);
 
 	// Cartesia TTS generate state
 	let cartesiaTtsText = $state('Halo bos, Bang Hack di sini');
 	let cartesiaTtsEmotion = $state('neutral');
 	let cartesiaTtsReqId = $state<string | null>(null);
-	const cartesiaTtsResult = $derived(cartesiaTtsReqId ? wsStore.testResults.get(cartesiaTtsReqId) : undefined);
+	const cartesiaTtsResult = $derived(cartesiaTtsReqId ? wsStore.testResults[cartesiaTtsReqId] : undefined);
 
 	// ── P3 state ──────────────────────────────────────────────────────────
 	let cartesiaVoiceId = $state('');
 	let cartesiaModel = $state('sonic-3');
 	let cartesiaDefaultEmotion = $state('neutral');
 	let cartesiaConfigReqId = $state<string | null>(null);
-	const cartesiaConfigResult = $derived(cartesiaConfigReqId ? wsStore.testResults.get(cartesiaConfigReqId) : undefined);
+	const cartesiaConfigResult = $derived(cartesiaConfigReqId ? wsStore.testResults[cartesiaConfigReqId] : undefined);
 
 	let newCartesiaKey = $state('');
 
@@ -79,7 +79,7 @@
 	let guardrailWindow = $state(60);
 	let guardrailMaxChars = $state(300);
 	let guardrailSaveReqId = $state<string | null>(null);
-	const guardrailSaveResult = $derived(guardrailSaveReqId ? wsStore.testResults.get(guardrailSaveReqId) : undefined);
+	const guardrailSaveResult = $derived(guardrailSaveReqId ? wsStore.testResults[guardrailSaveReqId] : undefined);
 
 	let budgetIdr = $state(5000);
 	let tiktokHotswapUsername = $state('');
@@ -95,6 +95,19 @@
 			guardrailRateMax = g.rate_max ?? 3;
 			guardrailWindow = g.rate_window_s ?? 60;
 			guardrailMaxChars = g.max_chars ?? 300;
+		}
+	});
+
+	// Populate Cartesia config from metrics
+	$effect(() => {
+		if (m.cartesia_voice_id && cartesiaVoiceId === '') {
+			cartesiaVoiceId = m.cartesia_voice_id;
+		}
+		if (m.cartesia_model && cartesiaModel === 'sonic-3') {
+			cartesiaModel = m.cartesia_model;
+		}
+		if (m.cartesia_default_emotion && cartesiaDefaultEmotion === 'neutral') {
+			cartesiaDefaultEmotion = m.cartesia_default_emotion;
 		}
 	});
 
@@ -129,7 +142,7 @@
 	}
 
 	let audioDevicesReqId = $state<string | null>(null);
-	const audioDevicesResult = $derived(audioDevicesReqId ? wsStore.testResults.get(audioDevicesReqId) : undefined);
+	const audioDevicesResult = $derived(audioDevicesReqId ? wsStore.testResults[audioDevicesReqId] : undefined);
 	$effect(() => {
 		if (audioDevicesResult?.ok && audioDevicesResult.result?.devices) {
 			audioDevices = audioDevicesResult.result.devices as typeof audioDevices;
@@ -178,8 +191,8 @@
 			<button
 				onclick={() => activeTab = 'system'}
 				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
-					{activeTab === 'system' 
-						? 'border-accent text-accent' 
+					{activeTab === 'system'
+						? 'border-accent text-accent'
 						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
 			>
 				⚙️ System & Runtime
@@ -187,8 +200,8 @@
 			<button
 				onclick={() => activeTab = 'llm'}
 				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
-					{activeTab === 'llm' 
-						? 'border-accent text-accent' 
+					{activeTab === 'llm'
+						? 'border-accent text-accent'
 						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
 			>
 				🤖 LLM & AI
@@ -196,8 +209,8 @@
 			<button
 				onclick={() => activeTab = 'tts'}
 				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
-					{activeTab === 'tts' 
-						? 'border-accent text-accent' 
+					{activeTab === 'tts'
+						? 'border-accent text-accent'
 						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
 			>
 				🔊 TTS & Audio
@@ -205,8 +218,8 @@
 			<button
 				onclick={() => activeTab = 'tiktok'}
 				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors
-					{activeTab === 'tiktok' 
-						? 'border-accent text-accent' 
+					{activeTab === 'tiktok'
+						? 'border-accent text-accent'
 						: 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'}"
 			>
 				📱 TikTok
@@ -691,9 +704,17 @@
 								</a>
 							</div>
 						</div>
+						<div class="text-xs text-text-secondary font-mono">
+							Debug: {edgeTtsResult.result.file_path}
+						</div>
 					</div>
 				{:else}
 					<div class="text-xs text-error">✗ {edgeTtsResult.error || 'Generation failed'}</div>
+					{#if edgeTtsResult.result}
+						<div class="text-xs text-text-secondary font-mono mt-1">
+							Debug result: {JSON.stringify(edgeTtsResult.result)}
+						</div>
+					{/if}
 				{/if}
 			{/if}
 			<p class="text-xs text-text-secondary">
@@ -750,9 +771,17 @@
 								</a>
 							</div>
 						</div>
+						<div class="text-xs text-text-secondary font-mono">
+							Debug: {cartesiaTtsResult.result.file_path}
+						</div>
 					</div>
 				{:else}
 					<div class="text-xs text-error">✗ {cartesiaTtsResult.error || 'Generation failed'}</div>
+					{#if cartesiaTtsResult.result}
+						<div class="text-xs text-text-secondary font-mono mt-1">
+							Debug result: {JSON.stringify(cartesiaTtsResult.result)}
+						</div>
+					{/if}
 				{/if}
 			{/if}
 			<p class="text-xs text-text-secondary">
@@ -764,7 +793,7 @@
 	<!-- === Audio Routing Info === -->
 	<section class="bg-bg-panel border border-border rounded-lg p-6">
 		<h3 class="text-lg font-semibold mb-4">🔊 Audio Routing Setup</h3>
-		
+
 		<!-- Status Check -->
 		<div class="mb-4 p-4 bg-bg-elevated rounded-lg border-l-4 border-accent">
 			<div class="font-medium mb-2">Current Audio Flow:</div>
@@ -799,8 +828,8 @@
 					<p class="text-sm text-yellow-100/80 mb-2">
 						Ini normal! VoiceMeeter perlu dikonfigurasi dulu untuk route audio ke speaker fisik.
 					</p>
-					<a 
-						href="https://github.com/dedy45/livetik/blob/main/docs/AUDIO_ROUTING_TROUBLESHOOTING.md" 
+					<a
+						href="https://github.com/dedy45/livetik/blob/main/docs/AUDIO_ROUTING_TROUBLESHOOTING.md"
 						target="_blank"
 						class="inline-flex items-center gap-1 text-sm text-yellow-200 hover:text-yellow-100 underline"
 					>

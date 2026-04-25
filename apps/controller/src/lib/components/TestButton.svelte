@@ -22,7 +22,7 @@
 	let reqId = $state<string | null>(null);
 	let busy = $state(false);
 
-	const result = $derived(reqId ? wsStore.testResults.get(reqId) : undefined);
+	const result = $derived(reqId ? wsStore.testResults[reqId] : undefined);
 
 	$effect(() => {
 		if (result && busy) {

@@ -17,7 +17,7 @@
 
 	// ── 7-day history ──────────────────────────────────────────────────────
 	let historyReqId = $state<string | null>(null);
-	const historyResult = $derived(historyReqId ? wsStore.testResults.get(historyReqId) : undefined);
+	const historyResult = $derived(historyReqId ? wsStore.testResults[historyReqId] : undefined);
 	let historyRows = $state<Array<{ ts: number; total_idr: number }>>([]);
 
 	$effect(() => {

@@ -334,65 +334,88 @@ async def main() -> NoReturn:
         """Generate Edge-TTS audio and save to static folder for download/play."""
         import edge_tts as _edge_tts  # type: ignore[import-not-found]
         import time
-        
+
+        log.info("cmd_generate_edge_tts START: params=%s", p)
+
         text = str(p.get("text", "")).strip()
         if not text:
+            log.error("cmd_generate_edge_tts: text required")
             raise RuntimeError("text required")
         voice = str(p.get("voice", os.getenv("EDGE_TTS_VOICE", "id-ID-ArdiNeural")))
-        
+
+        log.info("cmd_generate_edge_tts: text=%s voice=%s", text[:50], voice)
+
         # Save to controller static folder
         static_dir = Path("../controller/static/tts-samples")
         static_dir.mkdir(parents=True, exist_ok=True)
-        
+
         timestamp = int(time.time())
         filename = f"edge-{timestamp}.mp3"
         output_path = static_dir / filename
-        
+
+        log.info("cmd_generate_edge_tts: output_path=%s", output_path)
+
         communicate = _edge_tts.Communicate(text, voice)
         await communicate.save(str(output_path))
-        
+
+        log.info("cmd_generate_edge_tts: file saved")
+
         # Get file metadata
         file_size_kb = output_path.stat().st_size / 1024
-        
+
         # Estimate duration (rough: 150 words per minute, average 5 chars per word)
         word_count = len(text.split())
         duration_s = (word_count / 150) * 60
-        
-        return {
+
+        result = {
             "file_path": f"/tts-samples/{filename}",
             "duration_s": round(duration_s, 2),
             "file_size_kb": round(file_size_kb, 1),
             "voice": voice
         }
+        log.info("cmd_generate_edge_tts SUCCESS: result=%s", result)
+        return result
 
     async def cmd_generate_cartesia_tts(p: dict[str, object]) -> dict[str, object]:
         """Generate Cartesia TTS audio and save to static folder for download/play."""
         import time
         import httpx
-        
+
+        log.info("cmd_generate_cartesia_tts START: params=%s", p)
+
         if not tts:
+            log.error("cmd_generate_cartesia_tts: TTS not initialized")
             raise RuntimeError("TTS not initialized — check CARTESIA_API_KEYS")
-        
+
         text = str(p.get("text", "")).strip()
         if not text:
+            log.error("cmd_generate_cartesia_tts: text required")
             raise RuntimeError("text required")
         emotion = str(p.get("emotion", "neutral"))
-        
+
+        log.info("cmd_generate_cartesia_tts: text=%s emotion=%s", text[:50], emotion)
+
         # Save to controller static folder
         static_dir = Path("../controller/static/tts-samples")
         static_dir.mkdir(parents=True, exist_ok=True)
-        
+
         timestamp = int(time.time())
         filename = f"cartesia-{timestamp}.wav"
         output_path = static_dir / filename
-        
+
+        log.info("cmd_generate_cartesia_tts: output_path=%s", output_path)
+
         # Use Cartesia API directly via HTTP (like working scripts)
         if not tts.voice_id:
+            log.error("cmd_generate_cartesia_tts: CARTESIA_VOICE_ID not set")
             raise RuntimeError("CARTESIA_VOICE_ID not set")
-        
+
+        log.info("cmd_generate_cartesia_tts: acquiring slot from pool")
         slot = await tts.pool.acquire()
+        log.info("cmd_generate_cartesia_tts: acquired slot key_preview=%s", slot.preview())
+
         safe_emotion = emotion if emotion in tts.VALID_EMOTIONS else "neutral"
-        
+
         try:
             # Use HTTP API directly (same as scripts/voice/tts_lib.py)
             payload = {
@@ -415,42 +438,60 @@ async def main() -> NoReturn:
                     "emotion": safe_emotion
                 }
             }
-            
+
             headers = {
                 "Cartesia-Version": "2026-03-01",
                 "X-API-Key": slot.key,
                 "Content-Type": "application/json"
             }
-            
+
+            log.info("cmd_generate_cartesia_tts: calling Cartesia API")
             async with httpx.AsyncClient(timeout=60) as client:
                 response = await client.post(
                     "https://api.cartesia.ai/tts/bytes",
                     headers=headers,
                     json=payload
                 )
-                
+
+                log.info("cmd_generate_cartesia_tts: API response status=%d", response.status_code)
+
                 if response.status_code != 200:
-                    raise RuntimeError(f"HTTP {response.status_code}: {response.text[:200]}")
-                
+                    # FIX: Mark slot exhausted kalau quota/auth error
+                    error_text = response.text[:200]
+                    log.error("cmd_generate_cartesia_tts: API error status=%d text=%s", response.status_code, error_text)
+                    if response.status_code in (401, 402, 429):
+                        await tts.pool.mark_exhausted(slot)
+                        log.warning("Cartesia key %s exhausted (HTTP %d)", slot.preview(), response.status_code)
+                    raise RuntimeError(f"HTTP {response.status_code}: {error_text}")
+
                 audio_bytes = response.content
-                
+                log.info("cmd_generate_cartesia_tts: received %d bytes", len(audio_bytes))
+
                 # Save audio bytes to file
                 output_path.write_bytes(audio_bytes)
-                
+                log.info("cmd_generate_cartesia_tts: file saved to %s", output_path)
+
                 # Calculate metadata
                 file_size_kb = len(audio_bytes) / 1024
                 # Estimate duration: 44100 Hz, 32-bit float (4 bytes), mono
                 duration_s = len(audio_bytes) / (44100 * 4)
-                
-                return {
+
+                result = {
                     "file_path": f"/tts-samples/{filename}",
                     "duration_s": round(duration_s, 2),
                     "file_size_kb": round(file_size_kb, 1),
                     "emotion": safe_emotion,
                     "key_preview": slot.preview(),
                 }
+                log.info("cmd_generate_cartesia_tts SUCCESS: result=%s", result)
+                return result
         except Exception as e:
-            log.error("Cartesia TTS generation failed: %s", e)
+            # FIX: Mark exhausted kalau error message contains quota/auth keywords
+            msg = str(e).lower()
+            if any(tok in msg for tok in ("429", "quota", "insufficient", "402", "unauthorized", "401")):
+                await tts.pool.mark_exhausted(slot)
+                log.warning("Cartesia key %s exhausted (%s)", slot.preview(), e)
+            log.error("cmd_generate_cartesia_tts EXCEPTION: %s", e, exc_info=True)
             raise RuntimeError(f"Cartesia TTS failed: {e}")
 
 
@@ -743,24 +784,24 @@ async def main() -> NoReturn:
         """Approve a reply suggestion — send to TTS and broadcast reply.sent."""
         suggestion_id = str(p.get("suggestion_id", "")).strip()
         variant = int(p.get("variant", 0))
-        
+
         if not suggestion_id:
             raise RuntimeError("suggestion_id required")
-        
+
         sug = _pending_suggestions.pop(suggestion_id, None)
         if not sug:
             raise RuntimeError(f"suggestion {suggestion_id} not found")
-        
+
         if not (0 <= variant < len(sug["replies"])):
             raise RuntimeError(f"invalid variant {variant}")
-        
+
         reply_text = sug["replies"][variant]
         user = sug["user"]
         comment_text = sug["comment_text"]
-        
+
         t0 = time.monotonic()
         tts_engine = "skipped"
-        
+
         if not _flags["REPLY_ENABLED"]:
             log.info("[REPLY_DISABLED] Would reply to %s: %r", user, reply_text)
         elif _flags["DRY_RUN"]:
@@ -780,11 +821,11 @@ async def main() -> NoReturn:
                     "user": user,
                     "detail": str(e)[:300],
                 })
-        
+
         latency_ms = int((time.monotonic() - t0) * 1000)
         state.replies += 1
         state.record_latency(latency_ms)
-        
+
         await ws.broadcast({
             "type": "reply.sent",
             "ts": time.time(),
@@ -796,7 +837,7 @@ async def main() -> NoReturn:
             "tts": tts_engine,
             "latency_ms": latency_ms,
         })
-        
+
         return {"ok": True, "reply": reply_text, "user": user}
 
     async def _speak_reply(text: str) -> None:
@@ -817,24 +858,24 @@ async def main() -> NoReturn:
         import uuid
         suggestion_id = str(p.get("suggestion_id", "")).strip()
         hint = str(p.get("hint", "")).strip()
-        
+
         if not suggestion_id or suggestion_id not in _pending_suggestions:
             raise RuntimeError("suggestion_id not found")
-        
+
         sug = _pending_suggestions[suggestion_id]
         text = sug["comment_text"]
         intent = sug["intent"]
         user = sug["user"]
-        
+
         # For now, ignore hint and just regenerate
         # TODO: incorporate hint into LLM prompt
         current_product = live_director.get_state().get("product", "PALOMA")
         result = await suggester.handle(text, intent, product=current_product, user=user)
-        
+
         # Update existing suggestion
         sug["replies"] = result["replies"]
         sug["source"] = result["source"]
-        
+
         await ws.broadcast({
             "type": "reply.suggestion",
             "ts": time.time(),
@@ -846,7 +887,7 @@ async def main() -> NoReturn:
             "replies": result["replies"],
             "source": result["source"],
         })
-        
+
         return {
             "ok": True,
             "suggestion_id": suggestion_id,
@@ -1016,11 +1057,11 @@ async def main() -> NoReturn:
             import uuid
             comment_id = f"c_{uuid.uuid4().hex[:8]}"
             suggestion_id = f"s_{uuid.uuid4().hex[:8]}"
-            
+
             try:
                 current_product = live_director.get_state().get("product", "PALOMA")
                 result = await suggester.handle(ev.text, intent.name, product=current_product, user=ev.user)
-                
+
                 _pending_suggestions[suggestion_id] = {
                     "user": ev.user,
                     "comment_id": comment_id,
@@ -1029,7 +1070,7 @@ async def main() -> NoReturn:
                     "replies": result["replies"],
                     "source": result["source"],
                 }
-                
+
                 await ws.broadcast({
                     "type": "reply.suggestion",
                     "ts": time.time(),
@@ -1111,6 +1152,9 @@ async def main() -> NoReturn:
                 "reply_enabled": _flags["REPLY_ENABLED"],
                 "dry_run": _flags["DRY_RUN"],
                 "cartesia_pool": tts.pool.stats() if tts else [],
+                "cartesia_voice_id": tts.voice_id if tts else "",
+                "cartesia_model": tts.model_id if tts else "sonic-3",
+                "cartesia_default_emotion": tts.default_emotion if tts else "neutral",
                 "llm_models": llm.get_model_list(),
                 "tiktok_username": tt_supervisor.current_username,
                 "tiktok_running": tt_supervisor.is_running(),
